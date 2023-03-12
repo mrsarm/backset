@@ -1,18 +1,7 @@
-use actix_web::{post, web, HttpResponse, Responder, error, Error};
-use serde::{Deserialize, Serialize};
-//use serde_json::json;
+use actix_web::{error, Error, HttpResponse, post, Responder, web};
+use serde::Deserialize;
 use crate::AppState;
-
-#[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
-pub struct Tenant {
-    pub id: i64,
-    pub name: String,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-pub struct TenantForm {
-    pub name: String,
-}
+use crate::tenants::model::{Tenant, TenantForm};
 
 //TODO better catch serialization errors, and errors in general
 #[post("")]
@@ -20,14 +9,9 @@ async fn create(
     app: web::Data<AppState>,
     tenant_form: web::Json<TenantForm>,
 ) -> Result<impl Responder, Error> {
-    let tenant = sqlx::query_as!(
-        Tenant,
-        "INSERT INTO tenants (name) VALUES ($1) RETURNING *",
-        tenant_form.name
-    )
-    .fetch_one(&app.db)
-    .await
-    .map_err(error::ErrorInternalServerError)?;
+    let tenant = Tenant::insert(&app.pool, tenant_form.0)
+        .await
+        .map_err(error::ErrorInternalServerError)?;
 
     Ok(HttpResponse::Created().json(tenant))
 }
@@ -38,7 +22,7 @@ async fn create(
 //     app: web::Data<AppState>,
 // ) -> impl Responder {
 //     let ids = sqlx::query!("SELECT id FROM tenants")
-//         .fetch(&app.db)
+//         .fetch(&app.pool)
 //         .map_ok(|record| record.id)
 //         .try_collect::<Vec<_>>()
 //         .await?;
@@ -51,7 +35,7 @@ async fn create(
 //     id: i64
 // ) -> Option<Json<Tenant>> {
 //     sqlx::query!("SELECT id, name FROM tenants WHERE id = ?", id)
-//         .fetch_one(&app.db)
+//         .fetch_one(&app.pool)
 //         .map_ok(|r| Json(Tenant { id: Some(r.id), name: r.name }))
 //         .await
 //         .ok()

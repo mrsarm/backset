@@ -13,7 +13,7 @@ use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use tenants::{api as tenants_api};
 
 pub struct AppState {
-    db: Pool<Postgres>,
+    pool: Pool<Postgres>,
     env: Config,
 }
 
@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()> {
             .allowed_headers(vec![header::CONTENT_TYPE, header::ACCEPT]);
         App::new()
             .app_data(web::Data::new(AppState {
-                db: pool.clone(),
+                pool: pool.clone(),
                 env: config.clone(),
             }))
             .configure(health::config)
