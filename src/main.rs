@@ -10,6 +10,8 @@ use dotenv::dotenv;
 use log::{error, info};
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 
+use tenants::{api as tenants_api};
+
 pub struct AppState {
     db: Pool<Postgres>,
     env: Config,
@@ -50,7 +52,7 @@ async fn main() -> std::io::Result<()> {
                 env: config.clone(),
             }))
             .configure(health::config)
-            .configure(tenants::config)
+            .configure(tenants_api::config)
             .wrap(cors)
             .wrap(Logger::default())
     })
