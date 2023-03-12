@@ -1,4 +1,4 @@
-use actix_web::{post, web, HttpResponse, Responder};
+use actix_web::{post, web, HttpResponse, Responder, error, Error};
 use serde::{Deserialize, Serialize};
 //use serde_json::json;
 use crate::AppState;
@@ -17,33 +17,28 @@ pub struct TenantForm {
 //TODO better catch serialization errors, and errors in general
 #[post("")]
 async fn create(
+    app: web::Data<AppState>,
     tenant_form: web::Json<TenantForm>,
-    data: web::Data<AppState>,
-) -> impl Responder {
-    let query_result = sqlx::query_as!(
+) -> Result<impl Responder, Error> {
+    let tenant = sqlx::query_as!(
         Tenant,
         "INSERT INTO tenants (name) VALUES ($1) RETURNING *",
         tenant_form.name
     )
-    .fetch_one(&data.db)
-    .await;
+    .fetch_one(&app.db)
+    .await
+    .map_err(error::ErrorInternalServerError)?;
 
-    match query_result {
-        Ok(tenant) => HttpResponse::Created().json(tenant),
-        // TODO better error handling, return Result instead
-        Err(e) =>
-            HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "error","message": format!("{:?}", e)}))
-    }
+    Ok(HttpResponse::Created().json(tenant))
 }
 
 // TODO migration in process
 // #[get("")]
 // async fn list(
-//     data: web::Data<AppState>,
+//     app: web::Data<AppState>,
 // ) -> impl Responder {
 //     let ids = sqlx::query!("SELECT id FROM tenants")
-//         .fetch(&data.db)
+//         .fetch(&app.db)
 //         .map_ok(|record| record.id)
 //         .try_collect::<Vec<_>>()
 //         .await?;
@@ -51,9 +46,12 @@ async fn create(
 // }
 //
 // #[get("/<id>")]
-// async fn read(mut db: Connection<Db>, id: i64) -> Option<Json<Tenant>> {
+// async fn read(
+//     app: web::Data<AppState>,
+//     id: i64
+// ) -> Option<Json<Tenant>> {
 //     sqlx::query!("SELECT id, name FROM tenants WHERE id = ?", id)
-//         .fetch_one(&mut *db)
+//         .fetch_one(&app.db)
 //         .map_ok(|r| Json(Tenant { id: Some(r.id), name: r.name }))
 //         .await
 //         .ok()
