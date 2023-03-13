@@ -1,19 +1,39 @@
-use actix_web::{error, Error, HttpResponse, post, Responder, web};
-use serde::Deserialize;
+use actix_web::{HttpResponse, get, post, web};
 use crate::AppState;
+use crate::errors::BacksetError;
 use crate::tenants::model::{Tenant, TenantForm};
 
-//TODO better catch serialization errors, and errors in general
 #[post("")]
 async fn create(
     app: web::Data<AppState>,
     tenant_form: web::Json<TenantForm>,
-) -> Result<impl Responder, Error> {
-    let tenant = Tenant::insert(&app.pool, tenant_form.0)
-        .await
-        .map_err(error::ErrorInternalServerError)?;
+) -> Result<HttpResponse, BacksetError> {
+    let mut tx = app.pool.begin().await.map_err(BacksetError::PGError)?;
 
+    let tenant = Tenant::insert(&mut tx, tenant_form.0)
+        .await
+        .map_err(BacksetError::PGError)?;
+
+    tx.commit().await.map_err(BacksetError::PGError)?;
     Ok(HttpResponse::Created().json(tenant))
+}
+
+#[get("{id}")]
+async fn read(
+    app: web::Data<AppState>,
+    id: web::Path<i64>,
+) -> Result<HttpResponse, BacksetError> {
+    let mut tx = app.pool.begin().await.map_err(BacksetError::PGError)?;
+
+    let tenant = Tenant::get(&mut tx, id.into_inner())
+        .await
+        .map_err(BacksetError::PGError)?;
+
+    tx.commit().await.map_err(BacksetError::PGError)?;
+    match tenant {
+        Some(t) => Ok(HttpResponse::Ok().json(t)),
+        None => Ok(HttpResponse::NotFound().finish()),
+    }
 }
 
 // TODO migration in process
@@ -28,19 +48,7 @@ async fn create(
 //         .await?;
 //     Ok(Json(ids))
 // }
-//
-// #[get("/<id>")]
-// async fn read(
-//     app: web::Data<AppState>,
-//     id: i64
-// ) -> Option<Json<Tenant>> {
-//     sqlx::query!("SELECT id, name FROM tenants WHERE id = ?", id)
-//         .fetch_one(&app.pool)
-//         .map_ok(|r| Json(Tenant { id: Some(r.id), name: r.name }))
-//         .await
-//         .ok()
-// }
-//
+
 // #[delete("/<id>")]
 // async fn delete(mut db: Connection<Db>, id: i64) -> Result<Option<()>> {
 //     let result = sqlx::query!("DELETE FROM tenants WHERE id = ?", id)
@@ -56,6 +64,8 @@ async fn create(
 // }
 
 pub fn config(conf: &mut web::ServiceConfig) {
-    let scope = web::scope("/tenants").service(create);
+    let scope = web::scope("/tenants")
+        .service(create)
+        .service(read);
     conf.service(scope);
 }

@@ -1,5 +1,5 @@
+use sqlx::{Postgres, Transaction};
 use serde::{Deserialize, Serialize};
-use sqlx::{Pool, Postgres};
 
 #[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
 pub struct Tenant {
@@ -7,7 +7,7 @@ pub struct Tenant {
     pub name: String,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize)]
 pub struct TenantForm {
     pub name: String,
 }
@@ -15,7 +15,7 @@ pub struct TenantForm {
 
 impl Tenant {
     pub async fn insert(
-        pool: &Pool<Postgres>,
+        tx: &mut Transaction<'_, Postgres>,
         tenant_form: TenantForm,
     ) -> Result<Tenant, sqlx::Error> {
         let tenant = sqlx::query_as!(
@@ -23,7 +23,20 @@ impl Tenant {
             "INSERT INTO tenants (name) VALUES ($1) RETURNING *",
             tenant_form.name
         )
-        .fetch_one(pool)
+        .fetch_one(tx)
+        .await?;
+        Ok(tenant)
+    }
+
+    pub async fn get(
+        tx: &mut Transaction<'_, Postgres>,
+        id: i64
+    ) -> Result<Option<Tenant>, sqlx::Error> {
+        let tenant = sqlx::query_as!(
+            Tenant,
+            "SELECT id, name FROM tenants WHERE id = $1", id
+        )
+        .fetch_optional(tx)
         .await?;
         Ok(tenant)
     }

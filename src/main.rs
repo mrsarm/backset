@@ -1,4 +1,5 @@
 mod config;
+mod errors;
 mod health;
 mod tenants;
 
@@ -7,13 +8,14 @@ use actix_web::middleware::Logger;
 use actix_web::{http::header, web, App, HttpServer};
 use config::Config;
 use dotenv::dotenv;
+use errors::json_error_handler;
 use log::{error, info};
-use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
+use sqlx::{postgres::PgPoolOptions, PgPool};
 
 use tenants::{api as tenants_api};
 
 pub struct AppState {
-    pool: Pool<Postgres>,
+    pool: PgPool,
     env: Config,
 }
 
@@ -51,6 +53,7 @@ async fn main() -> std::io::Result<()> {
                 pool: pool.clone(),
                 env: config.clone(),
             }))
+            .app_data(web::JsonConfig::default().error_handler(json_error_handler))
             .configure(health::config)
             .configure(tenants_api::config)
             .wrap(cors)
