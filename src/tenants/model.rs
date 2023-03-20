@@ -24,7 +24,7 @@ impl Tenant {
             tenant_form.name
         )
         .fetch_one(tx)
-        .await?;
+        .await?;    // TODO transform here to BacksetError::PGError
         Ok(tenant)
     }
 
@@ -37,7 +37,7 @@ impl Tenant {
             "SELECT id, name FROM tenants WHERE id = $1", id
         )
         .fetch_optional(tx)
-        .await?;
+        .await?;    // TODO transform here to BacksetError::PGError
         Ok(tenant)
     }
 }

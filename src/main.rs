@@ -1,3 +1,4 @@
+mod app_state;
 mod config;
 mod errors;
 mod health;
@@ -6,42 +7,21 @@ mod tenants;
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{http::header, web, App, HttpServer};
+use app_state::AppState;
 use config::Config;
 use dotenv::dotenv;
 use errors::json_error_handler;
-use log::{error, info};
-use sqlx::{postgres::PgPoolOptions, PgPool};
-
+use log::info;
 use tenants::{api as tenants_api};
-
-pub struct AppState {
-    pool: PgPool,
-    env: Config,
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
     env_logger::init();
+    info!("🚀 Starting Backset server ...");
 
     let config = Config::init();
-
-    let pool = match PgPoolOptions::new()
-        .max_connections(10)
-        .connect(&config.database_url)
-        .await
-    {
-        Ok(pool) => {
-            info!("Connection to the database successful");
-            pool
-        }
-        Err(err) => {
-            error!("Failed to connect to the database: {:?}", err);
-            std::process::exit(2);
-        }
-    };
-
-    info!("🚀 Server started successfully");
+    let state = AppState::new(config).await;
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -49,10 +29,7 @@ async fn main() -> std::io::Result<()> {
             .allowed_methods(vec!["GET", "POST"])
             .allowed_headers(vec![header::CONTENT_TYPE, header::ACCEPT]);
         App::new()
-            .app_data(web::Data::new(AppState {
-                pool: pool.clone(),
-                env: config.clone(),
-            }))
+            .app_data(web::Data::new(state.clone()))
             .app_data(web::JsonConfig::default().error_handler(json_error_handler))
             .configure(health::config)
             .configure(tenants_api::config)

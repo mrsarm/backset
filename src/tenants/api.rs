@@ -8,11 +8,11 @@ async fn create(
     app: web::Data<AppState>,
     tenant_form: web::Json<TenantForm>,
 ) -> Result<HttpResponse, BacksetError> {
-    let mut tx = app.pool.begin().await.map_err(BacksetError::PGError)?;
+    let mut tx = app.get_tx().await?;
 
     let tenant = Tenant::insert(&mut tx, tenant_form.0)
         .await
-        .map_err(BacksetError::PGError)?;
+        .map_err(BacksetError::PGError)?;                                   // TODO this goes inside model layer
 
     tx.commit().await.map_err(BacksetError::PGError)?;
     Ok(HttpResponse::Created().json(tenant))
@@ -23,7 +23,7 @@ async fn read(
     app: web::Data<AppState>,
     id: web::Path<i64>,
 ) -> Result<HttpResponse, BacksetError> {
-    let mut tx = app.pool.begin().await.map_err(BacksetError::PGError)?;
+    let mut tx = app.get_tx().await?;
 
     let tenant = Tenant::get(&mut tx, id.into_inner())
         .await

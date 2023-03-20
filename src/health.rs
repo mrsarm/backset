@@ -1,6 +1,5 @@
 use actix_web::{get, web, HttpResponse, Responder};
 use serde_json::json;
-//use sqlx::Row;
 
 #[get("")]
 async fn health_check_handler() -> impl Responder {
