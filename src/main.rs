@@ -12,7 +12,7 @@ use config::Config;
 use dotenv::dotenv;
 use errors::json_error_handler;
 use log::info;
-use tenants::{api as tenants_api};
+use tenants::api as tenants_api;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

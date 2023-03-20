@@ -1,6 +1,6 @@
-use actix_web::{error, HttpRequest, HttpResponse, ResponseError};
 use actix_web::http::StatusCode;
-use anyhow;
+use actix_web::{error, HttpRequest, HttpResponse, ResponseError};
+use anyhow::Error;
 use serde::Serialize;
 use sqlx::Error as SqlxError;
 
@@ -15,7 +15,9 @@ impl JsonError {
             None => detail,
             Some((_, t2)) => t2,
         };
-        JsonError { error: String::from(text) }
+        JsonError {
+            error: String::from(text),
+        }
     }
 }
 
@@ -26,7 +28,7 @@ pub fn json_error_handler(err: error::JsonPayloadError, _req: &HttpRequest) -> e
     let resp = match &err {
         JsonPayloadError::ContentType => {
             HttpResponse::UnsupportedMediaType().json(JsonError::new(&detail))
-        },
+        }
         JsonPayloadError::Deserialize(json_err) if json_err.is_data() => {
             HttpResponse::UnprocessableEntity().json(JsonError::new(&detail))
         }
@@ -41,12 +43,11 @@ pub enum BacksetError {
     ValidationError(String),
 
     // TODO add more errors
-
     #[error(transparent)]
     PGError(#[from] SqlxError),
 
     #[error(transparent)]
-    UnexpectedError(#[from] anyhow::Error),
+    UnexpectedError(#[from] Error),
 }
 
 impl ResponseError for BacksetError {

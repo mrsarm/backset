@@ -1,7 +1,7 @@
-use actix_web::{HttpResponse, get, post, web};
-use crate::AppState;
 use crate::errors::BacksetError;
 use crate::tenants::model::{Tenant, TenantForm};
+use crate::AppState;
+use actix_web::{get, post, web, HttpResponse};
 
 #[post("")]
 async fn create(
@@ -12,7 +12,7 @@ async fn create(
 
     let tenant = Tenant::insert(&mut tx, tenant_form.0)
         .await
-        .map_err(BacksetError::PGError)?;                                   // TODO this goes inside model layer
+        .map_err(BacksetError::PGError)?; // TODO this goes inside model layer
 
     tx.commit().await.map_err(BacksetError::PGError)?;
     Ok(HttpResponse::Created().json(tenant))
@@ -64,8 +64,6 @@ async fn read(
 // }
 
 pub fn config(conf: &mut web::ServiceConfig) {
-    let scope = web::scope("/tenants")
-        .service(create)
-        .service(read);
+    let scope = web::scope("/tenants").service(create).service(read);
     conf.service(scope);
 }

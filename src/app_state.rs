@@ -1,8 +1,8 @@
-use log::{error, info};
-use sqlx::{PgPool, Postgres, Transaction};
-use sqlx::postgres::PgPoolOptions;
 use crate::config::Config;
 use crate::errors::BacksetError;
+use log::{error, info};
+use sqlx::postgres::PgPoolOptions;
+use sqlx::{PgPool, Postgres, Transaction};
 
 #[derive(Debug, Clone)]
 pub struct AppState {

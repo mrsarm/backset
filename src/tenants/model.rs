@@ -1,5 +1,5 @@
-use sqlx::{Postgres, Transaction};
 use serde::{Deserialize, Serialize};
+use sqlx::{Postgres, Transaction};
 
 #[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
 pub struct Tenant {
@@ -12,7 +12,6 @@ pub struct TenantForm {
     pub name: String,
 }
 
-
 impl Tenant {
     pub async fn insert(
         tx: &mut Transaction<'_, Postgres>,
@@ -24,13 +23,13 @@ impl Tenant {
             tenant_form.name
         )
         .fetch_one(tx)
-        .await?;    // TODO transform here to BacksetError::PGError
+        .await?; // TODO transform here to BacksetError::PGError
         Ok(tenant)
     }
 
     pub async fn get(
         tx: &mut Transaction<'_, Postgres>,
-        id: i64
+        id: i64,
     ) -> Result<Option<Tenant>, sqlx::Error> {
         let tenant = sqlx::query_as!(
             Tenant,
