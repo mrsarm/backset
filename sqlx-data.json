@@ -1,0 +1,55 @@
+{
+  "db": "PostgreSQL",
+  "06a6f12523e20a2b01b94f2bd05e9362e96c5c35d5a7092ec6628d2c171313aa": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      }
+    },
+    "query": "INSERT INTO tenants (name) VALUES ($1) RETURNING *"
+  },
+  "e8223fbeec3451a2ba42cbe3753cf29fd130d315962881d2103117d0cbe9ef51": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT id, name FROM tenants WHERE id = $1"
+  }
+}
