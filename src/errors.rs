@@ -44,7 +44,7 @@ pub enum BacksetError {
 
     // TODO add more errors
     #[error(transparent)]
-    PGError(#[from] SqlxError),
+    DBError(#[from] SqlxError),
 
     #[error(transparent)]
     UnexpectedError(#[from] Error),
@@ -54,7 +54,7 @@ impl ResponseError for BacksetError {
     fn status_code(&self) -> StatusCode {
         match self {
             BacksetError::ValidationError(_) => StatusCode::BAD_REQUEST,
-            BacksetError::PGError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            BacksetError::DBError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             BacksetError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }

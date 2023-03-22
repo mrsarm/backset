@@ -24,7 +24,7 @@ impl Tenant {
                 tenant_form.name)
             .fetch_one(tx)
             .await
-            .map_err(BacksetError::PGError)?;
+            .map_err(BacksetError::DBError)?;
         Ok(tenant)
     }
 
@@ -38,7 +38,7 @@ impl Tenant {
             )
             .fetch_optional(tx)
             .await
-            .map_err(BacksetError::PGError)?;
+            .map_err(BacksetError::DBError)?;
         Ok(tenant)
     }
 }

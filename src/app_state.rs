@@ -33,6 +33,6 @@ impl AppState {
     }
 
     pub async fn get_tx(&self) -> Result<Transaction<'static, Postgres>, BacksetError> {
-        Ok(self.pool.begin().await.map_err(BacksetError::PGError)?)
+        Ok(self.pool.begin().await.map_err(BacksetError::DBError)?)
     }
 }
