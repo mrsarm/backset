@@ -12,7 +12,7 @@ async fn create(
 
     let tenant = Tenant::insert(&mut tx, tenant_form.0).await?;
 
-    tx.commit().await.map_err(BacksetError::DBError)?;
+    app.commit_tx(tx).await?;
     Ok(HttpResponse::Created().json(tenant))
 }
 
@@ -25,7 +25,7 @@ async fn read(
 
     let tenant = Tenant::get(&mut tx, id.into_inner()).await?;
 
-    tx.commit().await.map_err(BacksetError::DBError)?;
+    app.commit_tx(tx).await?;
     match tenant {
         Some(t) => Ok(HttpResponse::Ok().json(t)),
         None => Ok(HttpResponse::NotFound().finish()),
