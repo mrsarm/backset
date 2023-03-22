@@ -10,9 +10,7 @@ async fn create(
 ) -> Result<HttpResponse, BacksetError> {
     let mut tx = app.get_tx().await?;
 
-    let tenant = Tenant::insert(&mut tx, tenant_form.0)
-        .await
-        .map_err(BacksetError::PGError)?; // TODO this goes inside model layer
+    let tenant = Tenant::insert(&mut tx, tenant_form.0).await?;
 
     tx.commit().await.map_err(BacksetError::PGError)?;
     Ok(HttpResponse::Created().json(tenant))
@@ -25,9 +23,7 @@ async fn read(
 ) -> Result<HttpResponse, BacksetError> {
     let mut tx = app.get_tx().await?;
 
-    let tenant = Tenant::get(&mut tx, id.into_inner())
-        .await
-        .map_err(BacksetError::PGError)?;
+    let tenant = Tenant::get(&mut tx, id.into_inner()).await?;
 
     tx.commit().await.map_err(BacksetError::PGError)?;
     match tenant {

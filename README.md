@@ -12,7 +12,7 @@ object belongs to.
 
 ### Requirements
 
-- Rust 1.67+ and Cargo (may work with older versions as well).
+- Rust 2021 edition and Cargo (tested with Rust 1.67+, may work with older versions as well).
 - Postgres or Docker and Docker Compose
 
 ### Migrations
