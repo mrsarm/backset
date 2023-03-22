@@ -124,26 +124,17 @@ content-type: application/json
 
 ## TO-DOs
 
-Missing, still not migrated from Rocket codebase:
+Missing, or still not migrated from Rocket codebase:
 
-- [ ] SQLx offline mode doesn't work
-- [ ] GET /tenants
-- [ ] DELETE /tenants/<id>
-- [-] Better error handling
-- [x] DB code should be moved to a "db" module
-  - [x] Each method should receive a transaction conn object,
-        instead of the pool/connection object
-
-Entities
-
-- [-] Tenants
-  - [ ] Full endpoints
-- [ ] Elements
-- [ ] Sets
+- [ ] Tenants endpoints
+  - [x] GET /tenants/{id}, POST /tenants
+  - [ ] GET /tenants
+  - [ ] DELETE /tenants/{id}
+- [ ] "/elements" model and endpoints
+- [ ] "/sets" model and endpoints
 
 More stuff to add:
 
-- [x] Better configuration management
 - [ ] Startup should not fail if DB is not available
 - [ ] Random PKs
 - [ ] Tests
