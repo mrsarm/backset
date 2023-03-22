@@ -6,7 +6,17 @@ use sqlx::{PgPool, Postgres, Transaction};
 
 
 /// Struct that holds the app configurations
-/// and the connection pool to the database
+/// and the connection pool to the database.
+/// Each API method should receive an AppState
+/// argument as following:
+///
+/// ```
+/// #[post("...")]
+/// async fn method_name(
+///     app: web::Data<AppState>,
+///     ...
+/// ) -> Result<HttpResponse, ...> {
+/// ```
 #[derive(Debug, Clone)]
 pub struct AppState {
     pub pool: PgPool,
@@ -15,7 +25,9 @@ pub struct AppState {
 
 impl AppState {
     /// Receive the configuration and initialize
-    /// the app state, like the pool connection to the DB
+    /// the app state, like the pool connection to the DB.
+    /// This method normally is used once at startup time
+    /// by the web framework (Actix).
     pub async fn new(config: Config) -> AppState {
         let pool = match PgPoolOptions::new()
             .max_connections(config.max_connections)
