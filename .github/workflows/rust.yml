@@ -1,11 +1,6 @@
 name: Rust
 
-on:
-  push:
-    branches: master
-  pull_request:
-    paths-ignore:
-      - '**.md'
+on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
