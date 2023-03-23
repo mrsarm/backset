@@ -127,7 +127,8 @@ content-type: application/json
 Missing, or still not migrated from Rocket codebase:
 
 - [ ] Tenants endpoints
-  - [x] GET /tenants/{id}, POST /tenants
+  - [x] GET /tenants/{id}
+  - [x] POST /tenants
   - [ ] GET /tenants
   - [ ] DELETE /tenants/{id}
 - [ ] "/elements" model and endpoints
@@ -135,7 +136,9 @@ Missing, or still not migrated from Rocket codebase:
 
 More stuff to add:
 
-- [ ] Startup should not fail if DB is not available
+- [ ] Some DB setups has to be configured with envs
+- [ ] Serialize HTTP 500 responses with generic JSON errors
+      and log errors with ERROR severity, e.g. DB connection errors 
 - [ ] Random PKs
 - [ ] Tests
 - [ ] Docker image

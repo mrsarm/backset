@@ -3,6 +3,7 @@ use crate::errors::BacksetError;
 use log::{error, info};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{PgPool, Postgres, Transaction};
+use std::time::Duration;
 
 
 /// Struct that holds the app configurations
@@ -29,16 +30,14 @@ impl AppState {
     /// This method normally is used once at startup time
     /// by the web framework (Actix).
     pub async fn new(config: Config) -> AppState {
-        let pool = match PgPoolOptions::new()
-            .max_connections(config.max_connections)
-            .connect(&config.database_url)
-            .await
-        {
+        let pool = match Self::_get_pool(&config) {
             Ok(pool) => {
-                info!("Connection to the database successful");
+                // The connection is lazy, so not sure whether the connection will work
+                info!("Connection to the database looks good");
                 pool
             }
             Err(err) => {
+                // Errors like wrongly parsed URLs arrive here
                 error!("Failed to connect to the database: {:?}", err);
                 std::process::exit(2);
             }
@@ -73,5 +72,17 @@ impl AppState {
     ) -> Result<(), BacksetError> {
         tx.rollback().await.map_err(BacksetError::DBError)?;
         Ok(())
+    }
+
+    fn _get_pool(config: &Config) -> Result<PgPool, BacksetError> {
+        let pool = PgPoolOptions::new()
+            .max_connections(config.max_connections)
+            .min_connections(1)                         // TODO makes this configurable
+            .acquire_timeout(Duration::from_secs(2))    //      idem
+            .idle_timeout(Duration::from_secs(2))       //      idem
+            .test_before_acquire(false)                 //      idem
+            .connect_lazy(&config.database_url)
+            .map_err(BacksetError::DBError);
+        pool
     }
 }
