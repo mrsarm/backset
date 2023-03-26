@@ -1,40 +1,48 @@
+use std::collections::HashMap;
 use actix_web::http::StatusCode;
-use actix_web::{error, HttpRequest, HttpResponse, ResponseError};
-use anyhow::Error;
+use actix_web::{HttpRequest, HttpResponse, ResponseError};
+use actix_web::error::InternalError;
+use actix_web_validator::Error;
 use serde::Serialize;
 use sqlx::Error as SqlxError;
+use validator::{ValidationErrors, ValidationErrorsKind};
 
 #[derive(Debug, Serialize)]
-pub struct JsonError {
+pub struct ValidationErrorPayload {
     pub error: String,
+    pub field_errors: Option<HashMap<&'static str, ValidationErrorsKind>>,
 }
 
-impl JsonError {
-    pub fn new(detail: &str) -> Self {
-        let text = match detail.rsplit_once("Json deserialize error: ") {
-            None => detail,
-            Some((_, t2)) => t2,
-        };
-        JsonError {
-            error: String::from(text),
+impl ValidationErrorPayload {
+    pub fn new(detail: String) -> Self {
+        ValidationErrorPayload {
+            error: detail,
+            field_errors: None,
         }
     }
 }
 
-pub fn json_error_handler(err: error::JsonPayloadError, _req: &HttpRequest) -> error::Error {
-    use actix_web::error::JsonPayloadError;
+impl From<&ValidationErrors> for ValidationErrorPayload {
+    fn from(error: &ValidationErrors) -> Self {
+        ValidationErrorPayload {
+            error: "Validation error".to_owned(),
+            field_errors: Some(error.clone().into_errors()),
+        }
+    }
+}
 
-    let detail = err.to_string();
-    let resp = match &err {
-        JsonPayloadError::ContentType => {
-            HttpResponse::UnsupportedMediaType().json(JsonError::new(&detail))
-        }
-        JsonPayloadError::Deserialize(json_err) if json_err.is_data() => {
-            HttpResponse::UnprocessableEntity().json(JsonError::new(&detail))
-        }
-        _ => HttpResponse::BadRequest().body(detail),
+pub fn json_error_handler(err: Error, _req: &HttpRequest) -> actix_web::error::Error {
+    let json_error = match &err {
+        Error::Validate(error) =>
+            HttpResponse::BadRequest().json(ValidationErrorPayload::from(error)),
+        Error::JsonPayloadError(error) =>
+            HttpResponse::UnprocessableEntity()
+                .json(ValidationErrorPayload::new(error.to_string())),
+        _ =>
+            HttpResponse::BadRequest()
+                .json(ValidationErrorPayload::new(err.to_string())),
     };
-    error::InternalError::from_response(err, resp).into()
+    InternalError::from_response(err, json_error).into()
 }
 
 #[derive(thiserror::Error, Debug)]

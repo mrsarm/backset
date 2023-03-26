@@ -1,12 +1,13 @@
 use crate::errors::BacksetError;
-use crate::tenants::model::{Tenant, TenantForm};
+use crate::tenants::model::{Tenant, TenantPayload};
 use crate::AppState;
 use actix_web::{get, post, web, HttpResponse};
+use actix_web_validator::Json;
 
 #[post("")]
 async fn create(
     app: web::Data<AppState>,
-    tenant_form: web::Json<TenantForm>,
+    tenant_form: Json<TenantPayload>,
 ) -> Result<HttpResponse, BacksetError> {
     let mut tx = app.get_tx().await?;
 

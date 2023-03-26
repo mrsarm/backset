@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use sqlx::{Postgres, Transaction};
+use validator::Validate;
 use crate::errors::BacksetError;
 
 #[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
@@ -8,15 +9,16 @@ pub struct Tenant {
     pub name: String,
 }
 
-#[derive(Deserialize)]
-pub struct TenantForm {
+#[derive(Deserialize, Validate)]
+pub struct TenantPayload {
+    #[validate(length(min = 3))]
     pub name: String,
 }
 
 impl Tenant {
     pub async fn insert(
         tx: &mut Transaction<'_, Postgres>,
-        tenant_form: TenantForm,
+        tenant_form: TenantPayload,
     ) -> Result<Tenant, BacksetError> {
         let tenant = sqlx::query_as!(
                 Tenant,

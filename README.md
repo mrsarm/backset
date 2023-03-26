@@ -136,6 +136,7 @@ Missing, or still not migrated from Rocket codebase:
 
 More stuff to add:
 
+- [x] Input validations
 - [ ] Some DB setups has to be configured with envs
 - [ ] Serialize HTTP 500 responses with generic JSON errors
       and log errors with ERROR severity, e.g. DB connection errors 

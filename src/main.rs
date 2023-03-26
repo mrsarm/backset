@@ -7,6 +7,7 @@ mod tenants;
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{http::header, web, App, HttpServer};
+use actix_web_validator::JsonConfig;
 use app_state::AppState;
 use config::Config;
 use dotenv::dotenv;
@@ -30,7 +31,7 @@ async fn main() -> std::io::Result<()> {
             .allowed_headers(vec![header::CONTENT_TYPE, header::ACCEPT]);
         App::new()
             .app_data(web::Data::new(state.clone()))
-            .app_data(web::JsonConfig::default().error_handler(json_error_handler))
+            .app_data(JsonConfig::default().error_handler(json_error_handler))
             .configure(health::config)
             .configure(tenants_api::config)
             .wrap(cors)
