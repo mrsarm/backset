@@ -51,7 +51,7 @@ impl AppState {
     /// Get a Transaction object to be used to transact with the DB.
     /// Once used #commit_tx() should be used to release the TX.
     pub async fn get_tx(&self) -> Result<Transaction<'static, Postgres>, BacksetError> {
-        Ok(self.pool.begin().await.map_err(BacksetError::DB)?)
+        self.pool.begin().await.map_err(BacksetError::DB)
     }
 
     /// Commit the transaction passed.
