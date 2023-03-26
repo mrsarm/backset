@@ -7,6 +7,17 @@ All objects are stored within a "tenant", and the tenant id is at
 the beginning of all request URIs to identify to which tenant the
 object belongs to.
 
+## Features
+
+- Rest API
+- SQLx with Postgres
+- SQL Migrations
+- Error management
+- Configuration through environment variables
+- Logging
+- CI pipeline with GitHub Actions
+- Model driven design
+
 
 ## Installation & Getting Started
 
@@ -138,8 +149,6 @@ More stuff to add:
 
 - [x] Input validations
 - [ ] Some DB setups has to be configured with envs
-- [ ] Serialize HTTP 500 responses with generic JSON errors
-      and log errors with ERROR severity, e.g. DB connection errors 
 - [ ] Random PKs
 - [ ] Tests
 - [ ] Docker image
