@@ -44,7 +44,7 @@ impl AppState {
         };
         AppState {
             pool,
-            env: config.clone(),
+            env: config,
         }
     }
 
