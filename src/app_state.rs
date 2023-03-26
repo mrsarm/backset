@@ -51,7 +51,7 @@ impl AppState {
     /// Get a Transaction object to be used to transact with the DB.
     /// Once used #commit_tx() should be used to release the TX.
     pub async fn get_tx(&self) -> Result<Transaction<'static, Postgres>, BacksetError> {
-        Ok(self.pool.begin().await.map_err(BacksetError::DBError)?)
+        Ok(self.pool.begin().await.map_err(BacksetError::DB)?)
     }
 
     /// Commit the transaction passed.
@@ -59,7 +59,7 @@ impl AppState {
         &self, tx:
         Transaction<'static, Postgres>
     ) -> Result<(), BacksetError> {
-        tx.commit().await.map_err(BacksetError::DBError)?;
+        tx.commit().await.map_err(BacksetError::DB)?;
         Ok(())
     }
 
@@ -70,19 +70,18 @@ impl AppState {
         &self,
         tx: Transaction<'static, Postgres>
     ) -> Result<(), BacksetError> {
-        tx.rollback().await.map_err(BacksetError::DBError)?;
+        tx.rollback().await.map_err(BacksetError::DB)?;
         Ok(())
     }
 
     fn _get_pool(config: &Config) -> Result<PgPool, BacksetError> {
-        let pool = PgPoolOptions::new()
+        PgPoolOptions::new()
             .max_connections(config.max_connections)
             .min_connections(1)                         // TODO makes this configurable
             .acquire_timeout(Duration::from_secs(2))    //      idem
             .idle_timeout(Duration::from_secs(2))       //      idem
             .test_before_acquire(false)                 //      idem
             .connect_lazy(&config.database_url)
-            .map_err(BacksetError::DBError);
-        pool
+            .map_err(BacksetError::DB)
     }
 }

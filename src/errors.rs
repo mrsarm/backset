@@ -40,22 +40,22 @@ pub fn json_error_handler(err: error::JsonPayloadError, _req: &HttpRequest) -> e
 #[derive(thiserror::Error, Debug)]
 pub enum BacksetError {
     #[error("{0}")]
-    ValidationError(String),
+    Validation(String),
 
     // TODO add more errors
     #[error(transparent)]
-    DBError(#[from] SqlxError),
+    DB(#[from] SqlxError),
 
     #[error(transparent)]
-    UnexpectedError(#[from] Error),
+    Unexpected(#[from] Error),
 }
 
 impl ResponseError for BacksetError {
     fn status_code(&self) -> StatusCode {
         match self {
-            BacksetError::ValidationError(_) => StatusCode::BAD_REQUEST,
-            BacksetError::DBError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            BacksetError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            BacksetError::Validation(_) => StatusCode::BAD_REQUEST,
+            BacksetError::DB(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            BacksetError::Unexpected(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
