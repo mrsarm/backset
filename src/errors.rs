@@ -5,7 +5,14 @@ use actix_web::error::InternalError;
 use actix_web_validator::Error;
 use serde::Serialize;
 use sqlx::Error as SqlxError;
+use log::{error, debug};
 use validator::{ValidationErrors, ValidationErrorsKind};
+
+
+#[derive(Debug, Serialize)]
+pub struct InternalErrorPayload {
+    pub error: &'static str,
+}
 
 #[derive(Debug, Serialize)]
 pub struct ValidationErrorPayload {
@@ -61,9 +68,21 @@ pub enum BacksetError {
 impl ResponseError for BacksetError {
     fn status_code(&self) -> StatusCode {
         match self {
-            BacksetError::Validation(_) => StatusCode::BAD_REQUEST,
-            BacksetError::DB(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            BacksetError::Unexpected(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Validation(_) => StatusCode::BAD_REQUEST,
+            Self::DB(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Unexpected(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        match self {
+            Self::Validation(e) => debug!("Validation error: {:?}", e),
+            _ => error!("Unexpected error: {:?}", self),
+        }
+        let status_code = self.status_code();
+        HttpResponse::build(status_code)
+            .json(InternalErrorPayload {
+                error: status_code.canonical_reason().unwrap_or("Unknown error")
+            })
     }
 }
