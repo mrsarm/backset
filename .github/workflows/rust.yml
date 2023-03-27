@@ -14,8 +14,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build
       run: SQLX_OFFLINE=true cargo build --verbose
-#    - name: Lint
-#      run: SQLX_OFFLINE=true cargo clippy -- -D warnings
+    - name: Lint
+      run: SQLX_OFFLINE=true cargo clippy -- -D warnings
 #    - name: Format Check
 #      run: SQLX_OFFLINE=true cargo fmt -- --check
 #    - name: Run tests

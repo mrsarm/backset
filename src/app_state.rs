@@ -66,6 +66,7 @@ impl AppState {
     /// Rollback the transaction passed.
     // TODO: should receive the error that caused the TX to be
     //       canceled, and "re-through" after rolling back
+    #[allow(dead_code)]
     pub async fn rollback_tx(
         &self,
         tx: Transaction<'static, Postgres>

@@ -55,6 +55,7 @@ pub fn json_error_handler(err: Error, _req: &HttpRequest) -> actix_web::error::E
 #[derive(thiserror::Error, Debug)]
 pub enum BacksetError {
     #[error("{0}")]
+    #[allow(dead_code)]
     Validation(String),
 
     // TODO add more errors
