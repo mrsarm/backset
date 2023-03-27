@@ -17,6 +17,7 @@ pub struct InternalErrorPayload {
 #[derive(Debug, Serialize)]
 pub struct ValidationErrorPayload {
     pub error: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub field_errors: Option<HashMap<&'static str, ValidationErrorsKind>>,
 }
 
