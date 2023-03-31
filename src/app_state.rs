@@ -3,7 +3,6 @@ use crate::errors::BacksetError;
 use log::{error, info};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{PgPool, Postgres, Transaction};
-use std::time::Duration;
 
 
 /// Struct that holds the app configurations
@@ -77,12 +76,12 @@ impl AppState {
 
     fn _get_pool(config: &Config) -> Result<PgPool, BacksetError> {
         PgPoolOptions::new()
-            .max_connections(config.max_connections)
-            .min_connections(1)                         // TODO makes this configurable
-            .acquire_timeout(Duration::from_secs(2))    //      idem
-            .idle_timeout(Duration::from_secs(2))       //      idem
-            .test_before_acquire(false)                 //      idem
-            .connect_lazy(&config.database_url)
+            .max_connections(config.db.max_connections)
+            .min_connections(config.db.min_connections)
+            .acquire_timeout(config.db.acquire_timeout)
+            .idle_timeout(config.db.idle_timeout)
+            .test_before_acquire(config.db.test_before_acquire)
+            .connect_lazy(&config.db.database_url)
             .map_err(BacksetError::DB)
     }
 }

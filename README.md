@@ -94,7 +94,7 @@ All the examples are provided with *HTTPie*.
 #### Health check
 
 ```shell
-http :8000/health
+http :8558/health
 HTTP/1.1 200 OK
 content-type: application/json
 ...
@@ -108,7 +108,7 @@ content-type: application/json
 #### POST /tenants
 
 ```shell
-http :8000/tenants --raw '{"name": "Tenant Name"}'
+http :8558/tenants --raw '{"name": "Tenant Name"}'
 HTTP/1.1 201 Created
 content-type: application/json
 ...
@@ -122,7 +122,7 @@ content-type: application/json
 #### GET /tenants/{id}
 
 ```shell
-http :8000/tenants/17
+http :8558/tenants/17
 HTTP/1.1 200 OK
 content-type: application/json
 ...
@@ -148,7 +148,6 @@ Missing, or still not migrated from Rocket codebase:
 More stuff to add:
 
 - [x] Input validations
-- [ ] Some DB setups has to be configured with envs
 - [ ] Random PKs
 - [ ] Tests
 - [ ] Docker image

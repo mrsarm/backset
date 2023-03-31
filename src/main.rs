@@ -22,6 +22,8 @@ async fn main() -> std::io::Result<()> {
     info!("🚀 Starting Backset server ...");
 
     let config = Config::init();
+    let port: u16 = config.port;
+    let addr = config.addr.clone();
     let state = AppState::new(config).await;
 
     HttpServer::new(move || {
@@ -37,7 +39,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .wrap(Logger::default())
     })
-    .bind(("127.0.0.1", 8000))?
+    .bind((addr, port))?
     .run()
     .await
 }
