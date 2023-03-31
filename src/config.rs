@@ -52,7 +52,7 @@ impl Config {
                 "1" => "true".to_owned(),
                 _ => v.to_lowercase(),
             })
-            .map(|v| v.parse::<bool>().expect(&(format!("{env_name} invalid boolean \"{v}\""))))
+            .map(|v| v.parse::<bool>().unwrap_or_else(|_| panic!("{env_name} invalid boolean \"{v}\"")))
             .unwrap_or(default_value)
     }
 
@@ -60,7 +60,7 @@ impl Config {
         where <A as FromStr>::Err: Debug
     {
         env::var(env_name)
-            .map(|v| v.parse::<A>().expect(&(format!("{env_name} invalid number \"{v}\""))))
+            .map(|v| v.parse::<A>().unwrap_or_else(|_| panic!("{env_name} invalid number \"{v}\"")))
             .unwrap_or(default_value)
     }
 }
