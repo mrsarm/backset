@@ -9,14 +9,15 @@ object belongs to.
 
 ## Features
 
-- Rest API
-- SQLx with Postgres
-- SQL Migrations
-- Error management
+- Rest API with Actix
+- Storage in Postgres with SQLx
+  - SQL migrations
 - Configuration through environment variables
 - Logging
 - CI pipeline with GitHub Actions
 - Model driven design
+- Good error management
+  - JSON validations with "validator" and "actix-web-validator" crates
 
 
 ## Installation & Getting Started
@@ -147,7 +148,6 @@ Missing, or still not migrated from Rocket codebase:
 
 More stuff to add:
 
-- [x] Input validations
 - [ ] Random PKs
 - [ ] Tests
 - [ ] Docker image
