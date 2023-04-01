@@ -1,6 +1,6 @@
 use crate::errors::BacksetError;
 use crate::tenants::model::{Tenant, TenantPayload};
-use crate::AppState;
+use crate::app_state::AppState;
 use actix_web::{get, post, web, HttpResponse};
 use actix_web_validator::Json;
 

@@ -4,8 +4,8 @@ use actix_web::{App, HttpServer, web};
 use actix_web::http::header;
 use actix_web::middleware::Logger;
 use actix_web_validator::JsonConfig;
-use crate::app_state::AppState;
 
+use crate::app_state::AppState;
 use crate::config::Config;
 use crate::errors::json_error_handler;
 use crate::health;
