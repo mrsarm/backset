@@ -1,8 +1,19 @@
+use dotenv::dotenv;
+use log::info;
 use std::env;
 use std::fmt::Debug;
 use std::str::FromStr;
 use std::time::Duration;
 
+/// `Config` is responsible of the configuration
+/// of the server, reading the settings from environment
+/// variables and .env file if exists, and configuring
+/// the logging system.
+///
+/// It does not setup anything related with the data layer
+/// other than the DB string connection, see the `app_state`
+/// module for that.
+/// The web layer configuration is configured by `app_server`.
 #[derive(Debug, Clone)]
 pub struct Config {
     // Add more config here
@@ -23,6 +34,9 @@ pub struct DbConfig {
 
 impl Config {
     pub fn init() -> Config {
+        dotenv().ok();  // read config from .env file if available
+        env_logger::init();
+        info!("⚙️ Configuring Backset server ...");
         let port = Self::_parse_num::<u16>("PORT", 8558);
         let addr = env::var("HOST").unwrap_or("127.0.0.1".to_owned());
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");

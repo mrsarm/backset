@@ -1,9 +1,9 @@
-use actix_cors::Cors;
 use actix_web::dev::Server;
-use actix_web::{App, HttpServer, web};
-use actix_web::http::header;
+use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
+use actix_web::web::{Data, ServiceConfig};
 use actix_web_validator::JsonConfig;
+use log::info;
 
 use crate::app_state::AppState;
 use crate::config::Config;
@@ -19,26 +19,29 @@ pub struct AppServer {
 
 impl AppServer {
     pub async fn build(config: Config) -> Result<Self, anyhow::Error> {
+        info!("🚀 Starting Backset server ...");
         let port: u16 = config.port;
         let addr = config.addr.clone();
         let state = AppState::new(config.clone()).await;
 
         let server = HttpServer::new(move || {
-            let cors = Cors::default()
-                //.allowed_origin("http://localhost:3000")
-                .allowed_methods(vec!["GET", "POST"])
-                .allowed_headers(vec![header::CONTENT_TYPE, header::ACCEPT]);
             App::new()
-                .app_data(web::Data::new(state.clone()))
-                .app_data(JsonConfig::default().error_handler(json_error_handler))
-                .configure(health::config)
-                .configure(tenants_api::config)
-                .wrap(cors)
+                .configure(Self::config_app(Data::new(state.clone())))
                 .wrap(Logger::default())
         })
         .bind((addr.clone(), port))?
         .run();
 
         Ok(AppServer { server, addr, port })
+    }
+
+    pub fn config_app(data: Data<AppState>) -> Box<dyn Fn(&mut ServiceConfig)> {
+        Box::new(move |conf: &mut ServiceConfig| {
+            conf
+                .app_data(data.clone())
+                .app_data(JsonConfig::default().error_handler(json_error_handler))
+                .configure(health::config)
+                .configure(tenants_api::config);
+        })
     }
 }
