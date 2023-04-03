@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build
-      run: SQLX_OFFLINE=true cargo build --verbose
+      run: SQLX_OFFLINE=true cargo build
     - name: Lint
       run: SQLX_OFFLINE=true cargo clippy -- -D warnings
 #    - name: Format Check
