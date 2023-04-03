@@ -4,6 +4,7 @@ use std::env;
 use std::fmt::Debug;
 use std::str::FromStr;
 use std::time::Duration;
+use strum_macros::EnumString;
 
 /// `Config` is responsible of the configuration
 /// of the server, reading the settings from environment
@@ -17,9 +18,19 @@ use std::time::Duration;
 #[derive(Debug, Clone)]
 pub struct Config {
     // Add more config here
+    pub env: Environment,
     pub port: u16,
     pub addr: String,
     pub db: DbConfig,
+}
+
+/// The possible runtime environment for our application.
+#[derive(Debug, PartialEq, EnumString, Clone)]
+#[strum(serialize_all = "snake_case")]
+pub enum Environment {
+    Local,
+    Test,
+    Production,
 }
 
 #[derive(Debug, Clone)]
@@ -37,6 +48,9 @@ impl Config {
         dotenv().ok();  // read config from .env file if available
         env_logger::init();
         info!("⚙️ Configuring Backset server ...");
+        let app_env = env::var("APP_ENV").unwrap_or("local".to_owned());
+        let env = Environment::from_str(app_env.as_str())
+            .unwrap_or_else(|_| panic!("APP_ENV invalid value \"{app_env}\""));
         let port = Self::_parse_num::<u16>("PORT", 8558);
         let addr = env::var("HOST").unwrap_or("127.0.0.1".to_owned());
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
@@ -46,6 +60,7 @@ impl Config {
         let idle_timeout = Duration::from_secs(Self::_parse_num::<u64>("IDLE_TIMEOUT_SEC", 2));
         let test_before_acquire = Self::_parse_bool("TEST_BEFORE_ACQUIRE", false);
         Config {
+            env,
             port,
             addr,
             db: DbConfig {
