@@ -1,5 +1,4 @@
-use dotenv::dotenv;
-use log::info;
+use log::debug;
 use std::env;
 use std::fmt::Debug;
 use std::str::FromStr;
@@ -48,9 +47,7 @@ pub struct DbConfig {
 
 impl Config {
     pub fn init() -> Config {
-        dotenv().ok();  // read config from .env file if available
-        env_logger::init();
-        info!("⚙️ Configuring Backset server ...");
+        debug!("⚙️ Configuring Backset server ...");
         let app_env = env::var("APP_ENV").unwrap_or("local".to_owned());
         let env = Environment::from_str(app_env.as_str())
             .unwrap_or_else(|_| panic!("APP_ENV invalid value \"{app_env}\""));
