@@ -6,6 +6,9 @@ use std::str::FromStr;
 use std::time::Duration;
 use strum_macros::EnumString;
 
+/// Default HTTP port used by Backset
+const BACKSET_PORT: u16 = 8558;
+
 /// `Config` is responsible of the configuration
 /// of the server, reading the settings from environment
 /// variables and .env file if exists, and configuring
@@ -51,7 +54,7 @@ impl Config {
         let app_env = env::var("APP_ENV").unwrap_or("local".to_owned());
         let env = Environment::from_str(app_env.as_str())
             .unwrap_or_else(|_| panic!("APP_ENV invalid value \"{app_env}\""));
-        let port = Self::_parse_num::<u16>("PORT", 8558);
+        let port = Self::_parse_num::<u16>("PORT", BACKSET_PORT);
         let addr = env::var("HOST").unwrap_or("127.0.0.1".to_owned());
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
         let max_connections = Self::_parse_num::<u32>("MAX_CONNECTIONS", 10);

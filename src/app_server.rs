@@ -11,6 +11,8 @@ use crate::errors::json_error_handler;
 use crate::health;
 use crate::tenants::api as tenants_api;
 
+use crate::BACKSET_VERSION;
+
 pub struct AppServer {
     pub server: Server,
     pub addr: String,
@@ -19,9 +21,9 @@ pub struct AppServer {
 
 impl AppServer {
     pub async fn build(config: Config) -> Result<Self, anyhow::Error> {
-        info!("🚀 Starting Backset server ...");
-        let port: u16 = config.port;
         let addr = config.addr.clone();
+        let port: u16 = config.port;
+        info!("🚀 Starting Backset server v{} at http://{}:{} ...", BACKSET_VERSION, addr, port);
         let state = AppState::new(config.clone()).await;
 
         let server = HttpServer::new(move || {
