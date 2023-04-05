@@ -35,11 +35,23 @@ mod tests {
     }
 
     #[actix_web::test]
+    async fn test_unregistered_route_get_404() {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let req = TestRequest::get()
+            .uri("/not-a-registered-route")
+            .insert_header(Accept::json())
+            .to_request();
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[actix_web::test]
     async fn test_tenants_get_404() {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let req = TestRequest::get()
-            .uri("/tenants/123456789")
+            .uri("/tenants/123456789") // tenant record doesn't exist
             .insert_header(Accept::json())
             .to_request();
         let resp = call_service(&app, req).await;
