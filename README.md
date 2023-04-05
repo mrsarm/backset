@@ -90,11 +90,15 @@ SQLX_OFFLINE=true cargo build
 cargo clippy -- -D warnings
 ```
 
+Or `make lint`.
+
 ### Style and Formatting
 
 ```shell
 cargo fmt -- --check
 ```
+
+Or `make fmt-check`.
 
 ### Tests
 
