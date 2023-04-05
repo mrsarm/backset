@@ -42,19 +42,27 @@ sqlx database create
 sqlx database drop
 ```
 
+Or use `make recreate-db`.
+
 #### Run migrations
 
 ```shell
 sqlx migrate run
 ```
 
+Or use `make migrate`.
+
 #### Create and migrate DB for tests
 
 The `DATABASE_URL` has to end with "_test", or backset will automatically
 append the "_test" string to the name when connecting to the DB for testing.
 
-you can execute the `./scripts/recreate-db-tests.sh` to create or re-create the
-DB for `cargo test`.
+you can execute the `./scripts/recreate-db-test.sh` to create or re-create the
+DB for `cargo test`, or execute the re-creation and the tests with:
+
+```shell
+make test
+```
 
 #### Update "offline mode" queries
 
@@ -90,7 +98,15 @@ cargo fmt -- --check
 
 ### Tests
 
-(TO-DO)
+Read the [Create and migrate DB for tests](#create-and-migrate-db-for-tests) section.
+
+Execute with:
+
+```shell
+make test
+```
+
+To only execute the tests without recreating the test DB:
 
 ```shell
 cargo test
