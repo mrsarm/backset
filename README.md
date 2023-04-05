@@ -48,6 +48,14 @@ sqlx database drop
 sqlx migrate run
 ```
 
+#### Create and migrate DB for tests
+
+The `DATABASE_URL` has to end with "_test", or backset will automatically
+append the "_test" string to the name when connecting to the DB for testing.
+
+you can execute the `./scripts/recreate-db-tests.sh` to create or re-create the
+DB for `cargo test`.
+
 #### Update "offline mode" queries
 
 ```shell
@@ -150,4 +158,6 @@ More stuff to add:
 
 - [ ] Random PKs
 - [ ] Tests
+  - [x] Basic tests and config
+  - [ ] Test all endpoints
 - [ ] Docker image

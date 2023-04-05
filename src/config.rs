@@ -27,9 +27,10 @@ pub struct Config {
 }
 
 /// The possible runtime environment for our application.
-#[derive(Debug, PartialEq, EnumString, Clone)]
+#[derive(Debug, Default, PartialEq, EnumString, Clone)]
 #[strum(serialize_all = "snake_case")]
 pub enum Environment {
+    #[default]
     Local,
     Test,
     Production,
@@ -47,13 +48,25 @@ pub struct DbConfig {
 
 impl Config {
     pub fn init() -> Config {
+        Self::init_for(Environment::default())
+    }
+
+    pub fn init_for(environment: Environment) -> Config {
         debug!("⚙️ Configuring Backset server ...");
-        let app_env = env::var("APP_ENV").unwrap_or("local".to_owned());
-        let env = Environment::from_str(app_env.as_str())
-            .unwrap_or_else(|_| panic!("APP_ENV invalid value \"{app_env}\""));
+        let app_env = env::var("APP_ENV");
+        let env = match app_env {
+            Err(_) => environment,
+            Ok(e) => Environment::from_str(e.as_str())
+                .unwrap_or_else(|_| panic!("APP_ENV invalid value \"{e}\"")),
+        };
         let port = Self::_parse_num::<u16>("PORT", BACKSET_PORT);
         let addr = env::var("HOST").unwrap_or("127.0.0.1".to_owned());
-        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        let url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        let database_url = if env == Environment::Test && !url.ends_with("_test") {
+            format!("{url}_test")
+        } else {
+            url
+        };
         let max_connections = Self::_parse_num::<u32>("MAX_CONNECTIONS", 10);
         let min_connections = Self::_parse_num::<u32>("MIN_CONNECTIONS", 1);
         let acquire_timeout =

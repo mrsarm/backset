@@ -6,7 +6,7 @@ mod tests {
     use actix_web::{http::header::Accept, App};
     use backset::app_server::AppServer;
     use backset::app_state::AppState;
-    use backset::config::Config;
+    use backset::config::{Config, Environment};
     use dotenv::dotenv;
     use std::sync::Once;
 
@@ -17,7 +17,7 @@ mod tests {
             dotenv().ok(); // read config from .env file if available
             env_logger::init();
         });
-        let config = Config::init();
+        let config = Config::init_for(Environment::Test);
         let data = AppState::new(config.clone()).await;
         Data::new(data)
     }
