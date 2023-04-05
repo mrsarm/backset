@@ -12,11 +12,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Run DB
+      run: docker compose up -d
+    - name: Migrations
+      run: make recreate-db
     - name: Build
-      run: SQLX_OFFLINE=true cargo build
+      run: make build
     - name: Lint
-      run: SQLX_OFFLINE=true cargo clippy -- -D warnings
+      run: make lint
 #    - name: Format Check
-#      run: SQLX_OFFLINE=true cargo fmt -- --check
-#    - name: Run tests
-#      run: SQLX_OFFLINE=true cargo test --verbose
+#      run: make fmt-check
+    - name: Tests
+      run: make test
