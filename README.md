@@ -33,6 +33,12 @@ Migrations are managed by SQLx, check-out the
 [SQLx CLI](https://github.com/launchbadge/sqlx/blob/main/sqlx-cli/README.md) docs
 for more info, but here are some shortcuts:
 
+#### Install SQLx CLI
+
+```shell
+cargo install sqlx-cli --no-default-features --features native-tls,postgres
+```
+
 #### Create DB
 
 Create/drop the database at `DATABASE_URL`:

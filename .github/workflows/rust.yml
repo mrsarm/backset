@@ -12,7 +12,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Run DB
+    - name: Create .env file
+      run: cp .env.example .env
+    - name: Install SQLx
+      run: cargo install sqlx-cli --no-default-features --features native-tls,postgres
+    - name: Run PostgreSQL
       run: docker compose up -d
     - name: Migrations
       run: make recreate-db

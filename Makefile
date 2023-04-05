@@ -29,10 +29,10 @@ fmt-check:
 	cargo fmt -- --check
 
 migrate:
-	cargo sqlx migrate run
+	sqlx migrate run
 
 create-db:
-	cargo sqlx database create
+	sqlx database create
 
 drop-db:
-	cargo sqlx database drop -y
+	sqlx database drop -y
