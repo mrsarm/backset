@@ -13,7 +13,6 @@ name = "backset"
 [dependencies]
 actix-web = "4.3"
 actix-web-validator = "5.0"
-actix-cors = "0.6"
 anyhow = "1.0"
 dotenv = "0.15"
 env_logger = "0.10.0"
