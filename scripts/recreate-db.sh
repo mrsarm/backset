@@ -6,6 +6,6 @@ set -ex
 
 DATABASE_URL="${DATABASE_URL:-postgresql://postgres:postgres@postgres/bss_dev}"
 
-sqlx database drop -y
-sqlx database create
-sqlx migrate run
+cargo sqlx database drop -y
+cargo sqlx database create
+cargo sqlx migrate run
