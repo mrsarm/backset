@@ -1,7 +1,7 @@
+use crate::errors::BacksetError;
 use serde::{Deserialize, Serialize};
 use sqlx::{Postgres, Transaction};
 use validator::Validate;
-use crate::errors::BacksetError;
 
 #[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
 pub struct Tenant {

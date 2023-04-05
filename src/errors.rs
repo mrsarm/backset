@@ -1,13 +1,12 @@
-use std::collections::HashMap;
+use actix_web::error::InternalError;
 use actix_web::http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError};
-use actix_web::error::InternalError;
 use actix_web_validator::Error;
+use log::{debug, error};
 use serde::Serialize;
 use sqlx::Error as SqlxError;
-use log::{error, debug};
+use std::collections::HashMap;
 use validator::{ValidationErrors, ValidationErrorsKind};
-
 
 #[derive(Debug, Serialize)]
 pub struct InternalErrorPayload {

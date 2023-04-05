@@ -56,7 +56,8 @@ impl Config {
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
         let max_connections = Self::_parse_num::<u32>("MAX_CONNECTIONS", 10);
         let min_connections = Self::_parse_num::<u32>("MIN_CONNECTIONS", 1);
-        let acquire_timeout = Duration::from_secs(Self::_parse_num::<u64>("ACQUIRE_TIMEOUT_SEC", 2));
+        let acquire_timeout =
+            Duration::from_secs(Self::_parse_num::<u64>("ACQUIRE_TIMEOUT_SEC", 2));
         let idle_timeout = Duration::from_secs(Self::_parse_num::<u64>("IDLE_TIMEOUT_SEC", 2));
         let test_before_acquire = Self::_parse_bool("TEST_BEFORE_ACQUIRE", false);
         Config {
@@ -81,15 +82,22 @@ impl Config {
                 "1" => "true".to_owned(),
                 _ => v.to_lowercase(),
             })
-            .map(|v| v.parse::<bool>().unwrap_or_else(|_| panic!("{env_name} invalid boolean \"{v}\"")))
+            .map(|v| {
+                v.parse::<bool>()
+                    .unwrap_or_else(|_| panic!("{env_name} invalid boolean \"{v}\""))
+            })
             .unwrap_or(default_value)
     }
 
     fn _parse_num<A: FromStr>(env_name: &'static str, default_value: A) -> A
-        where <A as FromStr>::Err: Debug
+    where
+        <A as FromStr>::Err: Debug,
     {
         env::var(env_name)
-            .map(|v| v.parse::<A>().unwrap_or_else(|_| panic!("{env_name} invalid number \"{v}\"")))
+            .map(|v| {
+                v.parse::<A>()
+                    .unwrap_or_else(|_| panic!("{env_name} invalid number \"{v}\""))
+            })
             .unwrap_or(default_value)
     }
 }

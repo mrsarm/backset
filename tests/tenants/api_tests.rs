@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use actix_web::{http::header::Accept, App};
     use actix_web::http::StatusCode;
     use actix_web::test::{call_service, init_service, TestRequest};
     use actix_web::web::Data;
+    use actix_web::{http::header::Accept, App};
     use backset::app_server::AppServer;
     use backset::app_state::AppState;
     use backset::config::Config;
@@ -12,19 +12,19 @@ mod tests {
 
     static INIT: Once = Once::new();
 
-    pub async fn initialize() -> (Config, Data<AppState>) {
+    pub async fn initialize() -> Data<AppState> {
         INIT.call_once(|| {
-            dotenv().ok();  // read config from .env file if available
+            dotenv().ok(); // read config from .env file if available
             env_logger::init();
         });
         let config = Config::init();
         let data = AppState::new(config.clone()).await;
-        (config, Data::new(data))
+        Data::new(data)
     }
 
     #[actix_web::test]
     async fn test_health_get() {
-        let (_, state) = initialize().await;
+        let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let req = TestRequest::get()
             .uri("/health")
@@ -36,7 +36,7 @@ mod tests {
 
     #[actix_web::test]
     async fn test_tenants_get_404() {
-        let (_, state) = initialize().await;
+        let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let req = TestRequest::get()
             .uri("/tenants/123456789")

@@ -4,7 +4,6 @@ use log::{debug, error};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{PgPool, Postgres, Transaction};
 
-
 ///! Struct that holds the app configurations
 ///! and the connection pool to the database.
 ///! Each API method should receive an AppState
@@ -20,7 +19,7 @@ use sqlx::{PgPool, Postgres, Transaction};
 #[derive(Debug, Clone)]
 pub struct AppState {
     pub pool: PgPool,
-    pub env: Config,
+    pub config: Config,
 }
 
 impl AppState {
@@ -41,10 +40,7 @@ impl AppState {
                 std::process::exit(2);
             }
         };
-        AppState {
-            pool,
-            env: config,
-        }
+        AppState { pool, config }
     }
 
     /// Get a Transaction object to be used to transact with the DB.
@@ -68,7 +64,7 @@ impl AppState {
     #[allow(dead_code)]
     pub async fn rollback_tx(
         &self,
-        tx: Transaction<'static, Postgres>
+        tx: Transaction<'static, Postgres>,
     ) -> Result<(), BacksetError> {
         tx.rollback().await.map_err(BacksetError::DB)?;
         Ok(())
