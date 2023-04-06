@@ -1,4 +1,4 @@
-.PHONY: clean build release run test lint fmt-check migrate create-db drop-db recreate-db recreate-db-test
+.PHONY: clean build release run test lint fmt-check migrate create-db drop-db recreate-db recreate-db-test check-sqlx-data
 .DEFAULT_GOAL := run
 
 clean:
@@ -36,3 +36,9 @@ create-db:
 
 drop-db:
 	sqlx database drop -y
+
+check-sqlx-data:
+	echo "Checking sqlx-data.json is up to date with DB ..."
+	cp sqlx-data.json sqlx-data-prev.json
+	cargo sqlx prepare
+	diff sqlx-data-prev.json sqlx-data.json
