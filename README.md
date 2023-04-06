@@ -183,7 +183,4 @@ Missing, or still not migrated from Rocket codebase:
 More stuff to add:
 
 - [ ] Random PKs
-- [ ] Tests
-  - [x] Basic tests and config
-  - [ ] Test all endpoints
 - [ ] Docker image
