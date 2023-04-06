@@ -18,6 +18,8 @@ jobs:
       run: cargo install sqlx-cli --no-default-features --features native-tls,postgres
     - name: Run PostgreSQL
       run: docker compose up -d
+    - name: Wait DB
+      run: sleep 5
     - name: Migrations
       run: make recreate-db
     - name: Build
