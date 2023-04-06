@@ -9,6 +9,7 @@ mod tests {
     use backset::app_server::AppServer;
     use backset::app_state::AppState;
     use backset::config::{Config, Environment};
+    use backset::errors::ValidationErrorPayload;
     use backset::tenants::model::Tenant;
     use dotenv::dotenv;
     use serde::Serialize;
@@ -75,6 +76,49 @@ mod tests {
         assert_eq!(resp.status(), StatusCode::OK);
         let tenant: Tenant = try_read_body_json(resp).await?;
         assert_eq!(tenant.name, "Another Name");
+        Ok(())
+    }
+
+    ///! The JSON error looks like:
+    ///! ```
+    ///! {
+    ///!   "error": "Validation error",
+    ///!   "field_errors": {
+    ///!     "name": [
+    ///!       {
+    ///!         "code": "length",
+    ///!         "message": null,
+    ///!         "params": { "min": 3, "value": "Ch" }
+    ///!       }
+    ///!     ]
+    ///!   }
+    ///! }
+    ///! ```
+    #[actix_web::test]
+    async fn test_tenants_post_short_name() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let req = _post(json!({
+            "name": "Sr"
+        }));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
+        let error: ValidationErrorPayload = try_read_body_json(resp).await?;
+        assert_eq!(error.error, "Validation error");
+        match error.field_errors {
+            None => assert!(false, "field_errors shouldn't not be None"),
+            Some(errors) => {
+                assert_eq!(errors.len(), 1);
+                match errors.get("name") {
+                    None => assert!(false, "field_errors should contain \"name\""),
+                    Some(field_errors) => {
+                        assert_eq!(field_errors.len(), 1);
+                        assert_eq!(&field_errors[0].code, "length");
+                    }
+                }
+                assert_ne!(errors.get("name"), None);
+            }
+        }
         Ok(())
     }
 

@@ -1,4 +1,5 @@
-.PHONY: clean build release run test lint fmt-check migrate create-db drop-db recreate-db recreate-db-test check-sqlx-data
+.PHONY: clean build build-test release run test lint fmt-check \
+        migrate create-db drop-db recreate-db recreate-db-test check-sqlx-data
 .DEFAULT_GOAL := run
 
 clean:
@@ -6,6 +7,9 @@ clean:
 
 build:
 	cargo build
+
+build-test:
+	cargo build --tests
 
 release:
 	cargo build --release

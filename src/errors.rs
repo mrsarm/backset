@@ -3,21 +3,21 @@ use actix_web::http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError};
 use actix_web_validator::Error;
 use log::{debug, error};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::Error as SqlxError;
 use std::collections::HashMap;
-use validator::{ValidationErrors, ValidationErrorsKind};
+use validator::{ValidationError, ValidationErrors};
 
 #[derive(Debug, Serialize)]
 pub struct InternalErrorPayload {
     pub error: &'static str,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ValidationErrorPayload {
     pub error: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub field_errors: Option<HashMap<&'static str, ValidationErrorsKind>>,
+    pub field_errors: Option<HashMap<String, Vec<ValidationError>>>,
 }
 
 impl ValidationErrorPayload {
@@ -31,9 +31,11 @@ impl ValidationErrorPayload {
 
 impl From<&ValidationErrors> for ValidationErrorPayload {
     fn from(error: &ValidationErrors) -> Self {
+        let mut errors: HashMap<String, Vec<ValidationError>> = HashMap::new();
+        errors.extend(error.field_errors().iter().map(|(k,v)| (String::from(*k), (*v).clone())));
         ValidationErrorPayload {
             error: "Validation error".to_owned(),
-            field_errors: Some(error.clone().into_errors()),
+            field_errors: Some(errors),
         }
     }
 }
