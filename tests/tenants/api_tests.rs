@@ -61,6 +61,24 @@ mod tests {
     }
 
     #[actix_web::test]
+    async fn test_tenants_post_and_get() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let req = _post(json!({
+            "name": "Another Name"
+        }));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::CREATED);
+        let tenant: Tenant = try_read_body_json(resp).await?;
+        let req = _get(format!("/tenants/{}", tenant.id).as_str());
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let tenant: Tenant = try_read_body_json(resp).await?;
+        assert_eq!(tenant.name, "Another Name");
+        Ok(())
+    }
+
+    #[actix_web::test]
     async fn test_tenants_get_404() {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
