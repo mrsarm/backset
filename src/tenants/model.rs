@@ -24,7 +24,7 @@ impl Tenant {
                 Tenant,
                 "INSERT INTO tenants (name) VALUES ($1) RETURNING *",
                 tenant_form.name)
-            .fetch_one(tx)
+            .fetch_one(&mut *tx)
             .await
             .map_err(BacksetError::DB)?;
         Ok(tenant)
@@ -38,7 +38,7 @@ impl Tenant {
                 Tenant,
                 "SELECT id, name FROM tenants WHERE id = $1", id
             )
-            .fetch_optional(tx)
+            .fetch_optional(&mut *tx)
             .await
             .map_err(BacksetError::DB)?;
         Ok(tenant)
