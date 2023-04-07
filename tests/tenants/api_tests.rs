@@ -88,7 +88,7 @@ mod tests {
     ///!       {
     ///!         "code": "length",
     ///!         "message": null,
-    ///!         "params": { "min": 3, "value": "Ch" }
+    ///!         "params": { "min": 3, "value": "Sr" }
     ///!       }
     ///!     ]
     ///!   }
@@ -114,6 +114,10 @@ mod tests {
                     Some(field_errors) => {
                         assert_eq!(field_errors.len(), 1);
                         assert_eq!(&field_errors[0].code, "length");
+                        match field_errors[0].params.get("min") {
+                            None => assert!(false, "field_errors.params should contain \"min\""),
+                            Some(v) => assert_eq!(v.to_string(), "3"),
+                        }
                     }
                 }
                 assert_ne!(errors.get("name"), None);
