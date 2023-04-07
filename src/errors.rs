@@ -57,7 +57,6 @@ pub fn json_error_handler(err: Error, _req: &HttpRequest) -> actix_web::error::E
 #[derive(thiserror::Error, Debug)]
 pub enum BacksetError {
     #[error("{0}")]
-    #[allow(dead_code)]
     Validation(String),
 
     // TODO add more errors
@@ -78,14 +77,20 @@ impl ResponseError for BacksetError {
     }
 
     fn error_response(&self) -> HttpResponse {
-        match self {
-            Self::Validation(e) => debug!("Validation error: {:?}", e),
-            _ => error!("Unexpected error: {:?}", self),
-        }
         let status_code = self.status_code();
-        HttpResponse::build(status_code)
-            .json(InternalErrorPayload {
-                error: status_code.canonical_reason().unwrap_or("Unknown error")
-            })
+        match self {
+            Self::Validation(e) => {
+                debug!("Validation error: {:?}", e);
+                HttpResponse::build(status_code)
+                    .json(ValidationErrorPayload::new(e.to_string()))
+            },
+            _ => {
+                error!("Unexpected error: {:?}", self);
+                HttpResponse::build(status_code)
+                    .json(InternalErrorPayload {
+                        error: status_code.canonical_reason().unwrap_or("Unknown error")
+                    })
+            },
+        }
     }
 }

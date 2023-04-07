@@ -1,4 +1,4 @@
 CREATE TABLE tenants (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL
+    name VARCHAR(50) NOT NULL UNIQUE
 );

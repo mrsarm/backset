@@ -79,6 +79,25 @@ mod tests {
         Ok(())
     }
 
+    #[actix_web::test]
+    async fn test_tenants_post_already_exists() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let req = _post(json!({
+            "name": "First Time Name"
+        }));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::CREATED);
+        let req = _post(json!({
+            "name": "First Time Name" // same name again
+        }));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
+        let error: ValidationErrorPayload = try_read_body_json(resp).await?;
+        assert_eq!(error.error, "Tenant already exists");
+        Ok(())
+    }
+
     ///! The JSON error looks like:
     ///! ```
     ///! {

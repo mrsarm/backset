@@ -11,7 +11,7 @@ pub struct Tenant {
 
 #[derive(Deserialize, Validate)]
 pub struct TenantPayload {
-    #[validate(length(min = 3))]
+    #[validate(length(min = 3, max = 50))]
     pub name: String,
 }
 
@@ -20,6 +20,15 @@ impl Tenant {
         tx: &mut Transaction<'_, Postgres>,
         tenant_form: TenantPayload,
     ) -> Result<Tenant, BacksetError> {
+        let res = sqlx::query!(
+                "SELECT EXISTS(SELECT id FROM tenants WHERE name = $1)",
+                tenant_form.name)
+            .fetch_one(&mut *tx)
+            .await
+            .map_err(BacksetError::DB)?;
+        if res.exists.unwrap_or(false) {
+            return Err(BacksetError::Validation("Tenant already exists".to_owned()));
+        }
         let tenant = sqlx::query_as!(
                 Tenant,
                 "INSERT INTO tenants (name) VALUES ($1) RETURNING *",
