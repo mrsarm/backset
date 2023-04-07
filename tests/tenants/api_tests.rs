@@ -12,6 +12,7 @@ mod tests {
     use backset::errors::ValidationErrorPayload;
     use backset::tenants::model::Tenant;
     use dotenv::dotenv;
+    use rand::Rng;
     use serde::Serialize;
     use serde_json::json;
     use std::error::Error;
@@ -51,13 +52,14 @@ mod tests {
     async fn test_tenants_post() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let name = format!("The Tenant Name {}", rand::thread_rng().gen::<u32>());
         let req = _post(json!({
-            "name": "The Tenant Name"
+            "name": name
         }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let tenant: Tenant = try_read_body_json(resp).await?;
-        assert_eq!(tenant.name, "The Tenant Name");
+        assert_eq!(tenant.name, name);
         Ok(())
     }
 
@@ -65,8 +67,9 @@ mod tests {
     async fn test_tenants_post_and_get() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let name = format!("Another Name {}", rand::thread_rng().gen::<u32>());
         let req = _post(json!({
-            "name": "Another Name"
+            "name": name
         }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
@@ -75,7 +78,7 @@ mod tests {
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let tenant: Tenant = try_read_body_json(resp).await?;
-        assert_eq!(tenant.name, "Another Name");
+        assert_eq!(tenant.name, name);
         Ok(())
     }
 
@@ -83,13 +86,14 @@ mod tests {
     async fn test_tenants_post_already_exists() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let same_name = format!("First Time Name {}", rand::thread_rng().gen::<u32>());
         let req = _post(json!({
-            "name": "First Time Name"
+            "name": same_name
         }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let req = _post(json!({
-            "name": "First Time Name" // same name again
+            "name": same_name // same name again
         }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::BAD_REQUEST);

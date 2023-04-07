@@ -25,3 +25,4 @@ thiserror = "1.0"
 validator = { version = "0.16", features = ["derive"] }
 strum = "0.24"
 strum_macros = "0.24"
+rand = "0.8"
