@@ -26,6 +26,26 @@
     },
     "query": "INSERT INTO tenants (name) VALUES ($1) RETURNING *"
   },
+  "5fa322f469de5f4874b7abe47d660aa2e38170037252fead3cd046ccc89bf5d8": {
+    "describe": {
+      "columns": [
+        {
+          "name": "exists",
+          "ordinal": 0,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT EXISTS(SELECT id FROM tenants WHERE name = $1)"
+  },
   "e8223fbeec3451a2ba42cbe3753cf29fd130d315962881d2103117d0cbe9ef51": {
     "describe": {
       "columns": [
