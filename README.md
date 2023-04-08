@@ -175,6 +175,7 @@ Missing, or still not migrated from Rocket codebase:
 - [ ] Tenants endpoints
   - [x] GET /tenants/{id}
   - [x] POST /tenants
+  - [x] DELETE /tenants/{id}
   - [ ] GET /tenants
 - [ ] "/elements" model and endpoints
 - [ ] "/sets" model and endpoints

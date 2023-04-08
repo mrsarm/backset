@@ -46,6 +46,18 @@
     },
     "query": "SELECT EXISTS(SELECT id FROM tenants WHERE name = $1)"
   },
+  "e43937670f326dda7fc3e001ef0fc849a7302eb76d3a85fc4ec1aa597f974bec": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "DELETE FROM tenants WHERE id = $1"
+  },
   "e8223fbeec3451a2ba42cbe3753cf29fd130d315962881d2103117d0cbe9ef51": {
     "describe": {
       "columns": [
