@@ -52,4 +52,16 @@ impl Tenant {
             .map_err(BacksetError::DB)?;
         Ok(tenant)
     }
+
+    pub async fn delete(
+        tx: &mut Transaction<'_, Postgres>,
+        id: i64,
+    ) -> Result<u64, BacksetError> {
+        let result = sqlx::query!("DELETE FROM tenants WHERE id = $1", id)
+            .execute(&mut *tx)
+            .await
+            .map_err(BacksetError::DB)?;
+
+        Ok(result.rows_affected())
+    }
 }

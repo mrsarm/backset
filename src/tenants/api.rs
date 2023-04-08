@@ -1,7 +1,7 @@
 use crate::app_state::AppState;
 use crate::errors::BacksetError;
 use crate::tenants::model::{Tenant, TenantPayload};
-use actix_web::{get, post, web, HttpResponse};
+use actix_web::{delete, get, post, web, HttpResponse};
 use actix_web_validator::Json;
 
 #[post("")]
@@ -46,21 +46,23 @@ async fn read(
 //     Ok(Json(ids))
 // }
 
-// #[delete("/<id>")]
-// async fn delete(mut db: Connection<Db>, id: i64) -> Result<Option<()>> {
-//     let result = sqlx::query!("DELETE FROM tenants WHERE id = ?", id)
-//         .execute(&mut *db)
-//         .await?;
-//     Ok((result.rows_affected() == 1).then(|| ()))
-// }
-//
-// #[delete("/")]
-// async fn destroy(mut db: Connection<Db>) -> Result<()> {
-//     sqlx::query!("DELETE FROM tenants").execute(&mut *db).await?;
-//     Ok(())
-// }
+#[delete("{id}")]
+async fn delete(
+    app: web::Data<AppState>,
+    id: web::Path<i64>,
+) -> Result<HttpResponse, BacksetError> {
+    let mut tx = app.get_tx().await?;
+
+    let rows_deleted = Tenant::delete(&mut tx, id.into_inner()).await?;
+
+    app.commit_tx(tx).await?;
+    match rows_deleted {
+        0 => Ok(HttpResponse::NotFound().finish()),
+        _ => Ok(HttpResponse::NoContent().finish()),
+    }
+}
 
 pub fn config(conf: &mut web::ServiceConfig) {
-    let scope = web::scope("/tenants").service(create).service(read);
+    let scope = web::scope("/tenants").service(create).service(delete).service(read);
     conf.service(scope);
 }

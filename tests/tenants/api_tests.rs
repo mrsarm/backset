@@ -158,6 +158,40 @@ mod tests {
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
     }
 
+    #[actix_web::test]
+    async fn test_tenants_delete() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let name = format!("To Be Deleted {}", rand::thread_rng().gen::<u32>());
+        let req = _post(json!({
+            "name": name
+        }));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::CREATED);
+        let tenant: Tenant = try_read_body_json(resp).await?;
+        let req = TestRequest::delete()
+            .uri(format!("/tenants/{}", tenant.id).as_str())
+            .to_request();
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::NO_CONTENT);
+        // trying to get the deleted element returns 404
+        let req = _get(format!("/tenants/{}", tenant.id).as_str());
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+        Ok(())
+    }
+
+    #[actix_web::test]
+    async fn test_tenants_delete_404() {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let req = TestRequest::delete()
+            .uri("/tenants/123456789") // does not exist
+            .to_request();
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+    }
+
     fn _post(data: impl Serialize) -> Request {
         TestRequest::post()
             .uri("/tenants")
