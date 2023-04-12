@@ -57,6 +57,9 @@ pub fn json_error_handler(err: Error, _req: &HttpRequest) -> actix_web::error::E
 #[derive(thiserror::Error, Debug)]
 pub enum BacksetError {
     #[error("{0}")]
+    StaticValidation(&'static str),
+
+    #[error("{0}")]
     Validation(String),
 
     // TODO add more errors
@@ -70,19 +73,23 @@ pub enum BacksetError {
 impl ResponseError for BacksetError {
     fn status_code(&self) -> StatusCode {
         match self {
-            Self::Validation(_) => StatusCode::BAD_REQUEST,
-            Self::DB(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::Unexpected(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::StaticValidation(_) | Self::Validation(_) => StatusCode::BAD_REQUEST,
+            Self::DB(_) | Self::Unexpected(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
     fn error_response(&self) -> HttpResponse {
         let status_code = self.status_code();
         match self {
-            Self::Validation(e) => {
-                debug!("Validation error: {:?}", e);
+            Self::Validation(error) => {
+                debug!("Validation error: {:?}", error);
                 HttpResponse::build(status_code)
-                    .json(ValidationErrorPayload::new(e.to_string()))
+                    .json(ValidationErrorPayload::new(error.to_owned()))
+            },
+            Self::StaticValidation(error) => {
+                debug!("Validation error: {:?}", error);
+                HttpResponse::build(status_code)
+                    .json(InternalErrorPayload { error })
             },
             _ => {
                 error!("Unexpected error: {:?}", self);

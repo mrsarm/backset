@@ -27,7 +27,7 @@ impl Tenant {
             .await
             .map_err(BacksetError::DB)?;
         if res.exists.unwrap_or(false) {
-            return Err(BacksetError::Validation("Tenant already exists".to_owned()));
+            return Err(BacksetError::StaticValidation("Tenant already exists"));
         }
         let tenant = sqlx::query_as!(
                 Tenant,
