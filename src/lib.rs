@@ -1,6 +1,7 @@
 pub mod app_server;
 pub mod app_state;
 pub mod config;
+pub mod core;
 pub mod errors;
 pub mod health;
 pub mod page;

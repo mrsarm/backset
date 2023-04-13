@@ -217,3 +217,4 @@ More stuff to add:
 
 - [ ] Random PKs
 - [ ] Docker image
+- [ ] Test/fix rollback implementation

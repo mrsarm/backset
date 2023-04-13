@@ -11,8 +11,8 @@ mod tests {
     use backset::config::{Config, Environment};
     use backset::errors::ValidationErrorPayload;
     use backset::page::Page;
-    use backset::PAGE_SIZE;
     use backset::tenants::model::Tenant;
+    use backset::PAGE_SIZE;
     use dotenv::dotenv;
     use rand::Rng;
     use serde::Serialize;
@@ -94,7 +94,11 @@ mod tests {
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
-        assert!(page.total >= 80, "page.total = {}, expected > 80", page.total);
+        assert!(
+            page.total >= 80,
+            "page.total = {}, expected > 80",
+            page.total
+        );
         assert_eq!(page.offset, 0);
         assert_eq!(page.page_size, PAGE_SIZE);
         assert_eq!(page.data.len() as i64, PAGE_SIZE);
@@ -103,9 +107,13 @@ mod tests {
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
-        assert!(page.total >= 80, "page.total = {}, expected > 80", page.total);
+        assert!(
+            page.total >= 80,
+            "page.total = {}, expected > 80",
+            page.total
+        );
         assert_eq!(page.offset, 10);
-        assert_eq!(page.page_size,5);
+        assert_eq!(page.page_size, 5);
         assert_eq!(page.data.len() as i64, 5);
         Ok(())
     }

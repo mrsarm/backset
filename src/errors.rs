@@ -8,7 +8,6 @@ use sqlx::Error as SqlxError;
 use std::collections::HashMap;
 use validator::{ValidationError, ValidationErrors};
 
-
 ///! Use to serialize a simple error with a static message.
 #[derive(Debug, Serialize)]
 pub struct InternalErrorPayload {
@@ -52,7 +51,12 @@ impl ValidationErrorPayload {
 impl From<&ValidationErrors> for ValidationErrorPayload {
     fn from(error: &ValidationErrors) -> Self {
         let mut errors: HashMap<String, Vec<ValidationError>> = HashMap::new();
-        errors.extend(error.field_errors().iter().map(|(k,v)| (String::from(*k), (*v).clone())));
+        errors.extend(
+            error
+                .field_errors()
+                .iter()
+                .map(|(k, v)| (String::from(*k), (*v).clone())),
+        );
         ValidationErrorPayload {
             error: "Validation error".to_owned(),
             field_errors: Some(errors),
@@ -74,12 +78,11 @@ pub fn json_error_handler(err: Error, _req: &HttpRequest) -> actix_web::error::E
     InternalError::from_response(err, json_error).into()
 }
 
-
 /// Main enum that implements the actix ResponseError
 /// trait to be used as wrapper for different errors
 /// in endpoint handlers.
 #[derive(thiserror::Error, Debug)]
-pub enum BacksetError {
+pub enum AppError {
     #[error("{0}")]
     StaticValidation(&'static str),
 
@@ -94,7 +97,7 @@ pub enum BacksetError {
     Unexpected(#[from] Error),
 }
 
-impl ResponseError for BacksetError {
+impl ResponseError for AppError {
     fn status_code(&self) -> StatusCode {
         match self {
             Self::StaticValidation(_) | Self::Validation(_) => StatusCode::BAD_REQUEST,
@@ -109,19 +112,19 @@ impl ResponseError for BacksetError {
                 debug!("Validation error: {:?}", error);
                 HttpResponse::build(status_code)
                     .json(ValidationErrorPayload::new(error.to_owned()))
-            },
+            }
             Self::StaticValidation(error) => {
                 debug!("Validation error: {:?}", error);
                 HttpResponse::build(status_code)
                     .json(InternalErrorPayload { error })
-            },
+            }
             _ => {
                 error!("Unexpected error: {:?}", self);
                 HttpResponse::build(status_code)
                     .json(InternalErrorPayload {
                         error: status_code.canonical_reason().unwrap_or("Unknown error")
                     })
-            },
+            }
         }
     }
 }
