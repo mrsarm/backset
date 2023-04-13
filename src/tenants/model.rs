@@ -63,7 +63,7 @@ impl Tenant {
             .fetch_one(&mut *tx)
             .await
             .map_err(BacksetError::DB)?;
-        Ok(count.count.unwrap_or(0i64))
+        Ok(count.count.unwrap_or(0))
     }
 
     pub async fn find(
