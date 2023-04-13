@@ -84,7 +84,7 @@ mod tests {
     async fn test_tenants_get_paginated() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        for i in 0..79 {
+        for i in 0..80 {
             let name = format!("Paginated {} {}", i, rand::thread_rng().gen::<u32>());
             let req = _post(json!({ "name": name }));
             let resp = call_service(&app, req).await;
