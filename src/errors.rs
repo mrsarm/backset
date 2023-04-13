@@ -1,8 +1,8 @@
 use actix_web::error::InternalError;
 use actix_web::http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError};
-use actix_web_validator::Error;
-use log::{debug, error};
+use actix_web_validator::Error as ActixValidatorError;
+use log::error;
 use serde::{Deserialize, Serialize};
 use sqlx::Error as SqlxError;
 use std::collections::HashMap;
@@ -64,11 +64,11 @@ impl From<&ValidationErrors> for ValidationErrorPayload {
     }
 }
 
-pub fn json_error_handler(err: Error, _req: &HttpRequest) -> actix_web::error::Error {
+pub fn json_error_handler(err: ActixValidatorError, _req: &HttpRequest) -> actix_web::error::Error {
     let json_error = match &err {
-        Error::Validate(error) =>
+        ActixValidatorError::Validate(error) =>
             HttpResponse::BadRequest().json(ValidationErrorPayload::from(error)),
-        Error::JsonPayloadError(error) =>
+        ActixValidatorError::JsonPayloadError(error) =>
             HttpResponse::UnprocessableEntity()
                 .json(ValidationErrorPayload::new(error.to_string())),
         _ =>
@@ -89,12 +89,23 @@ pub enum AppError {
     #[error("{0}")]
     Validation(String),
 
-    // TODO add more errors
     #[error(transparent)]
     DB(#[from] SqlxError),
 
+    ///! Any other error that needs to be wrapped inside an AppError.
+    ///! Having an Error `e`, can be used as follow:
+    ///!
+    ///! ```
+    ///! return Err(AppError::Unexpected(e.into()));
+    ///! ```
+    ///!
+    ///! Or something like:
+    ///!
+    ///! ```
+    ///! some_operation().map_err(AppError::Unexpected)?;
+    ///! ```
     #[error(transparent)]
-    Unexpected(#[from] Error),
+    Unexpected(#[from] anyhow::Error),
 }
 
 impl ResponseError for AppError {
@@ -109,12 +120,10 @@ impl ResponseError for AppError {
         let status_code = self.status_code();
         match self {
             Self::Validation(error) => {
-                debug!("Validation error: {:?}", error);
                 HttpResponse::build(status_code)
                     .json(ValidationErrorPayload::new(error.to_owned()))
             }
             Self::StaticValidation(error) => {
-                debug!("Validation error: {:?}", error);
                 HttpResponse::build(status_code)
                     .json(InternalErrorPayload { error })
             }

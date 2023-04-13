@@ -208,13 +208,15 @@ HTTP/1.1 204 No Content
 
 ## TO-DOs
 
-Missing, or still not migrated from Rocket codebase:
+Missing:
 
+- [x] "/tenants" model and endpoints
 - [ ] "/elements" model and endpoints
 - [ ] "/sets" model and endpoints
 
 More stuff to add:
 
+- [x] Tests
 - [ ] Random PKs
 - [ ] Docker image
-- [ ] Test/fix rollback implementation
+- [x] Test/fix rollback implementation
