@@ -1,12 +1,10 @@
+use crate::BACKSET_PORT;
 use log::debug;
 use std::env;
 use std::fmt::Debug;
 use std::str::FromStr;
 use std::time::Duration;
 use strum_macros::EnumString;
-
-/// Default HTTP port used by Backset
-const BACKSET_PORT: u16 = 8558;
 
 /// `Config` is responsible of the configuration
 /// of the server, reading the settings from environment

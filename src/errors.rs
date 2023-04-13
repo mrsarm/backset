@@ -8,11 +8,31 @@ use sqlx::Error as SqlxError;
 use std::collections::HashMap;
 use validator::{ValidationError, ValidationErrors};
 
+
+///! Use to serialize a simple error with a static message.
 #[derive(Debug, Serialize)]
 pub struct InternalErrorPayload {
     pub error: &'static str,
 }
 
+///! Use to serialize a validation
+///! with a string error and/or field validation errors.
+///!
+///! An error serialized as JSON looks like:
+///
+///! ```
+///! {
+///!   "error": "Validation error",
+///!   "field_errors": {
+///!     "name": [
+///!       {
+///!         "code": "length",
+///!         "message": null,
+///!         "params": { "min": 3, "value": "Sr" }
+///!       }
+///!     ]
+///!   }
+///! }
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ValidationErrorPayload {
     pub error: String,
@@ -54,6 +74,10 @@ pub fn json_error_handler(err: Error, _req: &HttpRequest) -> actix_web::error::E
     InternalError::from_response(err, json_error).into()
 }
 
+
+/// Main enum that implements the actix ResponseError
+/// trait to be used as wrapper for different errors
+/// in endpoint handlers.
 #[derive(thiserror::Error, Debug)]
 pub enum BacksetError {
     #[error("{0}")]

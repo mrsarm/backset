@@ -1,5 +1,6 @@
 use crate::app_state::AppState;
 use crate::errors::BacksetError;
+use crate::page::{Page, QuerySearch};
 use crate::tenants::model::{Tenant, TenantPayload};
 use actix_web::{delete, get, post, web, HttpResponse};
 use actix_web_validator::Json;
@@ -33,18 +34,24 @@ async fn read(
     }
 }
 
-// TODO migration in process
-// #[get("")]
-// async fn list(
-//     app: web::Data<AppState>,
-// ) -> impl Responder {
-//     let ids = sqlx::query!("SELECT id FROM tenants")
-//         .fetch(&app.pool)
-//         .map_ok(|record| record.id)
-//         .try_collect::<Vec<_>>()
-//         .await?;
-//     Ok(Json(ids))
-// }
+#[get("")]
+async fn list(
+    app: web::Data<AppState>,
+    query: web::Query<QuerySearch>,
+) -> Result<HttpResponse, BacksetError> {
+    let query = query.into_inner();
+    let mut tx = app.get_tx().await?;
+    let total = Tenant::count(&mut tx).await?;
+    let tenants = match total {
+        0 => Page::empty(),
+        _ => {
+            let data = Tenant::find(&mut tx, &query).await?;
+            Page::with_data(data, total, query.offset)
+        },
+    };
+    app.commit_tx(tx).await?;
+    Ok(HttpResponse::Ok().json(tenants))
+}
 
 #[delete("{id}")]
 async fn delete(
@@ -63,6 +70,10 @@ async fn delete(
 }
 
 pub fn config(conf: &mut web::ServiceConfig) {
-    let scope = web::scope("/tenants").service(create).service(delete).service(read);
+    let scope = web::scope("/tenants")
+        .service(create)
+        .service(delete)
+        .service(list)
+        .service(read);
     conf.service(scope);
 }

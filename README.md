@@ -128,6 +128,8 @@ All the examples are provided with *HTTPie*.
 
 #### Health check
 
+To check the service is running (it does not check the DB connection).
+
 ```shell
 http :8558/health
 HTTP/1.1 200 OK
@@ -168,15 +170,46 @@ content-type: application/json
 }
 ```
 
+#### GET /tenants
+
+Query arguments `page_size` (default 50) and `offset` (default 0) are optionals. 
+
+```shell
+$ http ":8558/tenants?page_size=5&offset=10"
+HTTP/1.1 200 OK
+content-type: application/json
+...
+
+{
+    "data": [
+        {
+            "id": 12,
+            "name": "Some Tenant"
+        },
+        {
+            "id": 13,
+            "name": "Another Tenant"
+        },
+        ...
+    ],
+    "offset": 10,
+    "page_size": 5,
+    "total": 28
+}
+```
+
+#### DELETE /tenants/{id}
+
+```shell
+$ http DELETE :8558/tenants/8
+HTTP/1.1 204 No Content
+...
+```
+
 ## TO-DOs
 
 Missing, or still not migrated from Rocket codebase:
 
-- [ ] Tenants endpoints
-  - [x] GET /tenants/{id}
-  - [x] POST /tenants
-  - [x] DELETE /tenants/{id}
-  - [ ] GET /tenants
 - [ ] "/elements" model and endpoints
 - [ ] "/sets" model and endpoints
 

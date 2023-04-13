@@ -10,6 +10,8 @@ mod tests {
     use backset::app_state::AppState;
     use backset::config::{Config, Environment};
     use backset::errors::ValidationErrorPayload;
+    use backset::page::Page;
+    use backset::PAGE_SIZE;
     use backset::tenants::model::Tenant;
     use dotenv::dotenv;
     use rand::Rng;
@@ -53,9 +55,7 @@ mod tests {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let name = format!("The Tenant Name {}", rand::thread_rng().gen::<u32>());
-        let req = _post(json!({
-            "name": name
-        }));
+        let req = _post(json!({ "name": name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let tenant: Tenant = try_read_body_json(resp).await?;
@@ -68,9 +68,7 @@ mod tests {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let name = format!("Another Name {}", rand::thread_rng().gen::<u32>());
-        let req = _post(json!({
-            "name": name
-        }));
+        let req = _post(json!({ "name": name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let tenant: Tenant = try_read_body_json(resp).await?;
@@ -83,18 +81,44 @@ mod tests {
     }
 
     #[actix_web::test]
+    async fn test_tenants_get_paginated() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        for i in 0..79 {
+            let name = format!("Paginated {} {}", i, rand::thread_rng().gen::<u32>());
+            let req = _post(json!({ "name": name }));
+            let resp = call_service(&app, req).await;
+            assert_eq!(resp.status(), StatusCode::CREATED);
+        }
+        let req = _get(format!("/tenants").as_str());
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let page: Page<Tenant> = try_read_body_json(resp).await?;
+        assert!(page.total >= 80);
+        assert_eq!(page.offset, 0);
+        assert_eq!(page.page_size, PAGE_SIZE);
+        assert_eq!(page.data.len() as i64, PAGE_SIZE);
+
+        let req = _get(format!("/tenants?page_size=5&offset=10").as_str());
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let page: Page<Tenant> = try_read_body_json(resp).await?;
+        assert!(page.total >= 80);
+        assert_eq!(page.offset, 10);
+        assert_eq!(page.page_size,5);
+        assert_eq!(page.data.len() as i64, 5);
+        Ok(())
+    }
+
+    #[actix_web::test]
     async fn test_tenants_post_already_exists() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let same_name = format!("First Time Name {}", rand::thread_rng().gen::<u32>());
-        let req = _post(json!({
-            "name": same_name
-        }));
+        let req = _post(json!({ "name": same_name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
-        let req = _post(json!({
-            "name": same_name // same name again
-        }));
+        let req = _post(json!({ "name": same_name })); // same name again
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
         let error: ValidationErrorPayload = try_read_body_json(resp).await?;
@@ -102,28 +126,11 @@ mod tests {
         Ok(())
     }
 
-    ///! The JSON error looks like:
-    ///! ```
-    ///! {
-    ///!   "error": "Validation error",
-    ///!   "field_errors": {
-    ///!     "name": [
-    ///!       {
-    ///!         "code": "length",
-    ///!         "message": null,
-    ///!         "params": { "min": 3, "value": "Sr" }
-    ///!       }
-    ///!     ]
-    ///!   }
-    ///! }
-    ///! ```
     #[actix_web::test]
-    async fn test_tenants_post_short_name() -> Result<(), Box<dyn Error>> {
+    async fn test_tenants_field_validations() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let req = _post(json!({
-            "name": "Sr"
-        }));
+        let req = _post(json!({ "name": "Sr" }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
         let error: ValidationErrorPayload = try_read_body_json(resp).await?;
@@ -163,9 +170,7 @@ mod tests {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let name = format!("To Be Deleted {}", rand::thread_rng().gen::<u32>());
-        let req = _post(json!({
-            "name": name
-        }));
+        let req = _post(json!({ "name": name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let tenant: Tenant = try_read_body_json(resp).await?;

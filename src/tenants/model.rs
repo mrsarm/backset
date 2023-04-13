@@ -1,4 +1,5 @@
 use crate::errors::BacksetError;
+use crate::page::QuerySearch;
 use serde::{Deserialize, Serialize};
 use sqlx::{Postgres, Transaction};
 use validator::Validate;
@@ -51,6 +52,34 @@ impl Tenant {
             .await
             .map_err(BacksetError::DB)?;
         Ok(tenant)
+    }
+
+    pub async fn count(
+        tx: &mut Transaction<'_, Postgres>
+    ) -> Result<i64, BacksetError> {
+        let count = sqlx::query!(
+                "SELECT COUNT(*) AS count FROM tenants",
+            )
+            .fetch_one(&mut *tx)
+            .await
+            .map_err(BacksetError::DB)?;
+        Ok(count.count.unwrap_or(0i64))
+    }
+
+    pub async fn find(
+        tx: &mut Transaction<'_, Postgres>,
+        query: &QuerySearch,
+    ) -> Result<Vec<Tenant>, BacksetError> {
+        let tenants = sqlx::query_as!(
+                Tenant,
+                "SELECT * FROM tenants LIMIT $1 OFFSET $2",
+                query.page_size,
+                query.offset,
+            )
+            .fetch_all(&mut *tx)
+            .await
+            .map_err(BacksetError::DB)?;
+        Ok(tenants)
     }
 
     pub async fn delete(
