@@ -1,7 +1,7 @@
 use crate::PAGE_SIZE;
 use serde::{Deserialize, Serialize};
 
-pub fn default_page_size() -> i64 {
+fn default_page_size() -> i64 {
     PAGE_SIZE
 }
 
@@ -55,6 +55,7 @@ impl<T> Page<T> {
             warning: None,
         }
     }
+
     pub fn with_data(data: Vec<T>, total: i64, offset: i64) -> Self {
         let page_size: i64 = data.len() as i64;
         Page {
