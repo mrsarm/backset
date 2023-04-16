@@ -42,8 +42,7 @@ impl AppServer {
 
     pub fn config_app(data: Data<AppState>) -> Box<dyn Fn(&mut ServiceConfig)> {
         Box::new(move |conf: &mut ServiceConfig| {
-            conf
-                .app_data(data.clone())
+            conf.app_data(data.clone())
                 .app_data(JsonConfig::default().error_handler(json_error_handler))
                 .configure(health::config)
                 .configure(tenants_api::config);

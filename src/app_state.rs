@@ -1,5 +1,5 @@
-use crate::core::{Result, Tx};
 use crate::config::Config;
+use crate::core::{Result, Tx};
 use crate::errors::AppError;
 use log::{debug, error};
 use sqlx::postgres::PgPoolOptions;
@@ -32,7 +32,7 @@ impl AppState {
         let pool = match Self::_get_pool(&config) {
             Ok(pool) => {
                 // The connection is lazy, so not sure whether the connection will work
-                debug!("Connection to the database looks good");
+                debug!("Connection configuration to the database looks good");
                 pool
             }
             Err(err) => {

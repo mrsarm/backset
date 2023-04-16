@@ -1,10 +1,10 @@
 use crate::BACKSET_PORT;
-use log::debug;
+use log::{debug, log, Level};
 use std::env;
 use std::fmt::Debug;
 use std::str::FromStr;
 use std::time::Duration;
-use strum_macros::EnumString;
+use strum_macros::{Display, EnumString};
 
 /// `Config` is responsible of the configuration
 /// of the server, reading the settings from environment
@@ -25,12 +25,13 @@ pub struct Config {
 }
 
 /// The possible runtime environment for our application.
-#[derive(Debug, Default, PartialEq, EnumString, Clone)]
+#[derive(Debug, Default, Display, PartialEq, EnumString, Clone)]
 #[strum(serialize_all = "snake_case")]
 pub enum Environment {
     #[default]
     Local,
     Test,
+    Stage,
     Production,
 }
 
@@ -46,17 +47,24 @@ pub struct DbConfig {
 
 impl Config {
     pub fn init() -> Config {
-        Self::init_for(Environment::default())
+        Self::init_for(None)
     }
 
-    pub fn init_for(environment: Environment) -> Config {
+    pub fn init_for(environment: Option<Environment>) -> Config {
         debug!("⚙️ Configuring Backset server ...");
-        let app_env = env::var("APP_ENV");
-        let env = match app_env {
-            Err(_) => environment,
-            Ok(e) => Environment::from_str(e.as_str())
-                .unwrap_or_else(|_| panic!("APP_ENV invalid value \"{e}\"")),
+        let env = environment.unwrap_or_else(|| {
+            let app_env = env::var("APP_ENV");
+            match app_env {
+                Err(_) => Environment::default(),
+                Ok(e) => Environment::from_str(e.as_str())
+                    .unwrap_or_else(|_| panic!("APP_ENV invalid value \"{e}\"")),
+            }
+        });
+        let log_level = match env {
+            Environment::Test => Level::Debug,
+            _ => Level::Info,
         };
+        log!(log_level, "⚙️ Environment set to {env}");
         let port = Self::_parse_num::<u16>("PORT", BACKSET_PORT);
         let addr = env::var("HOST").unwrap_or("127.0.0.1".to_owned());
         let url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");

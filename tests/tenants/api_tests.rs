@@ -27,7 +27,7 @@ mod tests {
             dotenv().ok(); // read config from .env file if available
             env_logger::init();
         });
-        let config = Config::init_for(Environment::Test);
+        let config = Config::init_for(Some(Environment::Test));
         let data = AppState::new(config.clone()).await;
         Data::new(data)
     }
