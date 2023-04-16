@@ -8,11 +8,12 @@ mod tests {
     use actix_web::App;
     use backset::app_server::AppServer;
     use backset::app_state::AppState;
-    use backset::config::{Config, Environment};
+    use backset::conf::Config;
+    use backset::conf::Environment;
     use backset::errors::ValidationErrorPayload;
     use backset::page::Page;
     use backset::tenants::model::Tenant;
-    use backset::PAGE_SIZE;
+    use backset::{BACKSET_PORT, PAGE_SIZE};
     use dotenv::dotenv;
     use rand::Rng;
     use serde::Serialize;
@@ -24,10 +25,10 @@ mod tests {
 
     pub async fn initialize() -> Data<AppState> {
         INIT.call_once(|| {
-            dotenv().ok(); // read config from .env file if available
+            dotenv().ok(); // read conf from .env file if available
             env_logger::init();
         });
-        let config = Config::init_for(Some(Environment::Test));
+        let config = Config::init_for(BACKSET_PORT, Some(Environment::Test));
         let data = AppState::new(config.clone()).await;
         Data::new(data)
     }

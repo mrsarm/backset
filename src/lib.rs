@@ -1,6 +1,6 @@
 pub mod app_server;
 pub mod app_state;
-pub mod config;
+pub mod conf;
 pub mod core;
 pub mod errors;
 pub mod health;
@@ -12,7 +12,7 @@ pub mod tenants;
 pub static BACKSET_VERSION: &str = "0.1.0";
 
 /// Default HTTP port used by Backset
-const BACKSET_PORT: u16 = 8558;
+pub const BACKSET_PORT: u16 = 8558;
 
 /// Default pagination size
 pub static PAGE_SIZE: i64 = 50;

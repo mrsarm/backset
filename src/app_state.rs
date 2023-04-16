@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::conf::Config;
 use crate::core::{Result, Tx};
 use crate::errors::AppError;
 use log::{debug, error};

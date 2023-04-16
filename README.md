@@ -260,6 +260,12 @@ and run all of them with:
 docker compose up
 ```
 
+Just run Postgres with docker compose:
+
+```shell
+docker compose up postgres
+```
+
 Run just backset with docker:
 
 ```shell

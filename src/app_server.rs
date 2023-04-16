@@ -6,12 +6,10 @@ use actix_web_validator::JsonConfig;
 use log::info;
 
 use crate::app_state::AppState;
-use crate::config::Config;
+use crate::conf::Config;
 use crate::errors::json_error_handler;
 use crate::health;
 use crate::tenants::api as tenants_api;
-
-use crate::BACKSET_VERSION;
 
 pub struct AppServer {
     pub server: Server,
@@ -20,14 +18,14 @@ pub struct AppServer {
 }
 
 impl AppServer {
-    pub async fn build(config: Config) -> Result<Self, anyhow::Error> {
+    pub async fn build(config: Config, app_version: &str) -> Result<Self, anyhow::Error> {
         let addr = config.addr.clone();
         let port: u16 = config.port;
         info!(
             "🚀 Starting Backset server v{} at http://{}:{} ...",
-            BACKSET_VERSION, addr, port
+            app_version, addr, port
         );
-        let state = AppState::new(config.clone()).await;
+        let state = AppState::new(config).await;
 
         let server = HttpServer::new(move || {
             App::new()
