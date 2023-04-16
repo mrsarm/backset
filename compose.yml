@@ -1,5 +1,26 @@
 services:
-  pg-bss:
+  bss:
+    container_name: bss
+    image: "mrsarm/backset:${TAG:-latest}"
+    build:
+      context: .
+      args:
+        - BUILD
+    ports:
+      - "8558:8558"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres/bss_dev
+      - APP_ENV
+      - RUST_LOG
+      - MAX_CONNECTIONS
+      - MIN_CONNECTIONS
+      - ACQUIRE_TIMEOUT_SEC
+      - IDLE_TIMEOUT_SEC
+      - TEST_BEFORE_ACQUIRE
+    depends_on:
+      - postgres
+
+  postgres:
     image: postgres
     container_name: pg-bss
     environment:
@@ -12,10 +33,20 @@ services:
 
   psql:
     image: postgres
-    command: psql postgres -h pg-bss -U postgres -W
+    command: psql postgres -h postgres -U postgres -W
     depends_on:
-      - pg-bss
+      - postgres
     profiles:       # To avoid the container start with `docker compose up'
+      - tools
+
+  sqlx:
+    image: "mrsarm/backset:${TAG:-latest}"
+    entrypoint: sqlx
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres/bss_dev
+    depends_on:
+      - postgres
+    profiles:
       - tools
 
 volumes:
@@ -25,9 +56,9 @@ volumes:
 # - `docker compose up' to start postgres attached to the console. Add `-d' option
 #   to start the container detached
 # - Connect with `docker compose run psql`. To pass more options to `psql' use:
-#   `docker compose run pg-bss psql postgres -h HOSTIP -U postgres -W [OPTIONS...]'
+#   `docker compose run postgres psql postgres -h HOSTIP -U postgres -W [OPTIONS...]'
 # - Run any pg_* command available in the container, e.g.
-#   `docker compose run pg-bss pg_dump [OPTIONS]`
+#   `docker compose run postgres pg_dump [OPTIONS]`
 # - `docker compose stop' to stop the service if it was detached,
 #    otherwise just press Ctrl+C to stop
 # - `docker compose down' to shutdown and drop the container (the data will continue

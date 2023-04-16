@@ -1,5 +1,5 @@
 .PHONY: clean build build-test release run test lint fmt-check \
-        migrate create-db drop-db recreate-db recreate-db-test check-sqlx-data
+        migrate migrate-info create-db drop-db recreate-db recreate-db-test check-sqlx-data
 .DEFAULT_GOAL := build-all
 
 clean:
@@ -36,6 +36,9 @@ fmt-check:
 
 migrate:
 	sqlx migrate run
+
+migrate-info:
+	sqlx migrate info
 
 create-db:
 	sqlx database create

@@ -51,7 +51,7 @@ impl Config {
     }
 
     pub fn init_for(environment: Option<Environment>) -> Config {
-        debug!("⚙️ Configuring Backset server ...");
+        debug!("⚙️  Configuring Backset server ...");
         let env = environment.unwrap_or_else(|| {
             let app_env = env::var("APP_ENV");
             match app_env {
@@ -64,7 +64,7 @@ impl Config {
             Environment::Test => Level::Debug,
             _ => Level::Info,
         };
-        log!(log_level, "⚙️ Environment set to {env}");
+        log!(log_level, "⚙️  Environment set to {env}");
         let port = Self::_parse_num::<u16>("PORT", BACKSET_PORT);
         let addr = env::var("HOST").unwrap_or("127.0.0.1".to_owned());
         let url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");

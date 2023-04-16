@@ -58,6 +58,13 @@ sqlx migrate run
 
 Or use `make migrate`.
 
+#### Check migrations
+
+```shell
+sqlx migrate info
+```
+
+
 #### Create and migrate DB for tests
 
 The `DATABASE_URL` has to end with "_test", or backset will automatically
@@ -106,6 +113,21 @@ cargo fmt -- --check
 
 Or `make fmt-check`.
 
+### Run
+
+```shell
+cargo run
+```
+
+Or `make run`, or `./target/debug/backset` if it's already compiled in debug mode (default),
+or to run the production build with the "production" setup:
+
+```shell
+APP_ENV=production ./target/release/backset
+```
+
+See the [Docker](#docker) section to see how to build and run with Docker.
+
 ### Tests
 
 Read the [Create and migrate DB for tests](#create-and-migrate-db-for-tests) section.
@@ -121,6 +143,7 @@ To only execute the tests without recreating the test DB:
 ```shell
 cargo test
 ```
+
 
 ### Endpoints usage
 
@@ -206,6 +229,90 @@ HTTP/1.1 204 No Content
 ...
 ```
 
+
+## Docker
+
+A reference [Dockerfile](Dockerfile), also [compose.yml](compose.yml) and
+[.env.example](.env.example) files are provided, you can run
+all from here, bss and Postgres.
+
+First, copy the `.env.example` file as `.env` file, and edit whatever
+value you want to:
+
+```shell
+cp .env.example .env
+```
+
+Then before run for the first time the containers, you have to either
+download the images from Docker Hub or build them from the source code. To
+build the images from the source code, execute:
+
+```shell
+docker compose build
+```
+
+### Up
+
+Once the images are built in your local machine, create the containers
+and run all of them with:
+
+```shell
+docker compose up
+```
+
+Run just backset with docker:
+
+```shell
+docker run -it --rm --name bss --env-file=.env -p 8558:8558 mrsarm/backset
+```
+
+### Queries to Postgres
+
+Run `psql` against the Postgres running with docker:
+
+```shell
+docker compose run psql
+```
+
+### Run migrations from containers
+
+Execute any SQLx command with:
+
+```shell
+docker compose run sqlx migrate COMMAND [SUBCOMMAND]
+```
+
+E.g. `docker compose run sqlx migrate run` to run
+the migrations, or `docker compose run sqlx migrate info`
+to get the status of the migrations.
+
+### Running commands inside bss the container
+
+The bss image is a thin runtime for `backset` and the `sqlx`
+command installed under the `/usr/app/bin` folder. You can
+access to the container with:
+
+```shell
+docker exec -u root -it $(docker ps -f 'name=^bss$' -q) bash
+```
+
+To debug issues with the app or the container might be useful
+to have some tools not installed by default, so first update
+the packages indexes:
+
+```shell
+apt update
+```
+
+And then to install commands like `curl`, `ping`, `ps` and `netstat`:
+
+```shell
+apt install curl inetutils-ping procps net-tools
+```
+
+Any other tool available in Debian is available for installation
+in the container, e.g. `vim`.
+
 ## TO-DOs
 
 Missing:
@@ -217,6 +324,5 @@ Missing:
 More stuff to add:
 
 - [x] Tests
-- [ ] Random PKs
-- [ ] Docker image
 - [x] Test/fix rollback implementation
+- [ ] Random PKs
