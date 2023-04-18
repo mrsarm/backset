@@ -1,3 +1,4 @@
+use crate::conf::db::DbConfig;
 use crate::conf::Config;
 use crate::core::{Result, Tx};
 use crate::errors::AppError;
@@ -29,7 +30,7 @@ impl AppState {
     /// This method normally is used once at startup time
     /// by the web framework (Actix).
     pub async fn new(config: Config) -> AppState {
-        let pool = match Self::_get_pool(&config) {
+        let pool = match Self::_get_pool(&config.db) {
             Ok(pool) => {
                 // The connection is lazy, so not sure whether the connection will work
                 debug!("Connection configuration to the database looks good");
@@ -57,22 +58,20 @@ impl AppState {
     }
 
     /// Rollback the transaction passed.
-    // TODO: should receive the error that caused the TX to be
-    //       canceled, and "re-through" after rolling back
     #[allow(dead_code)]
     pub async fn rollback_tx(&self, tx: Tx<'_>) -> Result<()> {
         tx.rollback().await.map_err(AppError::DB)?;
         Ok(())
     }
 
-    fn _get_pool(config: &Config) -> Result<PgPool> {
+    fn _get_pool(config: &DbConfig) -> Result<PgPool> {
         PgPoolOptions::new()
-            .max_connections(config.db.max_connections)
-            .min_connections(config.db.min_connections)
-            .acquire_timeout(config.db.acquire_timeout)
-            .idle_timeout(config.db.idle_timeout)
-            .test_before_acquire(config.db.test_before_acquire)
-            .connect_lazy(&config.db.database_url)
+            .max_connections(config.max_connections)
+            .min_connections(config.min_connections)
+            .acquire_timeout(config.acquire_timeout)
+            .idle_timeout(config.idle_timeout)
+            .test_before_acquire(config.test_before_acquire)
+            .connect_lazy(&config.database_url)
             .map_err(AppError::DB)
     }
 }
