@@ -2,6 +2,7 @@ mod config;
 mod env;
 
 pub mod db;
+pub mod server;
 pub use crate::conf::config::Config;
 pub use crate::conf::env::Environment;
 

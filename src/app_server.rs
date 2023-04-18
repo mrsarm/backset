@@ -19,8 +19,8 @@ pub struct AppServer {
 
 impl AppServer {
     pub async fn build(config: Config, app_version: &str) -> Result<Self, anyhow::Error> {
-        let addr = config.addr.clone();
-        let port: u16 = config.port;
+        let addr = config.server.addr.clone();
+        let port: u16 = config.server.port;
         info!(
             "🚀 Starting Backset server v{} at http://{}:{} ...",
             app_version, addr, port

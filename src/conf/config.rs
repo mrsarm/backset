@@ -1,8 +1,7 @@
 use crate::conf::db::DbConfig;
 use crate::conf::env::Environment;
-use crate::conf::env_num;
+use crate::conf::server::ServerConfig;
 use log::{debug, log, Level};
-use std::env;
 use std::fmt::Debug;
 
 /// `Config` is responsible of the configuration
@@ -18,16 +17,25 @@ use std::fmt::Debug;
 pub struct Config {
     // Add more conf here
     pub env: Environment,
-    pub port: u16,
-    pub addr: String,
+    pub server: ServerConfig,
     pub db: DbConfig,
 }
 
 impl Config {
+    /// Initialize config and the environment will be set with the `APP_ENV`
+    /// environment variable.
+    ///
+    /// The port number is get from the `PORT` env variable, otherwise
+    /// defaulted to `default_port`.
     pub fn init(default_port: u16) -> Config {
         Self::init_for(default_port, None)
     }
 
+    /// Initialize config with the environment passed, if `None`, the environment
+    /// will be set with the `APP_ENV` environment variable.
+    ///
+    /// The port number is get from the `PORT` env variable, otherwise
+    /// defaulted to `default_port`.
     pub fn init_for(default_port: u16, environment: Option<Environment>) -> Config {
         debug!("⚙️  Configuring Backset server ...");
         let env = environment.unwrap_or_else(Environment::from_app_env);
@@ -36,9 +44,8 @@ impl Config {
             _ => Level::Info,
         };
         log!(log_level, "⚙️  Environment set to {env}");
-        let port = env_num::<u16>("PORT", default_port);
-        let addr = env::var("HOST").unwrap_or("127.0.0.1".to_owned());
         let db = DbConfig::init_for(&env);
-        Config { env, port, addr, db }
+        let server = ServerConfig::init("127.0.0.1", default_port);
+        Config { env, server, db }
     }
 }
