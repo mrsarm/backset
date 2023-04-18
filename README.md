@@ -299,7 +299,7 @@ command installed under the `/usr/app/bin` folder. You can
 access to the container with:
 
 ```shell
-docker exec -u root -it $(docker ps -f 'name=^bss$' -q) bash
+docker exec -u root -it $(docker ps -f 'name=^bss$' -q) sh
 ```
 
 To debug issues with the app or the container might be useful
@@ -307,17 +307,17 @@ to have some tools not installed by default, so first update
 the packages indexes:
 
 ```shell
-apt update
+apk update
 ```
 
-And then to install commands like `curl`, `ping`, `ps` and `netstat`:
+And then to install commands like `curl` and `jq`:
 
 ```shell
-apt install curl inetutils-ping procps net-tools
+apk add curl jq
 ```
 
-Any other tool available in Debian is available for installation
-in the container, e.g. `vim`.
+Any other tool available in Alpine is available for installation
+in the container, e.g. the `netstat` command via the `net-tools` package.
 
 ## TO-DOs
 
