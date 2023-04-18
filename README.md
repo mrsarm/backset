@@ -21,7 +21,7 @@ object belongs to.
 - Dockerized, ready to use for development or production envs.
 
 
-### ⚙️ Installation & Getting Started
+### 🛠 Installation & Getting Started
 
 You need Rust and Postgres to build and launch the app. Here are some shortcuts,
 for more options see the [Installation](docs/installation.md) page.
@@ -77,6 +77,8 @@ More stuff to add:
 
 ### About
 
-**Author**: Mariano Ruiz <mrsarm at gmail.com> (https://github.com/mrsarm)
+**Project Home**: https://github.com/mrsarm/backset
+
+**Author**: Mariano Ruiz (mrsarm at gmail.com)
 
 **License**: (2023) [Apache Software License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
