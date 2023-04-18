@@ -1,5 +1,7 @@
 # Backset Service
 
+> 🚧 Work in progress, just a few endpoints implemented
+
 Backset Service, or `bss`, it's a REST service to store elements, sets,
 and relations between the two.
 
