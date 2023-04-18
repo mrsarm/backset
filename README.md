@@ -7,7 +7,7 @@ All objects are stored within a "tenant", and the tenant id is at
 the beginning of all request URIs to identify to which tenant the
 object belongs to.
 
-## 🔋 Features
+### 🔋 Features
 
 - Rest API with Actix.
 - Storage in Postgres with SQLx.
@@ -21,7 +21,7 @@ object belongs to.
 - Dockerized, ready to use for development or production envs.
 
 
-# ⚙️ Installation & Getting Started
+### ⚙️ Installation & Getting Started
 
 You need Rust and Postgres to build and launch the app. Here are some shortcuts,
 for more options see the [Installation](docs/installation.md) page.
@@ -55,11 +55,11 @@ curl localhost:8558/health
 
 List of endpoints with samples of usage: [API](docs/api.md).
 
-## 🐳 Docker
+### 🐳 Docker
 
 Dockerfile and compose files are provided, check-out the [Docker](docs/docker.md) page.
 
-## 🚧 TO-DOs
+### TO-DOs
 
 Missing:
 
@@ -73,3 +73,10 @@ More stuff to add:
 - [x] Test/fix rollback implementation
 - [ ] Random PKs
 - [ ] Date / Datetime fields
+
+
+### About
+
+**Author**: Mariano Ruiz <mrsarm at gmail.com> (https://github.com/mrsarm)
+
+**License**: (2023) [Apache Software License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
