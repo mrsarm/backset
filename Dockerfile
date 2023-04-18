@@ -2,7 +2,6 @@ FROM rust:1.68-alpine3.17 as build
 LABEL maintainer="Mariano Ruiz"
 
 RUN apk add --no-cache --purge openssl-dev musl-dev \
-    && rustup target add x86_64-unknown-linux-musl \
     && cargo install sqlx-cli --target x86_64-unknown-linux-musl --no-default-features --features native-tls,postgres
 
 WORKDIR /usr/src/backset

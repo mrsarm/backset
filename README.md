@@ -292,11 +292,11 @@ E.g. `docker compose run sqlx migrate run` to run
 the migrations, or `docker compose run sqlx migrate info`
 to get the status of the migrations.
 
-### Running commands inside bss the container
+### Running commands inside the bss container
 
 The bss image is a thin runtime for `backset` and the `sqlx`
 command installed under the `/usr/app/bin` folder. You can
-access to the container with:
+access to a running container within a shell session with:
 
 ```shell
 docker exec -u root -it $(docker ps -f 'name=^bss$' -q) sh
