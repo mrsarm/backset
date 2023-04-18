@@ -9,8 +9,8 @@ object belongs to.
 
 ### 🔋 Features
 
-- Rest API with Actix.
-- Storage in Postgres with SQLx.
+- Rest API with **Actix** and **Rust** 🦀.
+- Storage in **Postgres** with SQLx.
   - SQL migrations.
 - Configuration through environment variables.
 - Logging configured with settings examples in the source.
@@ -77,8 +77,8 @@ More stuff to add:
 
 ### About
 
-**Project Home**: https://github.com/mrsarm/backset
+**Project Home**: https://github.com/mrsarm/backset.
 
-**Author**: Mariano Ruiz (mrsarm at gmail.com)
+**Author**: Mariano Ruiz (mrsarm at gmail.com).
 
 **License**: (2023) [Apache Software License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
