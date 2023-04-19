@@ -1,18 +1,21 @@
 use crate::PAGE_SIZE;
 use serde::{Deserialize, Serialize};
+use validator::Validate;
 
 fn default_page_size() -> i64 {
     PAGE_SIZE
 }
 
 /// Struct used to deserialize query strings.
-#[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Deserialize, Validate, PartialEq, Eq)]
 pub struct QuerySearch {
     pub q: Option<String>,
     pub sort: Option<Vec<String>>,
     #[serde(default)]
+    #[validate(range(min = 0))]
     pub offset: i64,
     #[serde(default = "default_page_size")]
+    #[validate(range(min = 1))]
     pub page_size: i64,
 }
 

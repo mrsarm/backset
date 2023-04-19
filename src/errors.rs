@@ -64,6 +64,28 @@ impl From<&ValidationErrors> for ValidationErrorPayload {
     }
 }
 
+///! Handle validation errors in the request payload (JSON body) or the
+///! query string, generating a HTTP 400 error with a JSON body
+///! describing the error, e.g.:
+///!
+///! ```
+///! {
+///!     "error": "Validation error",
+///!     "field_errors": {
+///!         "name": [
+///!             {
+///!                 "code": "length",
+///!                 "message": null,
+///!                 "params": {
+///!                     "max": 50,
+///!                     "min": 3,
+///!                     "value": "Bi"
+///!                 }
+///!             }
+///!         ]
+///!     }
+///! }
+///! ```
 pub fn json_error_handler(err: ActixValidatorError, _req: &HttpRequest) -> actix_web::error::Error {
     let json_error = match &err {
         ActixValidatorError::Validate(error) =>

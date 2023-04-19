@@ -2,9 +2,9 @@ use crate::app_state::AppState;
 use crate::core::HttpResult;
 use crate::page::{Page, QuerySearch};
 use crate::tenants::model::{Tenant, TenantPayload};
-use actix_web::web::{Data, Path, Query};
+use actix_web::web::{Data, Path};
 use actix_web::{delete, get, post, web, HttpResponse};
-use actix_web_validator::Json;
+use actix_web_validator::{Json, Query};
 
 #[post("")]
 async fn create(app: Data<AppState>, tenant_form: Json<TenantPayload>) -> HttpResult {

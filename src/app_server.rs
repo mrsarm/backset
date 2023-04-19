@@ -2,7 +2,7 @@ use actix_web::dev::Server;
 use actix_web::middleware::Logger;
 use actix_web::web::{Data, ServiceConfig};
 use actix_web::{App, HttpServer};
-use actix_web_validator::JsonConfig;
+use actix_web_validator::{JsonConfig, QueryConfig};
 use log::info;
 
 use crate::app_state::AppState;
@@ -42,6 +42,7 @@ impl AppServer {
         Box::new(move |conf: &mut ServiceConfig| {
             conf.app_data(data.clone())
                 .app_data(JsonConfig::default().error_handler(json_error_handler))
+                .app_data(QueryConfig::default().error_handler(json_error_handler))
                 .configure(health::config)
                 .configure(tenants_api::config);
         })

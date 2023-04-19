@@ -73,8 +73,8 @@ content-type: application/json
         ...
     ],
     "offset": 10,
-    "page_size": 5,
-    "total": 28
+    "page_size": 2,
+    "total": 12
 }
 ```
 

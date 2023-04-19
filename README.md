@@ -16,7 +16,7 @@ object belongs to.
   - SQL migrations.
 - Configuration through environment variables.
 - Logging configured with settings examples in the source.
-- CI pipeline with GitHub Actions.
+- Tests and CI pipeline with GitHub Actions.
 - Model driven design.
 - Good error management.
   - JSON validations with "validator" and "actix-web-validator" crates.
@@ -71,10 +71,14 @@ Missing:
 
 More stuff to add:
 
-- [x] Tests
-- [x] Test/fix rollback implementation
-- [ ] Random PKs
+- [ ] Add sorting and search to `GET /tenants`
+- [ ] Improve validations: when a required field is not passed
+      the error is ```{"error": "Json deserialize error: missing field `name` at line ..."}```
+      instead of providing field details. Check-out the default string handler that return
+      a string instead of JSON (sucks) but can be a good sample of how to iterate the errors
+      at least for these cases: https://github.com/rambler-digital-solutions/actix-web-validator/blob/master/src/error.rs#L51-L55
 - [ ] Date / Datetime fields
+- [ ] Random PKs
 
 
 ### About
