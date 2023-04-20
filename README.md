@@ -55,7 +55,7 @@ curl localhost:8558/health
 
 ### 🐴 Endpoints usage
 
-List of endpoints with samples of usage: [API](docs/api.md).
+List of endpoints with usage samples: [API](docs/api.md).
 
 ### 🐳 Docker
 

@@ -2,7 +2,7 @@
 
 A reference [Dockerfile](../Dockerfile), also [compose.yml](../compose.yml) and
 [.env.example](../.env.example) files are provided, you can run
-all from here, bss and Postgres.
+all from here: bss and Postgres.
 
 First, copy the `.env.example` file as `.env` file, and edit whatever
 value you want to:
@@ -11,9 +11,8 @@ value you want to:
 cp .env.example .env
 ```
 
-Then before run for the first time the containers, you have to either
-download the images from Docker Hub or build them from the source code. To
-build the images from the source code, execute:
+Then before run for the first time the containers, you have to build
+the backset image from the source code. To build it, execute:
 
 ```shell
 docker compose build

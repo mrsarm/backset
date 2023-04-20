@@ -63,13 +63,27 @@ cargo sqlx prepare
 
 ### Build
 
-Debug build, with a Postgres DB instance with a migrated DB running:
+Debug build, you have to have a Postgres DB instance running and migrated:
 
 ```shell
 cargo build
 ```
 
+Or just `make` that will also compile tests.
+
+For an optimized production build:
+
+```shell
+cargo build --release
+```
+
+Or `make release`.
+
 #### Build in "offline mode"
+
+In "offline mode" you don't need to have a DB instance running,
+but SQLx will still check the queries written in the code against
+the `sqlx-data.json` file that has the latest queries cached.
 
 ```shell
 SQLX_OFFLINE=true cargo build

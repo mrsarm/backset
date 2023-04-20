@@ -1,6 +1,6 @@
 ## API
 
-Here is the list of endpoints with sample usage.
+Here is the list of endpoints.
 
 ### Endpoints usage
 
@@ -8,7 +8,7 @@ All the examples are provided with *HTTPie*.
 
 #### Health check
 
-To check the service is running (it does not check the DB connection).
+To check whether the service is running (it does not check the DB connection).
 
 ```shell
 http :8558/health
@@ -52,7 +52,7 @@ content-type: application/json
 
 #### GET /tenants
 
-Query arguments `page_size` (default 50) and `offset` (default 0) are optionals.
+Query arguments `page_size` (default 50) and `offset` (default 0) are optional.
 
 ```shell
 $ http ":8558/tenants?page_size=5&offset=10"
