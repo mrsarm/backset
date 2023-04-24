@@ -4,10 +4,6 @@ use crate::page::QuerySearch;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-lazy_static! {
-    static ref SORT_ALLOWED: Vec<&'static str> = vec!["name"];
-}
-
 #[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
 pub struct Tenant {
     pub id: i64,
@@ -76,7 +72,7 @@ impl Tenant {
     }
 
     pub async fn find(tx: &mut Tx<'_>, query: &QuerySearch) -> Result<Vec<Tenant>> {
-        let order = query.sort_as_order_by_args(&SORT_ALLOWED, "name");
+        let order = query.sort_as_order_by_args(&["name"], "name");
         let sql;
         let query = match query.q.as_deref() {
             None => {

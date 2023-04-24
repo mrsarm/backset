@@ -27,13 +27,13 @@ impl QuerySearch {
     /// ```
     /// use backset::page::QuerySearch;
     /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: None };
-    /// assert_eq!(q.parse_sort(&vec!["a", "b"]), Vec::<String>::new());
+    /// assert_eq!(q.parse_sort(&["a", "b"]), Vec::<String>::new());
     /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("a,-b")) };
-    /// assert_eq!(q.parse_sort(&vec!["a", "b"]), vec![String::from("a"), String::from("b DESC")]);
+    /// assert_eq!(q.parse_sort(&["a", "b"]), &[String::from("a"), String::from("b DESC")]);
     /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("name,-b,c")) };
-    /// assert_eq!(q.parse_sort(&vec!["name", "c"]), vec![String::from("name"), String::from("c")]);
+    /// assert_eq!(q.parse_sort(&vec!["name", "c"]), &[String::from("name"), String::from("c")]);
     /// ```
-    pub fn parse_sort(&self, allowed_fields: &Vec<&str>) -> Vec<String> {
+    pub fn parse_sort(&self, allowed_fields: &[&str]) -> Vec<String> {
         self.sort
             .as_deref()
             .unwrap_or("")
@@ -52,12 +52,12 @@ impl QuerySearch {
     /// ```
     /// use backset::page::QuerySearch;
     /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: None };
-    /// assert_eq!(q.sort_as_order_by_args(&vec!["a", "b"], "a"), "a");
+    /// assert_eq!(q.sort_as_order_by_args(&["a", "b"], "a"), "a");
     /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("a,-b")) };
-    /// assert_eq!(q.sort_as_order_by_args(&vec!["a", "b"], "a"), "a, b DESC");
+    /// assert_eq!(q.sort_as_order_by_args(&["a", "b"], "a"), "a, b DESC");
     /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("name,-b,c")) };
-    /// assert_eq!(q.sort_as_order_by_args(&vec!["a", "h"], "c"), "c");
-    pub fn sort_as_order_by_args(&self, allowed_fields: &Vec<&str>, default: &str) -> String {
+    /// assert_eq!(q.sort_as_order_by_args(&["a", "h"], "c"), "c");
+    pub fn sort_as_order_by_args(&self, allowed_fields: &[&str], default: &str) -> String {
         let sorting = self.parse_sort(allowed_fields);
         match sorting.len() {
             0 => String::from(default),
