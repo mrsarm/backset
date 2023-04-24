@@ -37,12 +37,9 @@ impl QuerySearch {
         self.sort
             .as_deref()
             .unwrap_or("")
-            .split(",")
-            .filter(|s| {
-                let field_name = if s.starts_with("-") { &s[1..] } else { s };
-                allowed_fields.contains(&field_name)
-            })
-            .map(|f| if f.starts_with("-") { format!("{} DESC", &f[1..]) } else { f.to_string() })
+            .split(',')
+            .filter(|s| allowed_fields.contains(&s.strip_prefix('-').unwrap_or(s)))
+            .map(|f| f.strip_prefix('-').map(|d| format!("{d} DESC")).unwrap_or(f.to_string()))
             .collect()
     }
 
