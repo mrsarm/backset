@@ -49,21 +49,10 @@ impl Tenant {
     }
 
     pub async fn count(tx: &mut Tx<'_>, q: Option<&str>) -> Result<i64> {
-        let sql;
         let query = match q {
-            None => {
-                sql = format!("SELECT COUNT(*) FROM tenants");
-                sqlx::query_as(sql.as_str())
-            }
-            Some(q) => {
-                let name_like = format!("%{q}%");
-                sql = format!(r#"
-                SELECT COUNT(*)
-                  FROM tenants
-                  WHERE name ILIKE $1
-                "#);
-                sqlx::query_as(sql.as_str()).bind(name_like)
-            }
+            None => sqlx::query_as("SELECT COUNT(*) FROM tenants"),
+            Some(q) => sqlx::query_as("SELECT COUNT(*) FROM tenants WHERE name ILIKE $1")
+                .bind(format!("%{q}%")),
         };
         let count: (i64,) = query.fetch_one(&mut *tx)
             .await
@@ -83,12 +72,14 @@ impl Tenant {
             }
             Some(q) => {
                 let name_like = format!("%{q}%");
-                sql = format!(r#"
+                sql = format!(
+                    r#"
                 SELECT *
                   FROM tenants
                   WHERE name ILIKE $1
                   ORDER BY {order} LIMIT $2 OFFSET $3
-                "#);
+                    "#
+                );
                 sqlx::query_as(sql.as_str())
                     .bind(name_like)
                     .bind(query.page_size)

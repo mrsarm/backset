@@ -154,12 +154,12 @@ mod tests {
         assert_eq!(page.total, 6);
         assert_eq!(page.offset, 0);
         assert_eq!(page.page_size, 5);
-        assert!(page.data
+        assert!(page
+            .data
             .get(0)
             .map(|t| t.name.as_str())
             .unwrap_or("Not Found")
-            .starts_with("NEW data")
-        );
+            .starts_with("NEW data"));
         Ok(())
     }
 

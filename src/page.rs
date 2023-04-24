@@ -39,7 +39,11 @@ impl QuerySearch {
             .unwrap_or("")
             .split(',')
             .filter(|s| allowed_fields.contains(&s.strip_prefix('-').unwrap_or(s)))
-            .map(|f| f.strip_prefix('-').map(|d| format!("{d} DESC")).unwrap_or(f.to_string()))
+            .map(|f| {
+                f.strip_prefix('-')
+                    .map(|d| format!("{d} DESC"))
+                    .unwrap_or(f.to_string())
+            })
             .collect()
     }
 
