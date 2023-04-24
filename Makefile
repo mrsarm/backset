@@ -26,7 +26,7 @@ recreate-db-test:
 	./scripts/recreate-db-test.sh
 
 test: recreate-db-test
-	RUST_LOG=warn cargo test --test tenants
+	RUST_LOG=warn cargo test
 
 lint:
 	cargo clippy -- -D warnings

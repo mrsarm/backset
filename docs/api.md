@@ -52,7 +52,12 @@ content-type: application/json
 
 #### GET /tenants
 
-Query arguments `page_size` (default 50) and `offset` (default 0) are optional.
+Query arguments:
+
+- `q`: optional, a string used to search by name.
+- `page_size`: optional, default 50.
+- `offset`: optional, default 0.
+- `sort`: optional, default "name". Possible options are "name" and "-name". 
 
 ```shell
 $ http ":8558/tenants?page_size=5&offset=10"
@@ -64,11 +69,11 @@ content-type: application/json
     "data": [
         {
             "id": 12,
-            "name": "Some Tenant"
+            "name": "A Tenant"
         },
         {
             "id": 13,
-            "name": "Another Tenant"
+            "name": "Some Tenant"
         },
         ...
     ],

@@ -10,13 +10,60 @@ fn default_page_size() -> i64 {
 #[derive(Debug, Clone, Deserialize, Validate, PartialEq, Eq)]
 pub struct QuerySearch {
     pub q: Option<String>,
-    pub sort: Option<Vec<String>>,
+    pub sort: Option<String>,
     #[serde(default)]
     #[validate(range(min = 0))]
     pub offset: i64,
     #[serde(default = "default_page_size")]
     #[validate(range(min = 1))]
     pub page_size: i64,
+}
+
+impl QuerySearch {
+    /// Parse sort argument "col1,col2,-col3..." into a vector of strings,
+    /// and if the column name starts with "-", it's translated to a DESC
+    /// keyword, e.g. "-name" --> "name DESC".
+    ///
+    /// ```
+    /// use backset::page::QuerySearch;
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: None };
+    /// assert_eq!(q.parse_sort(&vec!["a", "b"]), Vec::<String>::new());
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("a,-b")) };
+    /// assert_eq!(q.parse_sort(&vec!["a", "b"]), vec![String::from("a"), String::from("b DESC")]);
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("name,-b,c")) };
+    /// assert_eq!(q.parse_sort(&vec!["name", "c"]), vec![String::from("name"), String::from("c")]);
+    /// ```
+    pub fn parse_sort(&self, allowed_fields: &Vec<&str>) -> Vec<String> {
+        self.sort
+            .as_deref()
+            .unwrap_or("")
+            .split(",")
+            .filter(|s| {
+                let field_name = if s.starts_with("-") { &s[1..] } else { s };
+                allowed_fields.contains(&field_name)
+            })
+            .map(|f| if f.starts_with("-") { format!("{} DESC", &f[1..]) } else { f.to_string() })
+            .collect()
+    }
+
+    /// Parse sort argument "col1,col2,-col3..." into a compatible SQL ORDER BY expression,
+    /// e.g. "name,-age" --> "name, age DESC", to be concatenated in a SQL SELECT query.
+    ///
+    /// ```
+    /// use backset::page::QuerySearch;
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: None };
+    /// assert_eq!(q.sort_as_order_by_args(&vec!["a", "b"], "a"), "a");
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("a,-b")) };
+    /// assert_eq!(q.sort_as_order_by_args(&vec!["a", "b"], "a"), "a, b DESC");
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("name,-b,c")) };
+    /// assert_eq!(q.sort_as_order_by_args(&vec!["a", "h"], "c"), "c");
+    pub fn sort_as_order_by_args(&self, allowed_fields: &Vec<&str>, default: &str) -> String {
+        let sorting = self.parse_sort(allowed_fields);
+        match sorting.len() {
+            0 => String::from(default),
+            _ => sorting.join(", "),
+        }
+    }
 }
 
 /// Struct used to serialize and deserialize paginated results.

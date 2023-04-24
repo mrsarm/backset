@@ -91,7 +91,7 @@ mod tests {
             let resp = call_service(&app, req).await;
             assert_eq!(resp.status(), StatusCode::CREATED);
         }
-        let req = _get(format!("/tenants").as_str());
+        let req = _get("/tenants");
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
@@ -104,7 +104,7 @@ mod tests {
         assert_eq!(page.page_size, PAGE_SIZE);
         assert_eq!(page.data.len() as i64, PAGE_SIZE);
 
-        let req = _get(format!("/tenants?page_size=5&offset=10").as_str());
+        let req = _get("/tenants?page_size=5&offset=10");
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
@@ -116,6 +116,50 @@ mod tests {
         assert_eq!(page.offset, 10);
         assert_eq!(page.page_size, 5);
         assert_eq!(page.data.len() as i64, 5);
+        Ok(())
+    }
+
+    #[actix_web::test]
+    async fn test_tenants_search() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let rand_for_test = rand::thread_rng().gen::<u32>();
+        let rand_classic = format!("Classic data {rand_for_test}");
+        for i in 0..3 {
+            let name = format!("{rand_classic} {i} {}", rand::thread_rng().gen::<u32>());
+            let req = _post(json!({ "name": name }));
+            call_service(&app, req).await;
+        }
+        let rand_new = format!("NEW data {rand_for_test}");
+        for i in 0..3 {
+            let name = format!("{rand_new} {i} {}", rand::thread_rng().gen::<u32>());
+            let req = _post(json!({ "name": name }));
+            call_service(&app, req).await;
+        }
+        let req = _get(format!("/tenants?q={rand_for_test}").as_str());
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let page: Page<Tenant> = try_read_body_json(resp).await?;
+        assert_eq!(page.total, 6);
+        let q = rand_new.replace(" ", "%20"); //TODO improve query string parsing
+        let req = _get(format!("/tenants?q={q}").as_str());
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let page: Page<Tenant> = try_read_body_json(resp).await?;
+        assert_eq!(page.total, 3);
+        let req = _get(format!("/tenants?q={rand_for_test}&page_size=5&sort=-name").as_str());
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let page: Page<Tenant> = try_read_body_json(resp).await?;
+        assert_eq!(page.total, 6);
+        assert_eq!(page.offset, 0);
+        assert_eq!(page.page_size, 5);
+        assert!(page.data
+            .get(0)
+            .map(|t| t.name.as_str())
+            .unwrap_or("Not Found")
+            .starts_with("NEW data")
+        );
         Ok(())
     }
 

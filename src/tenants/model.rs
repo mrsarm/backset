@@ -4,6 +4,10 @@ use crate::page::QuerySearch;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
+lazy_static! {
+    static ref SORT_ALLOWED: Vec<&'static str> = vec!["name"];
+}
+
 #[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
 pub struct Tenant {
     pub id: i64,
@@ -48,22 +52,54 @@ impl Tenant {
         Ok(tenant)
     }
 
-    pub async fn count(tx: &mut Tx<'_>) -> Result<i64> {
-        let count = sqlx::query!("SELECT COUNT(*) AS count FROM tenants")
-            .fetch_one(&mut *tx)
+    pub async fn count(tx: &mut Tx<'_>, q: Option<&str>) -> Result<i64> {
+        let sql;
+        let query = match q {
+            None => {
+                sql = format!("SELECT COUNT(*) FROM tenants");
+                sqlx::query_as(sql.as_str())
+            }
+            Some(q) => {
+                let name_like = format!("%{q}%");
+                sql = format!(r#"
+                SELECT COUNT(*)
+                  FROM tenants
+                  WHERE name ILIKE $1
+                "#);
+                sqlx::query_as(sql.as_str()).bind(name_like)
+            }
+        };
+        let count: (i64,) = query.fetch_one(&mut *tx)
             .await
             .map_err(AppError::DB)?;
-        Ok(count.count.unwrap_or(0))
+        Ok(count.0)
     }
 
     pub async fn find(tx: &mut Tx<'_>, query: &QuerySearch) -> Result<Vec<Tenant>> {
-        let tenants = sqlx::query_as!(
-                Tenant,
-                "SELECT * FROM tenants LIMIT $1 OFFSET $2",
-                query.page_size,
-                query.offset,
-            )
-            .fetch_all(&mut *tx)
+        let order = query.sort_as_order_by_args(&SORT_ALLOWED, "name");
+        let sql;
+        let query = match query.q.as_deref() {
+            None => {
+                sql = format!("SELECT * FROM tenants ORDER BY {order} LIMIT $1 OFFSET $2");
+                sqlx::query_as(sql.as_str())
+                    .bind(query.page_size)
+                    .bind(query.offset)
+            }
+            Some(q) => {
+                let name_like = format!("%{q}%");
+                sql = format!(r#"
+                SELECT *
+                  FROM tenants
+                  WHERE name ILIKE $1
+                  ORDER BY {order} LIMIT $2 OFFSET $3
+                "#);
+                sqlx::query_as(sql.as_str())
+                    .bind(name_like)
+                    .bind(query.page_size)
+                    .bind(query.offset)
+            }
+        };
+        let tenants = query.fetch_all(&mut *tx)
             .await
             .map_err(AppError::DB)?;
         Ok(tenants)
