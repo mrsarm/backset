@@ -58,6 +58,7 @@ impl QuerySearch {
     /// assert_eq!(q.sort_as_order_by_args(&["a", "b"], "a"), "a, b DESC");
     /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("name,-b,c")) };
     /// assert_eq!(q.sort_as_order_by_args(&["a", "h"], "c"), "c");
+    /// ```
     pub fn sort_as_order_by_args(&self, allowed_fields: &[&str], default: &str) -> String {
         let sorting = self.parse_sort(allowed_fields);
         match sorting.len() {
