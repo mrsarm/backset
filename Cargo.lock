@@ -427,6 +427,7 @@ dependencies = [
  "anyhow",
  "dotenv",
  "env_logger",
+ "lazy_static",
  "log",
  "rand",
  "serde",
