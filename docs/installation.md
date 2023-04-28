@@ -42,6 +42,18 @@ Or use `make migrate`.
 sqlx migrate info
 ```
 
+#### Revert last migration
+
+```shell
+sqlx migrate revert
+```
+
+#### Add new migration script
+
+```shell
+sqlx migrate add -r <name-migration>
+```
+
 
 #### Create and migrate DB for tests
 

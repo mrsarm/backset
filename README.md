@@ -71,7 +71,6 @@ Missing:
 
 More stuff to add:
 
-- [ ] Add sorting and search to `GET /tenants`
 - [ ] Improve validations: when a required field is not passed
       the error is ```{"error": "Json deserialize error: missing field `name` at line ..."}```
       instead of providing field details. Check-out the default string handler that return
