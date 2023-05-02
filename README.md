@@ -80,7 +80,6 @@ More stuff to add:
         when the error is a "ActixValidatorError::JsonPayloadError(Deserialize)", and the message
         is ```Json deserialize error: missing field `FIELDNAME` at line \d+ column \d+```,
         the error type and field name can be inferred.
-- [ ] Date / Datetime fields
 - [ ] Random PKs
 
 

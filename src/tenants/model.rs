@@ -2,12 +2,14 @@ use crate::core::{Result, Tx};
 use crate::errors::AppError;
 use crate::page::QuerySearch;
 use serde::{Deserialize, Serialize};
+use chrono::NaiveDateTime;
 use validator::Validate;
 
 #[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
 pub struct Tenant {
     pub id: i64,
     pub name: String,
+    pub created_at: NaiveDateTime,
 }
 
 #[derive(Deserialize, Validate)]
@@ -29,7 +31,7 @@ impl Tenant {
         }
         let tenant = sqlx::query_as!(
                 Tenant,
-                "INSERT INTO tenants (name) VALUES ($1) RETURNING *",
+                "INSERT INTO tenants (name, created_at) VALUES ($1, NOW()) RETURNING *",
                 tenant_form.name)
             .fetch_one(&mut *tx)
             .await
@@ -40,7 +42,7 @@ impl Tenant {
     pub async fn get(tx: &mut Tx<'_>, id: i64) -> Result<Option<Tenant>> {
         let tenant = sqlx::query_as!(
                 Tenant,
-                "SELECT id, name FROM tenants WHERE id = $1", id
+                "SELECT id, name, created_at FROM tenants WHERE id = $1", id
             )
             .fetch_optional(&mut *tx)
             .await
@@ -61,7 +63,7 @@ impl Tenant {
     }
 
     pub async fn find(tx: &mut Tx<'_>, query: &QuerySearch) -> Result<Vec<Tenant>> {
-        let order = query.sort_as_order_by_args(&["name"], "name");
+        let order = query.sort_as_order_by_args(&["name", "created_at"], "name");
         let sql;
         let query = match query.q.as_deref() {
             None => {

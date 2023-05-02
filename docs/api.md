@@ -46,7 +46,8 @@ content-type: application/json
 
 {
     "id": 17,
-    "name": "Tenant Name"
+    "name": "Tenant Name",
+    "created_at":"2023-04-21T09:20:40.128477"
 }
 ```
 
@@ -57,7 +58,8 @@ Query arguments:
 - `q`: optional, a string used to search by name.
 - `page_size`: optional, default 50.
 - `offset`: optional, default 0.
-- `sort`: optional, default "name". Possible options are "name" and "-name". 
+- `sort`: optional, default "name". Possible options are "name", "-name",
+  "created_at" or "-created_at". 
 
 ```shell
 $ http ":8558/tenants?page_size=5&offset=10"
@@ -69,11 +71,13 @@ content-type: application/json
     "data": [
         {
             "id": 12,
-            "name": "A Tenant"
+            "name": "A Tenant",
+            "created_at":"2023-05-01T00:54:38.936738"
         },
         {
             "id": 13,
-            "name": "Some Tenant"
+            "name": "Some Tenant",
+            "created_at":"2023-04-20T10:00:11.572824"
         },
         ...
     ],
