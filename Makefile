@@ -1,5 +1,6 @@
 .PHONY: clean build build-test release run test lint fmt-check \
-        migrate migrate-info create-db drop-db recreate-db recreate-db-test check-sqlx-data
+        migrate migrate-revert migrate-info create-db drop-db recreate-db recreate-db-test \
+        check-sqlx-data psql
 .DEFAULT_GOAL := build-all
 
 clean:
@@ -37,6 +38,9 @@ fmt-check:
 migrate:
 	sqlx migrate run
 
+migrate-revert:
+	sqlx migrate revert
+
 migrate-info:
 	sqlx migrate info
 
@@ -51,3 +55,7 @@ check-sqlx-data:
 	cp sqlx-data.json sqlx-data-prev.json
 	cargo sqlx prepare
 	diff sqlx-data-prev.json sqlx-data.json
+
+psql:
+	$(eval DATABASE_URL ?= $(shell cat .env | grep DATABASE_URL | cut -d= -f2))
+	psql "${DATABASE_URL}"
