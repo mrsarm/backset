@@ -1,31 +1,5 @@
 {
   "db": "PostgreSQL",
-  "06a6f12523e20a2b01b94f2bd05e9362e96c5c35d5a7092ec6628d2c171313aa": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "name",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar"
-        ]
-      }
-    },
-    "query": "INSERT INTO tenants (name) VALUES ($1) RETURNING *"
-  },
   "5fa322f469de5f4874b7abe47d660aa2e38170037252fead3cd046ccc89bf5d8": {
     "describe": {
       "columns": [
@@ -46,19 +20,7 @@
     },
     "query": "SELECT EXISTS(SELECT id FROM tenants WHERE name = $1)"
   },
-  "e43937670f326dda7fc3e001ef0fc849a7302eb76d3a85fc4ec1aa597f974bec": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "DELETE FROM tenants WHERE id = $1"
-  },
-  "e8223fbeec3451a2ba42cbe3753cf29fd130d315962881d2103117d0cbe9ef51": {
+  "8d72c933052520bf579ec1252c8a4fd4b38989af21905b9724c71cb3fc267c4c": {
     "describe": {
       "columns": [
         {
@@ -70,9 +32,47 @@
           "name": "name",
           "ordinal": 1,
           "type_info": "Varchar"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 2,
+          "type_info": "Timestamp"
         }
       ],
       "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      }
+    },
+    "query": "INSERT INTO tenants (name, created_at) VALUES ($1, NOW()) RETURNING *"
+  },
+  "c4781ab073b5977e07be827b3c9d411e84cbe5b53b998a78f0124c933a7b8010": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 2,
+          "type_info": "Timestamp"
+        }
+      ],
+      "nullable": [
+        false,
         false,
         false
       ],
@@ -82,6 +82,18 @@
         ]
       }
     },
-    "query": "SELECT id, name FROM tenants WHERE id = $1"
+    "query": "SELECT id, name, created_at FROM tenants WHERE id = $1"
+  },
+  "e43937670f326dda7fc3e001ef0fc849a7302eb76d3a85fc4ec1aa597f974bec": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "DELETE FROM tenants WHERE id = $1"
   }
 }
