@@ -5,7 +5,9 @@ use chrono::NaiveDateTime;
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use validator::Validate;
+use std::borrow::Cow;
+use std::collections::HashMap;
+use validator::{Validate, ValidationError};
 
 lazy_static! {
     static ref ID_VALID: Regex = Regex::new(r"^[a-z][a-z0-9\-]+$").unwrap();
@@ -18,11 +20,22 @@ pub struct Tenant {
     pub created_at: NaiveDateTime,
 }
 
+fn validate_forbidden_list(tenant_id: &str) -> core::result::Result<(), ValidationError> {
+    if tenant_id == "tenants" || tenant_id == "health" {
+        // id cannot collide with endpoint paths
+        return Err(ValidationError {
+            code: Cow::from("forbidden_id"),
+            message: Some(Cow::from("Forbidden tenant id.")),
+            params: HashMap::new()
+        });
+    }
+    Ok(())
+}
+
 #[derive(Deserialize, Validate)]
 pub struct TenantPayload {
     #[validate(length(min = 3, max = 40))]
-    #[validate(does_not_contain(pattern = "tenants", code = "forbidden_id"))]
-    #[validate(does_not_contain(pattern = "health", code = "forbidden_id"))]
+    #[validate(custom = "validate_forbidden_list")]
     #[validate(regex(
         path = "ID_VALID",
         code = "invalid_id",
