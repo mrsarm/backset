@@ -27,4 +27,5 @@ validator = { version = "0.16", features = ["derive"] }
 strum = "0.24"
 strum_macros = "0.24"
 rand = "0.8"
+regex = "1.8"
 chrono = { version = "0.4", features = ["serde"] }

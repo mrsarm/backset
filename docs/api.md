@@ -25,27 +25,28 @@ content-type: application/json
 #### POST /tenants
 
 ```shell
-http :8558/tenants --raw '{"name": "Tenant Name"}'
+http :8558/tenants --raw '{"id": "tenant-me", "name": "Tenant Name"}'
 HTTP/1.1 201 Created
 content-type: application/json
 ...
 
 {
-    "id": 17,
-    "name": "Tenant Name"
+    "id": "tenant-me",
+    "name": "Tenant Name",
+    "created_at": "2023-05-19T20:04:26.331117"
 }
 ```
 
-#### GET /tenants/{id}
+#### GET /{id}
 
 ```shell
-http :8558/tenants/17
+http :8558/my-tenant
 HTTP/1.1 200 OK
 content-type: application/json
 ...
 
 {
-    "id": 17,
+    "id": "my-tenant",
     "name": "Tenant Name",
     "created_at":"2023-04-21T09:20:40.128477"
 }
@@ -55,11 +56,12 @@ content-type: application/json
 
 Query arguments:
 
-- `q`: optional, a string used to search by name.
+- `q`: optional, a string used to search by id or name.
 - `page_size`: optional, default 50.
 - `offset`: optional, default 0.
-- `sort`: optional, default "name". Possible options are "name", "-name",
-  "created_at" or "-created_at". 
+- `sort`: optional, default "id". Possible options are "id", "name" or "created_at",
+  and using the "-" prefix the sorting is from z-a instead of a-z, e.g. use
+  "-name" to sort by name in reverse order.
 
 ```shell
 $ http ":8558/tenants?page_size=5&offset=10"
@@ -70,13 +72,13 @@ content-type: application/json
 {
     "data": [
         {
-            "id": 12,
+            "id": "my-tenant",
             "name": "A Tenant",
             "created_at":"2023-05-01T00:54:38.936738"
         },
         {
-            "id": 13,
-            "name": "Some Tenant",
+            "id": "tags",
+            "name": "Tags collection",
             "created_at":"2023-04-20T10:00:11.572824"
         },
         ...
@@ -90,7 +92,7 @@ content-type: application/json
 #### DELETE /tenants/{id}
 
 ```shell
-$ http DELETE :8558/tenants/8
+$ http DELETE :8558/tenants/my-tentant
 HTTP/1.1 204 No Content
 ...
 ```

@@ -1,5 +1,25 @@
 {
   "db": "PostgreSQL",
+  "59f26753871560cbc3a4819decbddfc4895a6da0fe9b1162638598d05b2200c7": {
+    "describe": {
+      "columns": [
+        {
+          "name": "exists",
+          "ordinal": 0,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT EXISTS(SELECT id FROM tenants WHERE id = $1)"
+  },
   "5fa322f469de5f4874b7abe47d660aa2e38170037252fead3cd046ccc89bf5d8": {
     "describe": {
       "columns": [
@@ -20,13 +40,13 @@
     },
     "query": "SELECT EXISTS(SELECT id FROM tenants WHERE name = $1)"
   },
-  "8d72c933052520bf579ec1252c8a4fd4b38989af21905b9724c71cb3fc267c4c": {
+  "a7ebcd3b52747be0e9cae0723f55b495609043bb8e5307c377e22fff8052b687": {
     "describe": {
       "columns": [
         {
           "name": "id",
           "ordinal": 0,
-          "type_info": "Int8"
+          "type_info": "Varchar"
         },
         {
           "name": "name",
@@ -46,11 +66,12 @@
       ],
       "parameters": {
         "Left": [
+          "Varchar",
           "Varchar"
         ]
       }
     },
-    "query": "INSERT INTO tenants (name, created_at) VALUES ($1, NOW()) RETURNING *"
+    "query": "INSERT INTO tenants (id, name, created_at) VALUES ($1, $2, NOW()) RETURNING *"
   },
   "c4781ab073b5977e07be827b3c9d411e84cbe5b53b998a78f0124c933a7b8010": {
     "describe": {
@@ -58,7 +79,7 @@
         {
           "name": "id",
           "ordinal": 0,
-          "type_info": "Int8"
+          "type_info": "Varchar"
         },
         {
           "name": "name",
@@ -78,7 +99,7 @@
       ],
       "parameters": {
         "Left": [
-          "Int8"
+          "Text"
         ]
       }
     },
@@ -90,7 +111,7 @@
       "nullable": [],
       "parameters": {
         "Left": [
-          "Int8"
+          "Text"
         ]
       }
     },

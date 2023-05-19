@@ -17,10 +17,10 @@ async fn create(app: Data<AppState>, tenant_form: Json<TenantPayload>) -> HttpRe
 }
 
 #[get("{id}")]
-async fn read(app: Data<AppState>, id: Path<i64>) -> HttpResult {
+async fn read(app: Data<AppState>, id: Path<String>) -> HttpResult {
     let mut tx = app.get_tx().await?;
 
-    let tenant = Tenant::get(&mut tx, id.into_inner()).await?;
+    let tenant = Tenant::get(&mut tx, id.into_inner().as_str()).await?;
 
     app.commit_tx(tx).await?;
     match tenant {
@@ -46,10 +46,10 @@ async fn list(app: Data<AppState>, query: Query<QuerySearch>) -> HttpResult {
 }
 
 #[delete("{id}")]
-async fn delete(app: Data<AppState>, id: Path<i64>) -> HttpResult {
+async fn delete(app: Data<AppState>, id: Path<String>) -> HttpResult {
     let mut tx = app.get_tx().await?;
 
-    let rows_deleted = Tenant::delete(&mut tx, id.into_inner()).await?;
+    let rows_deleted = Tenant::delete(&mut tx, id.into_inner().as_str()).await?;
 
     app.commit_tx(tx).await?;
     match rows_deleted {
@@ -62,7 +62,9 @@ pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/tenants")
         .service(create)
         .service(delete)
-        .service(list)
+        .service(list);
+    conf.service(scope);
+    let scope = web::scope("")
         .service(read);
     conf.service(scope);
 }

@@ -1,10 +1,11 @@
 #[cfg(test)]
 mod tests {
     use actix_http::Request;
+    use actix_web::dev::ServiceResponse;
     use actix_web::http::header::{Accept, ContentType};
     use actix_web::http::StatusCode;
-    use actix_web::test::{call_service, init_service, try_read_body_json, TestRequest};
-    use actix_web::web::Data;
+    use actix_web::test::{call_service, init_service, read_body, try_read_body_json, TestRequest};
+    use actix_web::web::{Bytes, Data};
     use actix_web::App;
     use backset::app_server::AppServer;
     use backset::app_state::AppState;
@@ -55,11 +56,14 @@ mod tests {
     async fn test_tenants_post() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let name = format!("The Tenant Name {}", rand::thread_rng().gen::<u32>());
-        let req = _post(json!({ "name": name }));
+        let _id = rand::thread_rng().gen::<u32>();
+        let id = format!("ten-{_id}");
+        let name = format!("The Tenant Name {_id}");
+        let req = _post(json!({ "id": id, "name": name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let tenant: Tenant = try_read_body_json(resp).await?;
+        assert_eq!(tenant.id, id);
         assert_eq!(tenant.name, name);
         Ok(())
     }
@@ -68,15 +72,18 @@ mod tests {
     async fn test_tenants_post_and_get() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let name = format!("Another Name {}", rand::thread_rng().gen::<u32>());
-        let req = _post(json!({ "name": name }));
+        let _id = rand::thread_rng().gen::<u32>();
+        let id = format!("another-{_id}");
+        let name = format!("Another Name {_id}");
+        let req = _post(json!({ "id": id, "name": name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let tenant: Tenant = try_read_body_json(resp).await?;
-        let req = _get(format!("/tenants/{}", tenant.id).as_str());
+        let req = _get(format!("/{}", tenant.id).as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let tenant: Tenant = try_read_body_json(resp).await?;
+        assert_eq!(tenant.id, id);
         assert_eq!(tenant.name, name);
         Ok(())
     }
@@ -86,10 +93,12 @@ mod tests {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         for i in 0..80 {
-            let name = format!("Paginated {} {}", i, rand::thread_rng().gen::<u32>());
-            let req = _post(json!({ "name": name }));
+            let _id = rand::thread_rng().gen::<u32>();
+            let id = format!("paginated-{_id}-{i}");
+            let name = format!("Paginated {_id} {i}");
+            let req = _post(json!({ "id": id, "name": name }));
             let resp = call_service(&app, req).await;
-            assert_eq!(resp.status(), StatusCode::CREATED);
+            assert_status(resp, StatusCode::CREATED).await;
         }
         let req = _get("/tenants");
         let resp = call_service(&app, req).await;
@@ -126,14 +135,18 @@ mod tests {
         let rand_for_test = rand::thread_rng().gen::<u32>();
         let rand_classic = format!("Classic data {rand_for_test}");
         for i in 0..3 {
-            let name = format!("{rand_classic} {i} {}", rand::thread_rng().gen::<u32>());
-            let req = _post(json!({ "name": name }));
+            let _id = rand::thread_rng().gen::<u32>();
+            let id = format!("classic-{rand_for_test}-{_id}-{i}");
+            let name = format!("{rand_classic} {rand_for_test} {i} {_id}");
+            let req = _post(json!({ "id": id, "name": name }));
             call_service(&app, req).await;
         }
         let rand_new = format!("NEW data {rand_for_test}");
         for i in 0..3 {
+            let _id = rand::thread_rng().gen::<u32>();
+            let id = format!("new-{rand_for_test}-{_id}-{i}");
             let name = format!("{rand_new} {i} {}", rand::thread_rng().gen::<u32>());
-            let req = _post(json!({ "name": name }));
+            let req = _post(json!({ "id": id, "name": name }));
             call_service(&app, req).await;
         }
         let req = _get(format!("/tenants?q={rand_for_test}").as_str());
@@ -167,15 +180,34 @@ mod tests {
     async fn test_tenants_post_already_exists() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let same_name = format!("First Time Name {}", rand::thread_rng().gen::<u32>());
-        let req = _post(json!({ "name": same_name }));
+        let _id = rand::thread_rng().gen::<u32>();
+        let id = format!("first-{_id}");
+        let same_name = format!("First Time Name {_id}");
+        let req = _post(json!({ "id": id, "name": same_name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
-        let req = _post(json!({ "name": same_name })); // same name again
+        let req = _post(json!({
+            "id": format!("id-{}", rand::thread_rng().gen::<u32>()),
+            "name": same_name // same name again
+        }));
         let resp = call_service(&app, req).await;
-        assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
-        let error: ValidationErrorPayload = try_read_body_json(resp).await?;
-        assert_eq!(error.error, "Tenant already exists");
+        let body = assert_status(resp, StatusCode::BAD_REQUEST).await;
+        let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            error.error,
+            format!("Tenant with name \"{same_name}\" already exists.")
+        );
+        let req = _post(json!({
+            "id": id,   // same id
+            "name": format!("Some Name {}", rand::thread_rng().gen::<u32>())
+        }));
+        let resp = call_service(&app, req).await;
+        let body = assert_status(resp, StatusCode::BAD_REQUEST).await;
+        let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            error.error,
+            format!("Tenant with id \"{id}\" already exists.")
+        );
         Ok(())
     }
 
@@ -183,7 +215,10 @@ mod tests {
     async fn test_tenants_field_validations() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let req = _post(json!({ "name": "Sr" }));
+        let req = _post(json!({
+            "id": format!("validate-{}", rand::thread_rng().gen::<u32>()),
+            "name": "Sr"
+        }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
         let error: ValidationErrorPayload = try_read_body_json(resp).await?;
@@ -222,8 +257,9 @@ mod tests {
     async fn test_tenants_delete() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let id = format!("to-delete-{}", rand::thread_rng().gen::<u32>());
         let name = format!("To Be Deleted {}", rand::thread_rng().gen::<u32>());
-        let req = _post(json!({ "name": name }));
+        let req = _post(json!({ "id": id, "name": name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let tenant: Tenant = try_read_body_json(resp).await?;
@@ -248,6 +284,14 @@ mod tests {
             .to_request();
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+    }
+
+    async fn assert_status(resp: ServiceResponse, expected_status: StatusCode) -> Bytes {
+        let status = resp.status();
+        let body_bytes = read_body(resp).await;
+        let body: &str = std::str::from_utf8(&body_bytes[..]).unwrap();
+        assert_eq!(status, expected_status, "Response Body: {}", body);
+        body_bytes
     }
 
     fn _post(data: impl Serialize) -> Request {
