@@ -24,8 +24,8 @@ serde_json = "1.0"
 sqlx = { version = "0.6", features = ["runtime-async-std-native-tls", "postgres", "offline", "macros", "chrono"] }
 thiserror = "1.0"
 validator = { version = "0.16", features = ["derive"] }
-strum = "0.24"
-strum_macros = "0.24"
+strum = "0.25"
+strum_macros = "0.25"
 rand = "0.8"
 regex = "1.8"
 chrono = { version = "0.4", features = ["serde"] }
