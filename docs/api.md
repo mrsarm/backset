@@ -4,7 +4,9 @@ Here is the list of endpoints.
 
 ### Endpoints usage
 
-All the examples are provided with *HTTPie*.
+All the examples are provided with *HTTPie*, and assumed the default
+port `8558` was not changed (env `PORT`), nor the default URI prefix `/`
+(env `APP_URI`).
 
 #### Health check
 
@@ -38,6 +40,8 @@ content-type: application/json
 ```
 
 #### GET /{id}
+
+Having a tenant with id `my-tenant`:
 
 ```shell
 http :8558/my-tenant

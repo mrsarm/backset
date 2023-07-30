@@ -11,6 +11,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres/bss_dev
       - APP_ENV
+      - APP_URI
       - RUST_LOG
       - MAX_CONNECTIONS
       - MIN_CONNECTIONS

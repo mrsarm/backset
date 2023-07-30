@@ -11,15 +11,16 @@ object belongs to.
 
 ### 🔋 Features
 
-- Rest API with **Actix** and **Rust** 🦀.
-- Storage in **Postgres** with SQLx.
+- Rest API with [Actix](https://github.com/actix/actix) and **Rust** 🦀.
+- Storage in **Postgres** with [SQLx](https://github.com/launchbadge/sqlx).
   - SQL migrations.
 - Configuration through environment variables.
 - Logging configured with settings examples in the source.
 - Tests and CI pipeline with GitHub Actions.
 - Model driven design.
 - Good error management.
-  - JSON validations with "validator" and "actix-web-validator" crates.
+  - JSON validations with [validator](https://github.com/Keats/validator) and
+    [actix-web-validator](https://github.com/rambler-digital-solutions/actix-web-validator) crates.
 - Dockerized, ready to use for development or production envs.
 
 
@@ -70,7 +71,8 @@ Missing:
 - [ ] "/sets" model and endpoints
 
 More stuff to add:
-
+- [ ] Add argument `include_total=(true|false)` (default `true`) to include/omit total count
+      that might be expensive sometimes.
 - [ ] Improve validations: when a required field is not passed
       the error is ```{"error": "Json deserialize error: missing field `name` at line ..."}```
       instead of providing field details. Check-out the default string handler that return
@@ -81,6 +83,11 @@ More stuff to add:
         is ```Json deserialize error: missing field `FIELDNAME` at line \d+ column \d+```,
         the error type and field name can be inferred.
 - [ ] Random PKs
+- [ ] Command lines options:
+    - [ ] To check server status pinging `/health` endpoint, so a health check script
+      can be added to `Dockerfile`.
+    - [ ] Option to run the migrations command, so there is no need to include the
+      `sqlx` command to run them, reducing the size a lot.
 
 
 ### About

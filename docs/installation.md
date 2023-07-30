@@ -148,3 +148,9 @@ To only execute the tests without recreating the test DB:
 ```shell
 cargo test
 ```
+
+### Environment variables
+
+Check out [.env.example](../.env.example) that has some examples, and the full list
+of variables in the [compose.yml](../compose.yml), in the service `bss`,
+section `environment`.

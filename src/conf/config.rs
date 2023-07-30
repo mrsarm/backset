@@ -1,6 +1,6 @@
 use crate::conf::db::DbConfig;
 use crate::conf::env::Environment;
-use crate::conf::server::ServerConfig;
+use crate::conf::server::HttpServerConfig;
 use log::{debug, log, Level};
 use std::fmt::Debug;
 
@@ -17,7 +17,7 @@ use std::fmt::Debug;
 pub struct Config {
     // Add more conf here
     pub env: Environment,
-    pub server: ServerConfig,
+    pub server: HttpServerConfig,
     pub db: DbConfig,
 }
 
@@ -45,7 +45,7 @@ impl Config {
         };
         log!(log_level, "⚙️  Environment set to {env}");
         let db = DbConfig::init_for(&env);
-        let server = ServerConfig::init("127.0.0.1", default_port);
+        let server = HttpServerConfig::init("127.0.0.1", default_port);
         Config { env, server, db }
     }
 }

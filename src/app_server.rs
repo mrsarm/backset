@@ -1,5 +1,6 @@
 use actix_web::dev::Server;
 use actix_web::middleware::Logger;
+use actix_web::web;
 use actix_web::web::{Data, ServiceConfig};
 use actix_web::{App, HttpServer};
 use actix_web_validator::{JsonConfig, QueryConfig};
@@ -21,15 +22,18 @@ impl AppServer {
     pub async fn build(config: Config, app_version: &str) -> Result<Self, anyhow::Error> {
         let addr = config.server.addr.clone();
         let port: u16 = config.server.port;
+        let uri = config.server.uri.clone();
         info!(
-            "🚀 Starting Backset server v{} at http://{}:{} ...",
-            app_version, addr, port
+            "🚀 Starting Backset server v{} at http://{}:{}/{} ...",
+            app_version, addr, port, uri
         );
         let state = AppState::new(config).await;
 
         let server = HttpServer::new(move || {
             App::new()
-                .configure(Self::config_app(Data::new(state.clone())))
+                .service(web::scope(uri.as_str()).configure(
+                    Self::config_app(Data::new(state.clone()))
+                ))
                 .wrap(Logger::default())
         })
         .bind((addr.clone(), port))?
