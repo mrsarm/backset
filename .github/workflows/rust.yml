@@ -20,7 +20,7 @@ jobs:
     - name: Run PostgreSQL
       run: docker compose up postgres -d
     - name: Wait DB
-      run: sleep 1
+      run: sleep 3
     - name: Migrations
       run: make recreate-db
     - name: Build
