@@ -1,4 +1,4 @@
-FROM rust:1.68-alpine3.17 as build
+FROM rust:1.71-alpine3.17 as build
 LABEL maintainer="Mariano Ruiz"
 
 RUN apk add --no-cache --purge openssl-dev musl-dev \
