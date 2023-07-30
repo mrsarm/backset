@@ -26,7 +26,7 @@ fn validate_forbidden_list(tenant_id: &str) -> core::result::Result<(), Validati
         return Err(ValidationError {
             code: Cow::from("forbidden_id"),
             message: Some(Cow::from("Forbidden tenant id.")),
-            params: HashMap::new()
+            params: HashMap::new(),
         });
     }
     Ok(())

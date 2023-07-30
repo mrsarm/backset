@@ -8,30 +8,30 @@ use sqlx::Error as SqlxError;
 use std::collections::HashMap;
 use validator::{ValidationError, ValidationErrors};
 
-///! Use to serialize a simple error with a static message.
+/// Use to serialize a simple error with a static message.
 #[derive(Debug, Serialize)]
 pub struct InternalErrorPayload {
     pub error: &'static str,
 }
 
-///! Use to serialize a validation
-///! with a string error and/or field validation errors.
-///!
-///! An error serialized as JSON looks like:
+/// Use to serialize a validation
+/// with a string error and/or field validation errors.
 ///
-///! ```
-///! {
-///!   "error": "Validation error",
-///!   "field_errors": {
-///!     "name": [
-///!       {
-///!         "code": "length",
-///!         "message": null,
-///!         "params": { "min": 3, "value": "Sr" }
-///!       }
-///!     ]
-///!   }
-///! }
+/// An error serialized as JSON looks like:
+///
+/// ```json
+/// {
+///   "error": "Validation error",
+///   "field_errors": {
+///     "name": [
+///       {
+///         "code": "length",
+///         "message": null,
+///         "params": { "min": 3, "value": "Sr" }
+///       }
+///     ]
+///   }
+/// }
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ValidationErrorPayload {
     pub error: String,
@@ -64,28 +64,28 @@ impl From<&ValidationErrors> for ValidationErrorPayload {
     }
 }
 
-///! Handle validation errors in the request payload (JSON body) or the
-///! query string, generating a HTTP 400 error with a JSON body
-///! describing the error, e.g.:
-///!
-///! ```
-///! {
-///!     "error": "Validation error",
-///!     "field_errors": {
-///!         "name": [
-///!             {
-///!                 "code": "length",
-///!                 "message": null,
-///!                 "params": {
-///!                     "max": 50,
-///!                     "min": 3,
-///!                     "value": "Bi"
-///!                 }
-///!             }
-///!         ]
-///!     }
-///! }
-///! ```
+/// Handle validation errors in the request payload (JSON body) or the
+/// query string, generating a HTTP 400 error with a JSON body
+/// describing the error, e.g.:
+///
+/// ```json
+/// {
+///     "error": "Validation error",
+///     "field_errors": {
+///         "name": [
+///             {
+///                 "code": "length",
+///                 "message": null,
+///                 "params": {
+///                     "max": 50,
+///                     "min": 3,
+///                     "value": "Bi"
+///                 }
+///             }
+///         ]
+///     }
+/// }
+/// ```
 pub fn json_error_handler(err: ActixValidatorError, _req: &HttpRequest) -> actix_web::error::Error {
     let json_error = match &err {
         ActixValidatorError::Validate(error) =>

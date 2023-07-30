@@ -56,6 +56,9 @@ content-type: application/json
 }
 ```
 
+(Note that getting a tenant info is not under the
+`/tenants` URI but under the root of the API routes) 
+
 #### GET /tenants
 
 Query arguments:

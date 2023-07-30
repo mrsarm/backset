@@ -6,18 +6,18 @@ use log::{debug, error};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 
-///! Struct that holds the app configurations
-///! and the connection pool to the database.
-///! Each API method should receive an AppState
-///! argument as following:
-///!
-///! ```
-///! #[post("...")]
-///! async fn method_name(
-///!     app: web::Data<AppState>,
-///!     ...
-///! ) -> Result<HttpResponse, ...> {
-///! ```
+/// Struct that holds the app configurations
+/// and the connection pool to the database.
+/// Each API method should receive an AppState
+/// argument as following:
+///
+/// ```example
+/// #[post("...")]
+/// async fn method_name(
+///     app: web::Data<AppState>,
+///     ...
+/// ) -> Result<HttpResponse, ...> {
+/// ```
 #[derive(Debug, Clone)]
 pub struct AppState {
     pub pool: PgPool,

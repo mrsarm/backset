@@ -30,10 +30,9 @@ impl AppServer {
         let state = AppState::new(config).await;
 
         let server = HttpServer::new(move || {
+            let config_app = Self::config_app(Data::new(state.clone()));
             App::new()
-                .service(web::scope(uri.as_str()).configure(
-                    Self::config_app(Data::new(state.clone()))
-                ))
+                .service(web::scope(uri.as_str()).configure(config_app))
                 .wrap(Logger::default())
         })
         .bind((addr.clone(), port))?
