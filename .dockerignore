@@ -5,5 +5,4 @@
 /.settings
 /.vscode
 
-/.sqlx
 Dockerfile
