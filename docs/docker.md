@@ -1,6 +1,6 @@
 # Docker
 
-A reference [Dockerfile](../Dockerfile), also [compose.yml](../compose.yml) and
+A reference [Dockerfile](../Dockerfile), also [compose.yaml](../compose.yaml) and
 [.env.example](../.env.example) files are provided, you can run
 all from here: bss and Postgres.
 

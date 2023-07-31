@@ -152,5 +152,5 @@ cargo test
 ### Environment variables
 
 Check out [.env.example](../.env.example) that has some examples, and the full list
-of variables in the [compose.yml](../compose.yml), in the service `bss`,
+of variables in the [compose.yaml](../compose.yaml), in the service `bss`,
 section `environment`.
