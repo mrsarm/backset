@@ -50,6 +50,9 @@ create-db:
 drop-db:
 	sqlx database drop -y
 
+sqlx-data:
+	cargo sqlx prepare
+
 check-sqlx-data:
 	echo "Checking .sqlx/ is up to date with DB ..."
 	cargo sqlx prepare
