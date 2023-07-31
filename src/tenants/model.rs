@@ -51,7 +51,7 @@ impl Tenant {
         let res = sqlx::query!(
                 "SELECT EXISTS(SELECT id FROM tenants WHERE id = $1)",
                 tenant_form.id)
-            .fetch_one(&mut *tx)
+            .fetch_one(&mut **tx)
             .await
             .map_err(AppError::DB)?;
         if res.exists.unwrap_or(false) {
@@ -62,7 +62,7 @@ impl Tenant {
         let res = sqlx::query!(
                 "SELECT EXISTS(SELECT id FROM tenants WHERE name = $1)",
                 tenant_form.name)
-            .fetch_one(&mut *tx)
+            .fetch_one(&mut **tx)
             .await
             .map_err(AppError::DB)?;
         if res.exists.unwrap_or(false) {
@@ -75,7 +75,7 @@ impl Tenant {
                 "INSERT INTO tenants (id, name, created_at) VALUES ($1, $2, NOW()) RETURNING *",
                 tenant_form.id,
                 tenant_form.name)
-            .fetch_one(&mut *tx)
+            .fetch_one(&mut **tx)
             .await
             .map_err(AppError::DB)?;
         Ok(tenant)
@@ -86,7 +86,7 @@ impl Tenant {
                 Tenant,
                 "SELECT id, name, created_at FROM tenants WHERE id = $1", id
             )
-            .fetch_optional(&mut *tx)
+            .fetch_optional(&mut **tx)
             .await
             .map_err(AppError::DB)?;
         Ok(tenant)
@@ -98,7 +98,7 @@ impl Tenant {
             Some(q) => sqlx::query_as("SELECT COUNT(*) FROM tenants WHERE name ILIKE $1")
                 .bind(format!("%{q}%")),
         };
-        let count: (i64,) = query.fetch_one(&mut *tx)
+        let count: (i64,) = query.fetch_one(&mut **tx)
             .await
             .map_err(AppError::DB)?;
         Ok(count.0)
@@ -130,7 +130,7 @@ impl Tenant {
                     .bind(query.offset)
             }
         };
-        let tenants = query.fetch_all(&mut *tx)
+        let tenants = query.fetch_all(&mut **tx)
             .await
             .map_err(AppError::DB)?;
         Ok(tenants)
@@ -138,7 +138,7 @@ impl Tenant {
 
     pub async fn delete(tx: &mut Tx<'_>, id: &str) -> Result<u64> {
         let result = sqlx::query!("DELETE FROM tenants WHERE id = $1", id)
-            .execute(&mut *tx)
+            .execute(&mut **tx)
             .await
             .map_err(AppError::DB)?;
 

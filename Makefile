@@ -51,10 +51,9 @@ drop-db:
 	sqlx database drop -y
 
 check-sqlx-data:
-	echo "Checking sqlx-data.json is up to date with DB ..."
-	cp sqlx-data.json sqlx-data-prev.json
+	echo "Checking .sqlx/ is up to date with DB ..."
 	cargo sqlx prepare
-	diff sqlx-data-prev.json sqlx-data.json
+	git diff --exit-code --stat .sqlx/
 
 psql:
 	$(eval DATABASE_URL ?= $(shell cat .env | grep DATABASE_URL | cut -d= -f2))
