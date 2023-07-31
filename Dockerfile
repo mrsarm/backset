@@ -1,4 +1,4 @@
-FROM rust:1.71-alpine3.17 as build
+FROM rust:1.71-alpine3.18 as build
 LABEL maintainer="Mariano Ruiz"
 
 RUN apk add --no-cache --purge openssl-dev musl-dev \
@@ -14,7 +14,7 @@ LABEL build=${BUILD}
 RUN echo "Build: $BUILD" > image_build \
     && echo "UTC: $(date --utc +%FT%R)" >> image_build
 
-FROM alpine:3.17
+FROM alpine:3.18
 
 ENV HOST=0
 
