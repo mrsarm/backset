@@ -46,8 +46,8 @@ sqlx database create
 # Migrate
 sqlx migrate run
 
-# Run (and compile if needed)
-cargo run
+# Run the server (and compile if needed)
+cargo run -- run
 # ^ replace "run" with "test" to run the tests
 
 # Check is alive with

@@ -120,14 +120,14 @@ Or `make fmt-check`.
 ### Run
 
 ```shell
-cargo run
+cargo run -- run
 ```
 
 Or `make run`, or `./target/debug/backset` if it's already compiled in debug mode (default),
 or to run the production build with the "production" setup:
 
 ```shell
-APP_ENV=production ./target/release/backset
+APP_ENV=production ./target/release/backset run
 ```
 
 See the [Docker](docker.md) page to see how to build and run with Docker.

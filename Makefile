@@ -1,4 +1,4 @@
-.PHONY: clean build build-test release run test lint fmt-check \
+.PHONY: clean build build-test release run list-tenants test lint fmt-check \
         migrate migrate-revert migrate-info create-db drop-db recreate-db recreate-db-test \
         check-sqlx-data psql
 .DEFAULT_GOAL := build-all
@@ -18,7 +18,10 @@ release:
 	cargo build --release
 
 run:
-	cargo run
+	cargo run -- run
+
+list-tenants:
+	cargo run -- list tenants
 
 recreate-db:
 	./scripts/recreate-db.sh
