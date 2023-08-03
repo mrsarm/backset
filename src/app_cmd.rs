@@ -6,8 +6,10 @@ use crate::tenants::model::Tenant;
 use clap::{Parser, Subcommand};
 use env_logger::Target;
 use log::{error, info, LevelFilter};
+use std::env::var;
 use std::io::Write;
 use std::process::exit;
+use std::str::FromStr;
 
 /// App class to command line instructions, instead of the HTTP server
 pub struct AppCmd {
@@ -64,8 +66,11 @@ impl Args {
         match &args.command {
             // Commands use normal stdout, command-like style for output
             Commands::List { object: _ } => {
+                let log_level = var("LOG_LEVEL").unwrap_or("INFO".to_string());
                 env_logger::builder()
                     .target(Target::Stdout)
+                    .filter_level(LevelFilter::from_str(log_level.as_str()).unwrap_or(LevelFilter::Info))
+                    .filter(Some("backset::conf"), LevelFilter::Warn)
                     .filter(Some("backset::conf"), LevelFilter::Warn)
                     .filter(Some("backset::app_state"), LevelFilter::Warn)
                     .format(|buf, record| writeln!(buf, "{}", record.args()))
