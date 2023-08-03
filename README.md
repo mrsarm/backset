@@ -48,10 +48,20 @@ sqlx migrate run
 
 # Run the server (and compile if needed)
 cargo run -- run
-# ^ replace "run" with "test" to run the tests
+# `cargo test' to run the tests
 
 # Check is alive with
-curl localhost:8558/health
+curl localhost:8558/
+
+# This command run backset in "command" mode, listing all tenants within the terminal
+cargo run -- list tenants
+
+# If you have already installed the binary with `make release && sudo make install',
+# you can use the binary as follow to run the server:
+backset run
+
+# List tenants
+backset list tenants
 ```
 
 ### 🐴 Endpoints usage

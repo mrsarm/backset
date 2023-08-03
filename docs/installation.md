@@ -99,6 +99,8 @@ the `sqlx-data.json` file that has the latest queries cached.
 
 ```shell
 SQLX_OFFLINE=true cargo build
+# or
+SQLX_OFFLINE=true make
 ```
 
 ### Linting
@@ -132,6 +134,32 @@ APP_ENV=production ./target/release/backset run
 
 See the [Docker](docker.md) page to see how to build and run with Docker.
 
+### Install
+
+To install the optimized binary for release under the `/usr/local/bin/` folder:
+
+```shell
+make release
+sudo make install
+```
+
+To change the prefix folder use the `INSTALL_PREFIX` env variable. E.g. to
+install the binary under the user folder at `~/.local/bin/backset`, and compiling
+the sources without the Postgres database:
+
+```shell
+SQLX_OFFLINE=true make release
+INSTALL_PREFIX="~/.local" make install
+```
+
+Uninstall with:
+
+```shell
+make uninstall
+```
+
+You can use the same variable `INSTALL_PREFIX` to set the base directory
+where the binary is installed.
 
 ### Tests
 

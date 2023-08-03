@@ -1,4 +1,4 @@
-.PHONY: clean build build-test release run list-tenants test lint fmt-check \
+.PHONY: clean build build-test release install uninstall run list-tenants test lint fmt-check \
         migrate migrate-revert migrate-info create-db drop-db recreate-db recreate-db-test \
         check-sqlx-data psql
 .DEFAULT_GOAL := build-all
@@ -16,6 +16,15 @@ build-all: build build-test
 
 release:
 	cargo build --release
+
+install:
+	$(eval INSTALL_PREFIX ?= /usr/local)
+	mkdir -p "${INSTALL_PREFIX}/bin"
+	cp "target/release/backset" "${INSTALL_PREFIX}/bin/backset"
+
+uninstall:
+	$(eval INSTALL_PREFIX ?= /usr/local)
+	rm -f "${INSTALL_PREFIX}/bin/backset"
 
 run:
 	cargo run -- run
