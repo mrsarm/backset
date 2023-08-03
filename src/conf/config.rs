@@ -37,7 +37,7 @@ impl Config {
     /// The port number is get from the `PORT` env variable, otherwise
     /// defaulted to `default_port`.
     pub fn init_for(default_port: u16, environment: Option<Environment>) -> Config {
-        debug!("⚙️  Configuring Backset server ...");
+        debug!("⚙️  Configuring Backset ...");
         let env = environment.unwrap_or_else(Environment::from_app_env);
         let log_level = match env {
             Environment::Test => Level::Debug,

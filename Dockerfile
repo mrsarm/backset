@@ -34,4 +34,4 @@ COPY --from=build /usr/src/backset/image_build /usr/app/image_build
 COPY --from=build /usr/src/backset/migrations /usr/app/migrations
 COPY --from=build /usr/src/backset/README.md /usr/app/README.md
 
-CMD ["/usr/app/bin/backset"]
+CMD ["/usr/app/bin/backset", "run"]
