@@ -149,7 +149,7 @@ the sources without the Postgres database:
 
 ```shell
 SQLX_OFFLINE=true make release
-INSTALL_PREFIX="~/.local" make install
+INSTALL_PREFIX="$HOME/.local" make install
 ```
 
 Uninstall with:
