@@ -32,6 +32,9 @@ run:
 list-tenants:
 	cargo run -- list tenants
 
+health:
+	cargo run -- health
+
 recreate-db:
 	./scripts/recreate-db.sh
 

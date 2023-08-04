@@ -9,6 +9,7 @@ pub mod core;
 pub mod errors;
 pub mod health;
 pub mod page;
+pub mod stream;
 pub mod tenants;
 
 // Has to match Cargo.toml > version

@@ -124,7 +124,7 @@ pub enum AppError {
     ///! Or something like:
     ///!
     ///! ```
-    ///! some_operation().map_err(AppError::Unexpected)?;
+    ///! some_operation().map_err(|e| AppError::Unexpected(e.into()))?;
     ///! ```
     #[error(transparent)]
     Unexpected(#[from] anyhow::Error),
