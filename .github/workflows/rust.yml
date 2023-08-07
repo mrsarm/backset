@@ -33,3 +33,9 @@ jobs:
       run: make test
     - name: Check .sqlx/
       run: make check-sqlx-data
+    - name: Run server
+      run: make run &
+    - name: Wait Server
+      run: sleep 2
+    - name: Check server
+      run: make health

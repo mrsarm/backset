@@ -93,14 +93,6 @@ More stuff to add:
         is ```Json deserialize error: missing field `FIELDNAME` at line \d+ column \d+```,
         the error type and field name can be inferred.
 - [ ] Random PKs
-- [ ] Command lines options:
-    - [ ] To check server status pinging `/health` endpoint, so a health check script
-      can be added to `Dockerfile`.
-    - [x] To run "tasks" that have access to the AppState and business logic, so later it's
-          the base to write tasks that can be scheduled with tools like K8s jobs or Cron.
-          A example task could be one that lists all tenants in the standard output.
-    - [ ] Option to run the migrations command, so there is no need to include the
-      `sqlx` command to run them, reducing the size a lot.
 
 
 ### About

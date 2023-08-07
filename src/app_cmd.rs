@@ -53,8 +53,10 @@ impl AppCmd {
 
     async fn healthcheck(&self) -> Result<()> {
         let client = Client::default();
+        let health_url = format!("{}{}", &self.state.config.server.url, "health");
+        info!("Checking backset at {} ...", health_url);
         let mut res = client
-            .get("http://localhost:8558/health") // TODO replace hardcoding
+            .get(&health_url)
             .insert_header(Accept::json())
             .send()
             .await
