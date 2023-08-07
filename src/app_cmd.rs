@@ -62,7 +62,7 @@ impl AppCmd {
             .await
             .unwrap_or_else(|e| {
                 error!("{}", e);
-                exit(7);
+                exit(1);
             });
 
         if res.status().is_success() {
@@ -71,13 +71,14 @@ impl AppCmd {
                 .await
                 .map_err(|e| AppError::Unexpected(e.into()))?;
             match val.service.as_str() {
-                // Check it's backset and not another service listening in the same URL
+                // Check it is backset and not another service listening in the same URL
                 "backset" => {
                     info!("{}", res.status());
                     info!("Backset version: {}", val.version.as_deref().unwrap_or(""));
                 }
                 _ => {
                     error!("Unexpected response, looks like it's not backset.");
+                    exit(1);
                 }
             }
         } else {
@@ -86,7 +87,7 @@ impl AppCmd {
                 res.status(),
                 read_body(res.body()).await?
             );
-            exit(2);
+            exit(1);
         }
         Ok(())
     }
