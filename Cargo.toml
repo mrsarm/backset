@@ -2,7 +2,7 @@
 name = "backset"
 version = "0.1.0"
 edition = "2021"
-description = " Backset REST Service store elements, sets, and relations between the two."
+description = " Backset REST Service stores elements, sets, and relationships between them."
 readme = "README.md"
 homepage = "https://github.com/mrsarm/backset"
 repository = "https://github.com/mrsarm/backset"

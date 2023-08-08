@@ -1,4 +1,4 @@
-//! Backset REST Service store elements, sets, and relations between the two.
+//! Backset REST Service stores elements, sets, and relationships between them.
 
 use backset::app_args::{Args, Commands};
 use backset::app_cmd::AppCmd;

@@ -3,7 +3,7 @@
 > ### 🚧  Work in progress, just a few endpoints implemented.
 
 Backset Service, or `bss`, it's a REST service to store elements, sets,
-and relations between the two.
+and relationships between them.
 
 All objects are stored within a "tenant", and the tenant id is at
 the beginning of all request URIs to identify to which tenant the
@@ -93,6 +93,9 @@ More stuff to add:
         is ```Json deserialize error: missing field `FIELDNAME` at line \d+ column \d+```,
         the error type and field name can be inferred.
 - [ ] Random PKs
+- [ ] New CLI command `env` to print all configurations in the form `ENV=value`.
+      - [ ] Encapsulates env access into a new module that prevent access to env
+            not defined beforehand.
 
 
 ### About
