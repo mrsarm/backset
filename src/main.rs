@@ -1,6 +1,7 @@
 //! Backset REST Service store elements, sets, and relations between the two.
 
-use backset::app_cmd::{AppCmd, Args, Commands};
+use backset::app_args::{Args, Commands};
+use backset::app_cmd::AppCmd;
 use backset::app_server::AppServer;
 use backset::conf::Config;
 use backset::{BACKSET_PORT, BACKSET_VERSION};

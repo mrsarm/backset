@@ -4,7 +4,7 @@
 
 set -ex
 
-DATABASE_URL="${DATABASE_URL:-postgresql://postgres:localhost@postgres/bss_dev}"
+DATABASE_URL="${DATABASE_URL:-postgresql://postgres:localhost@postgres:5433/bss_dev}"
 
 sqlx database drop -y
 sqlx database create
