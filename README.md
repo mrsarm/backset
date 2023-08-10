@@ -96,6 +96,17 @@ More stuff to add:
 - [ ] New CLI command `env` to print all configurations in the form `ENV=value`.
       - [ ] Encapsulates env access into a new module that prevent access to env
             not defined beforehand.
+  - [ ] Fix: HTTP 500 errors are logged with `INFO` severity, it should be `ERROR`, e.g.
+        when DB isn't available and a request is made, although an `ERROR` is printed out
+        with enough details from the `backset:errors` module, another message
+        from the logger `actix_web::middleware::logger` follows
+        with the details of the failed request and the HTTP 500 response, but with
+        `INFO` severity, making it hard to relate each other with log analysis tools. Note
+        that the logger looks to not be configurable in this sense (`.wrap(Logger::default())`),
+        so the solution looks to be a more robust logger with telemetry built-in like
+        https://crates.io/crates/tracing-actix-web , although it doesn't look to log properly,
+        or copy & paste the code of `actix_web.middleware.logger.Logger` and customize it to
+        support filter by HTTP code and change to support logging levels.
 
 
 ### About

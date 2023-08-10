@@ -84,4 +84,18 @@ apk add curl jq
 ```
 
 Any other tool available in Alpine is available for installation
-in the container, e.g. the `netstat` command via the `net-tools` package.
+in the container, e.g. the `psql` command to connect with Postgres
+is in the `postgresql-client` package, so to connect to Postgres
+within the same container:
+
+```shell
+# Install
+apk update && apk add postgresql-client
+# Access the DB
+psql "$DATABASE_URL"
+```
+
+To run `psql` for local testing, you can run instead within
+a console: `docker compose run psql`.
+
+Another useful command `netstat` is in the `net-tools` package.
