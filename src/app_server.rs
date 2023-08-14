@@ -1,10 +1,11 @@
+use actix_contrib_logger::middleware::Logger;
 use actix_web::dev::Server;
-use actix_web::middleware::Logger;
 use actix_web::web;
 use actix_web::web::{Data, ServiceConfig};
 use actix_web::{App, HttpServer};
 use actix_web_validator::{JsonConfig, QueryConfig};
-use log::info;
+use awc::http::StatusCode;
+use log::{info, Level};
 
 use crate::app_state::AppState;
 use crate::conf::server::HttpServerConfig;
@@ -27,9 +28,26 @@ impl AppServer {
 
         let server = HttpServer::new(move || {
             let config_app = Self::config_app(Data::new(state.clone()));
+            let logger = Logger::default()
+                .custom_level(|status| {
+                    if status.is_server_error() {
+                        Level::Error
+                    } else if status == StatusCode::NOT_FOUND {
+                        Level::Warn
+                    } else {
+                        Level::Info
+                    }
+                })
+                .custom_error_resp_level(|status| {
+                    if status.is_server_error() {
+                        Level::Error
+                    } else {
+                        Level::Info
+                    }
+                });
             App::new()
                 .service(web::scope(uri.as_str()).configure(config_app))
-                .wrap(Logger::default())
+                .wrap(logger)
         })
         .bind((addr.clone(), port))?
         .run();

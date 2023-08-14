@@ -20,6 +20,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-contrib-logger"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f385cfe5971dd42895ed503c8ae11a6022aae402c20543d1ee795b66d144d4af"
+dependencies = [
+ "actix-http",
+ "actix-rt",
+ "actix-service",
+ "actix-utils",
+ "actix-web",
+ "bytes",
+ "env_logger",
+ "futures-core",
+ "http",
+ "log",
+ "pin-project-lite",
+ "regex",
+ "time 0.3.20",
+]
+
+[[package]]
 name = "actix-http"
 version = "3.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -87,6 +108,7 @@ version = "2.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "15265b6b8e2347670eb363c47fc8c75208b4a4994b27192f345fcbe707804f3e"
 dependencies = [
+ "actix-macros",
  "futures-core",
  "tokio",
 ]
@@ -508,6 +530,7 @@ dependencies = [
 name = "backset"
 version = "0.1.0"
 dependencies = [
+ "actix-contrib-logger",
  "actix-http",
  "actix-web",
  "actix-web-validator",

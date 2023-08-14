@@ -150,7 +150,6 @@ impl ResponseError for AppError {
                     .json(InternalErrorPayload { error })
             }
             _ => {
-                error!("Unexpected error: {:?}", self);
                 HttpResponse::build(status_code)
                     .json(InternalErrorPayload {
                         error: status_code.canonical_reason().unwrap_or("Unknown error")

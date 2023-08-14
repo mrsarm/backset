@@ -18,11 +18,12 @@ name = "backset"
 actix-web = "4.3"
 actix-web-validator = "5.0"
 actix-http = "3.3"
+actix-contrib-logger = "0.1"
 awc = { version = "3.1", features = ["rustls"] }
 anyhow = "1.0"
 clap = { version = "4.3", features = ["derive"] }
 dotenv = "0.15"
-env_logger = "0.10.0"
+env_logger = "0.10"
 futures-core = "0.3"
 lazy_static = "1.4"
 log = "0.4"
