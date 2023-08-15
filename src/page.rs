@@ -103,7 +103,7 @@ impl<T> Page<T> {
             data: Vec::new(),
             offset: 0,
             page_size: 0,
-            total: None,
+            total: Some(0),
             message: None,
             warning: None,
         }
