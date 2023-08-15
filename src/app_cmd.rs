@@ -97,6 +97,7 @@ impl AppCmd {
                 offset: 0,
                 page_size: lines,
                 sort: Some("id".to_string()),
+                include_total: Some(false),
             },
         )
         .await?;

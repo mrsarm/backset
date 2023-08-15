@@ -64,11 +64,13 @@ content-type: application/json
 Query arguments:
 
 - `q`: optional, a string used to search by id or name.
-- `page_size`: optional, default 50.
-- `offset`: optional, default 0.
+- `page_size`: optional integer, default 50.
+- `offset`: optional integer, default 0.
 - `sort`: optional, default "id". Possible options are "id", "name" or "created_at",
   and using the "-" prefix the sorting is from z-a instead of a-z, e.g. use
   "-name" to sort by name in reverse order.
+- `include_total`: optional boolean, default true. If true include a count of the
+  total records in the database in the field `total`.
 
 ```shell
 $ http ":8558/tenants?page_size=5&offset=10"

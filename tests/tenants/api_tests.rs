@@ -92,21 +92,22 @@ mod tests {
     async fn test_tenants_get_paginated() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let _id = rand::thread_rng().gen::<u32>();
+        let _id_prefix = format!("paginated-{_id}");
         for i in 0..80 {
-            let _id = rand::thread_rng().gen::<u32>();
-            let id = format!("paginated-{_id}-{i}");
+            let id = format!("{_id_prefix}-{i}");
             let name = format!("Paginated {_id} {i}");
             let req = _post(json!({ "id": id, "name": name }));
             let resp = call_service(&app, req).await;
             assert_status(resp, StatusCode::CREATED).await;
         }
-        let req = _get("/tenants");
+        let req = _get(format!("/tenants?q={_id_prefix}").as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
         assert!(
-            page.total >= 80,
-            "page.total = {}, expected > 80",
+            page.total == Some(80),
+            "page.total = {:?}, expected 80",
             page.total
         );
         assert_eq!(page.offset, 0);
@@ -118,11 +119,41 @@ mod tests {
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
         assert!(
-            page.total >= 80,
-            "page.total = {}, expected > 80",
+            page.total >= Some(80),
+            "page.total = {:?}, expected > 80",
             page.total
         );
         assert_eq!(page.offset, 10);
+        assert_eq!(page.page_size, 5);
+        assert_eq!(page.data.len() as i64, 5);
+        Ok(())
+    }
+
+    #[actix_web::test]
+    async fn test_tenants_do_not_include_total() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let _id = rand::thread_rng().gen::<u32>();
+        let _id_prefix = format!("paginated-without-total-{_id}");
+        for i in 0..5 {
+            let id = format!("{_id_prefix}-{i}");
+            let name = format!("Paginated Without Total {_id} {i}");
+            let req = _post(json!({ "id": id, "name": name }));
+            let resp = call_service(&app, req).await;
+            assert_status(resp, StatusCode::CREATED).await;
+        }
+        let req = _get(
+            format!("/tenants?q={_id_prefix}&include_total=false").as_str()
+        );
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let page: Page<Tenant> = try_read_body_json(resp).await?;
+        assert!(
+            page.total.is_none(),
+            "page.total = {:?}, expected None",
+            page.total
+        );
+        assert_eq!(page.offset, 0);
         assert_eq!(page.page_size, 5);
         assert_eq!(page.data.len() as i64, 5);
         Ok(())
@@ -134,16 +165,16 @@ mod tests {
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let rand_for_test = rand::thread_rng().gen::<u32>();
         let rand_classic = format!("Classic data {rand_for_test}");
+        let _id = rand::thread_rng().gen::<u32>();
         for i in 0..3 {
-            let _id = rand::thread_rng().gen::<u32>();
             let id = format!("classic-{rand_for_test}-{_id}-{i}");
             let name = format!("{rand_classic} {rand_for_test} {i} {_id}");
             let req = _post(json!({ "id": id, "name": name }));
             call_service(&app, req).await;
         }
         let rand_new = format!("NEW data {rand_for_test}");
+        let _id = rand::thread_rng().gen::<u32>();
         for i in 0..3 {
-            let _id = rand::thread_rng().gen::<u32>();
             let id = format!("new-{rand_for_test}-{_id}-{i}");
             let name = format!("{rand_new} {i} {}", rand::thread_rng().gen::<u32>());
             let req = _post(json!({ "id": id, "name": name }));
@@ -153,18 +184,18 @@ mod tests {
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
-        assert_eq!(page.total, 6);
+        assert_eq!(page.total, Some(6));
         let q = rand_new.replace(" ", "%20"); //TODO improve query string parsing
         let req = _get(format!("/tenants?q={q}").as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
-        assert_eq!(page.total, 3);
+        assert_eq!(page.total, Some(3));
         let req = _get(format!("/tenants?q={rand_for_test}&page_size=5&sort=-name").as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
-        assert_eq!(page.total, 6);
+        assert_eq!(page.total, Some(6));
         assert_eq!(page.offset, 0);
         assert_eq!(page.page_size, 5);
         assert!(page

@@ -17,6 +17,7 @@ pub struct QuerySearch {
     #[serde(default = "default_page_size")]
     #[validate(range(min = 1))]
     pub page_size: i64,
+    pub include_total: Option<bool>,
 }
 
 impl QuerySearch {
@@ -26,11 +27,11 @@ impl QuerySearch {
     ///
     /// ```
     /// use backset::page::QuerySearch;
-    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: None };
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: None, include_total: None };
     /// assert_eq!(q.parse_sort(&["a", "b"]), Vec::<String>::new());
-    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("a,-b")) };
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("a,-b")), include_total: None };
     /// assert_eq!(q.parse_sort(&["a", "b"]), &[String::from("a"), String::from("b DESC")]);
-    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("name,-b,c")) };
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("name,-b,c")), include_total: None };
     /// assert_eq!(q.parse_sort(&vec!["name", "c"]), &[String::from("name"), String::from("c")]);
     /// ```
     pub fn parse_sort(&self, allowed_fields: &[&str]) -> Vec<String> {
@@ -52,11 +53,11 @@ impl QuerySearch {
     ///
     /// ```
     /// use backset::page::QuerySearch;
-    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: None };
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: None, include_total: None };
     /// assert_eq!(q.sort_as_order_by_args(&["a", "b"], "a"), "a");
-    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("a,-b")) };
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("a,-b")), include_total: None };
     /// assert_eq!(q.sort_as_order_by_args(&["a", "b"], "a"), "a, b DESC");
-    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("name,-b,c")) };
+    /// let q = QuerySearch { q: None, offset: 0, page_size: 10, sort: Some(String::from("name,-b,c")), include_total: None };
     /// assert_eq!(q.sort_as_order_by_args(&["a", "h"], "c"), "c");
     /// ```
     pub fn sort_as_order_by_args(&self, allowed_fields: &[&str], default: &str) -> String {
@@ -74,7 +75,7 @@ pub struct Page<T> {
     pub data: Vec<T>,
     pub offset: i64,
     pub page_size: i64,
-    pub total: i64,
+    pub total: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
@@ -89,7 +90,7 @@ impl<T> From<Vec<T>> for Page<T> {
             data: vec,
             offset: 0,
             page_size: len,
-            total: len,
+            total: Some(len),
             message: None,
             warning: None,
         }
@@ -102,13 +103,13 @@ impl<T> Page<T> {
             data: Vec::new(),
             offset: 0,
             page_size: 0,
-            total: 0,
+            total: None,
             message: None,
             warning: None,
         }
     }
 
-    pub fn with_data(data: Vec<T>, total: i64, offset: i64) -> Self {
+    pub fn with_data(data: Vec<T>, total: Option<i64>, offset: i64) -> Self {
         let page_size: i64 = data.len() as i64;
         Page {
             data,

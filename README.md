@@ -81,8 +81,6 @@ Missing:
 - [ ] "/sets" model and endpoints
 
 More stuff to add:
-- [ ] Add argument `include_total=(true|false)` (default `true`) to include/omit total count
-      that might be expensive sometimes.
 - [ ] Improve validations: when a required field is not passed
       the error is ```{"error": "Json deserialize error: missing field `name` at line ..."}```
       instead of providing field details. Check-out the default string handler that return

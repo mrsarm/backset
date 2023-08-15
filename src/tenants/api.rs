@@ -33,9 +33,13 @@ async fn read(app: Data<AppState>, id: Path<String>) -> HttpResult {
 async fn list(app: Data<AppState>, query: Query<QuerySearch>) -> HttpResult {
     let query = query.into_inner();
     let mut tx = app.get_tx().await?;
-    let total = Tenant::count(&mut tx, query.q.as_deref()).await?;
+    let total = if query.include_total.unwrap_or(true) {
+        Some(Tenant::count(&mut tx, query.q.as_deref()).await?)
+    } else {
+        None
+    };
     let tenants = match total {
-        0 => Page::empty(),
+        Some(0) => Page::empty(),
         _ => {
             let data = Tenant::find(&mut tx, &query).await?;
             Page::with_data(data, total, query.offset)
