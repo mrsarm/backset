@@ -12,6 +12,7 @@ pub mod health;
 pub mod page;
 pub mod stream;
 pub mod tenants;
+pub mod test;
 
 // Has to match Cargo.toml > version
 // TODO add in CI script to check both versions match

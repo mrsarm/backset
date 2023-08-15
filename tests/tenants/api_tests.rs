@@ -1,11 +1,10 @@
 #[cfg(test)]
 mod tests {
     use actix_http::Request;
-    use actix_web::dev::ServiceResponse;
     use actix_web::http::header::{Accept, ContentType};
     use actix_web::http::StatusCode;
-    use actix_web::test::{call_service, init_service, read_body, try_read_body_json, TestRequest};
-    use actix_web::web::{Bytes, Data};
+    use actix_web::test::{call_service, init_service, try_read_body_json, TestRequest};
+    use actix_web::web::Data;
     use actix_web::App;
     use backset::app_server::AppServer;
     use backset::app_state::AppState;
@@ -14,6 +13,7 @@ mod tests {
     use backset::errors::ValidationErrorPayload;
     use backset::page::Page;
     use backset::tenants::model::Tenant;
+    use backset::test::assert_status;
     use backset::{BACKSET_PORT, PAGE_SIZE};
     use dotenv::dotenv;
     use rand::Rng;
@@ -61,8 +61,8 @@ mod tests {
         let name = format!("The Tenant Name {_id}");
         let req = _post(json!({ "id": id, "name": name }));
         let resp = call_service(&app, req).await;
-        assert_eq!(resp.status(), StatusCode::CREATED);
-        let tenant: Tenant = try_read_body_json(resp).await?;
+        let body = assert_status(resp, StatusCode::CREATED).await;
+        let tenant: Tenant = serde_json::from_slice(&body).unwrap();
         assert_eq!(tenant.id, id);
         assert_eq!(tenant.name, name);
         Ok(())
@@ -292,8 +292,8 @@ mod tests {
         let name = format!("To Be Deleted {}", rand::thread_rng().gen::<u32>());
         let req = _post(json!({ "id": id, "name": name }));
         let resp = call_service(&app, req).await;
-        assert_eq!(resp.status(), StatusCode::CREATED);
-        let tenant: Tenant = try_read_body_json(resp).await?;
+        let body = assert_status(resp, StatusCode::CREATED).await;
+        let tenant: Tenant = serde_json::from_slice(&body).unwrap();
         let req = TestRequest::delete()
             .uri(format!("/tenants/{}", tenant.id).as_str())
             .to_request();
@@ -315,14 +315,6 @@ mod tests {
             .to_request();
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
-    }
-
-    async fn assert_status(resp: ServiceResponse, expected_status: StatusCode) -> Bytes {
-        let status = resp.status();
-        let body_bytes = read_body(resp).await;
-        let body: &str = std::str::from_utf8(&body_bytes[..]).unwrap();
-        assert_eq!(status, expected_status, "Response Body: {}", body);
-        body_bytes
     }
 
     fn _post(data: impl Serialize) -> Request {
