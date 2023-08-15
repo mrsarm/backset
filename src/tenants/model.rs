@@ -95,7 +95,12 @@ impl Tenant {
     pub async fn count(tx: &mut Tx<'_>, q: Option<&str>) -> Result<i64> {
         let query = match q {
             None => sqlx::query_as("SELECT COUNT(*) FROM tenants"),
-            Some(q) => sqlx::query_as("SELECT COUNT(*) FROM tenants WHERE name ILIKE $1")
+            Some(q) => sqlx::query_as(
+                r#"
+                SELECT COUNT(*)
+                  FROM tenants
+                  WHERE id ILIKE $1 OR name ILIKE $1
+                "#)
                 .bind(format!("%{q}%")),
         };
         let count: (i64,) = query.fetch_one(&mut **tx)
