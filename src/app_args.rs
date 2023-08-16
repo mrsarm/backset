@@ -20,8 +20,13 @@ impl Args {
         let log_level = var("LOG_LEVEL").unwrap_or("INFO".to_string());
         let level_filter = LevelFilter::from_str(log_level.as_str()).unwrap_or(LevelFilter::Info);
         match &args.command {
+            // The server defaults output to stdout, with more info than commands
+            Commands::Run => env_logger::builder()
+                .target(Target::Stdout)
+                .filter_level(level_filter)
+                .init(),
             // Commands use normal stdout, command-like style for output
-            Commands::Health | Commands::List { object: _ } => env_logger::builder()
+            _ => env_logger::builder()
                 .target(Target::Stdout)
                 .filter_level(level_filter)
                 .filter(Some("backset::conf"), LevelFilter::Warn)
@@ -34,11 +39,6 @@ impl Args {
                         _ => writeln!(buf, "{}: {}", level, record.args()),
                     }
                 })
-                .init(),
-            // The server defaults output to stdout, with more info than commands
-            Commands::Run => env_logger::builder()
-                .target(Target::Stdout)
-                .filter_level(level_filter)
                 .init(),
         }
         args
@@ -71,4 +71,6 @@ pub enum Objects {
         #[arg(short = 'n', long, default_value_t = 1000, value_name = "MAX")]
         lines: i64,
     },
+    /// List all ENVIRONMENT_VARIABLE=current_value used by the server
+    Envs,
 }

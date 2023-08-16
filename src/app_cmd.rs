@@ -8,6 +8,7 @@ use crate::stream::read_body;
 use crate::tenants::model::Tenant;
 use actix_web::http::header::Accept;
 use awc::Client;
+use std::env;
 use log::{error, info};
 use serde::Deserialize;
 use std::process::exit;
@@ -31,18 +32,21 @@ impl AppCmd {
     }
 
     pub async fn run(&self, cmd: &Commands) -> Result<()> {
-        if let Commands::List {
-            object: Objects::Tenants { query, lines },
-        } = cmd
-        {
-            // List tenants
-            self.list_tenants(query, *lines).await?;
-        } else if let Commands::Health = cmd {
-            self.healthcheck().await?;
-        } else {
-            // It should not get to this point
-            error!("Unexpected command {} !", cmd);
-            exit(1);
+        match cmd {
+            Commands::Health => {
+                self.healthcheck().await?;
+            }
+            Commands::List { object: Objects::Tenants { query, lines } } => {
+                self.list_tenants(query, *lines).await?;
+            }
+            Commands::List { object: Objects::Envs } => {
+                self.list_envs();
+            }
+            Commands::Run => {
+                // It should not get to this point
+                error!("Unexpected run command");
+                exit(1);
+            }
         };
         Ok(())
     }
@@ -106,5 +110,25 @@ impl AppCmd {
             info!("{}: {}", tenant.id, tenant.name);
         }
         Ok(())
+    }
+
+    fn list_envs(&self) {
+        info!("#");
+        info!("# The following items are the environment variables and its values from");
+        info!("# the OS, from an .env file, or the default value used by **Backset**.");
+        info!("#");
+        info!("# APP_URL --> {}", self.state.config.server.url);
+        info!("#");
+        info!("APP_ENV={}", self.state.config.env);
+        info!("APP_URI=\"{}\"", self.state.config.server.uri);
+        info!("HOST={}", self.state.config.server.addr);
+        info!("PORT={}", self.state.config.server.port);
+        info!("DATABASE_URL=\"{}\"", self.state.config.db.database_url);
+        info!("MIN_CONNECTIONS={}", self.state.config.db.min_connections);
+        info!("MAX_CONNECTIONS={}", self.state.config.db.max_connections);
+        info!("ACQUIRE_TIMEOUT_SEC={}", self.state.config.db.acquire_timeout.as_secs());
+        info!("IDLE_TIMEOUT_SEC={}", self.state.config.db.idle_timeout.as_secs());
+        info!("TEST_BEFORE_ACQUIRE={}", self.state.config.db.test_before_acquire);
+        info!("RUST_LOG=\"{}\"", env::var("RUST_LOG").unwrap_or("".to_string()));
     }
 }
