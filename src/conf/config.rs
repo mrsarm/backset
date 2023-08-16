@@ -2,6 +2,7 @@ use crate::conf::db::DbConfig;
 use crate::conf::env::Environment;
 use crate::conf::server::HttpServerConfig;
 use log::{debug, log, Level};
+use std::env;
 use std::fmt::Debug;
 
 /// `Config` is responsible of the configuration
@@ -47,5 +48,44 @@ impl Config {
         let db = DbConfig::init_for(&env);
         let server = HttpServerConfig::init("127.0.0.1", default_port);
         Config { env, server, db }
+    }
+}
+
+impl ToString for Config {
+    /// This `to_string()` implementation prints out all the config
+    /// values in `.env` format, using as key the environment variable
+    /// used to set-up the config, even if the configuration was
+    /// set in another way, e.g. using a default value.
+    fn to_string(&self) -> String {
+        format!(
+r#"# The following items are the environment variables and its values from
+# the OS, from an .env file, or the default value used by **Backset**.
+#
+# APP_URL --> {}
+#
+APP_ENV={}
+APP_URI="{}"
+HOST={}
+PORT={}
+DATABASE_URL="{}"
+MIN_CONNECTIONS={}
+MAX_CONNECTIONS={}
+ACQUIRE_TIMEOUT_SEC={}
+IDLE_TIMEOUT_SEC={}
+TEST_BEFORE_ACQUIRE={}
+RUST_LOG="{}""#,
+            self.server.url,
+            self.env,
+            self.server.uri,
+            self.server.addr,
+            self.server.port,
+            self.db.database_url,
+            self.db.min_connections,
+            self.db.max_connections,
+            self.db.acquire_timeout.as_secs(),
+            self.db.idle_timeout.as_secs(),
+            self.db.test_before_acquire,
+            env::var("RUST_LOG").unwrap_or("".to_string())
+            )
     }
 }
