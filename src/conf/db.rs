@@ -30,6 +30,9 @@ pub struct DbConfig {
 }
 
 impl DbConfig {
+    /// Init the object with `env` passed, and the rest of the
+    /// attributes reading its corresponding environment variable,
+    /// otherwise use a default value.
     pub fn init_for(env: &Environment) -> Self {
         let url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
         let database_url = if *env == Environment::Test && !url.ends_with("_test") {

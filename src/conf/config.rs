@@ -16,9 +16,13 @@ use std::fmt::Debug;
 /// The web layer configuration is configured by `app_server`.
 #[derive(Debug, Clone)]
 pub struct Config {
-    // Add more conf here
+    /// The environment name chosen to run the app, normally
+    /// set through the environment variable `APP_ENV`.
+    /// See [`Environment::from_app_env()`].
     pub env: Environment,
+    /// All the config needed to launch an HTTP server.
     pub server: HttpServerConfig,
+    /// All the config needed to launch an HTTP server.
     pub db: DbConfig,
 }
 

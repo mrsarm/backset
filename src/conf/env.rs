@@ -15,6 +15,9 @@ pub enum Environment {
 }
 
 impl Environment {
+    /// Get the value from the environment variable
+    /// `APP_ENV`.
+    /// It panics if the string doesn't match a possible environment.
     pub fn from_app_env() -> Self {
         let app_env = env::var("APP_ENV");
         match app_env {

@@ -72,13 +72,29 @@ impl QuerySearch {
 /// Struct used to serialize and deserialize paginated results.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Page<T> {
+    /// The data in the page, an empty `[]` vector
+    /// if there is no results.
     pub data: Vec<T>,
+    /// the offset from the full results, normally
+    /// zero indexed.
     pub offset: i64,
+    /// The size of the current page result, that could
+    /// be <= to the size requested depending of how many
+    /// results you get.
     pub page_size: i64,
+    /// The total results count including the ones included
+    /// in this page.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub total: Option<i64>,
 
+    /// A message that might be presented to the user along
+    /// the result, e.g. a hint of how to improve the
+    /// query to get more results.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
+    /// A warning message that might be presented to the user along
+    /// the results, e.g. a user using a source of information
+    /// that is deprecated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warning: Option<String>,
 }

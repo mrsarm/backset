@@ -32,6 +32,7 @@ pub struct InternalErrorPayload {
 ///     ]
 ///   }
 /// }
+/// ```
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ValidationErrorPayload {
     pub error: String,
@@ -105,24 +106,52 @@ pub fn json_error_handler(err: ActixValidatorError, _req: &HttpRequest) -> actix
 /// in endpoint handlers.
 #[derive(thiserror::Error, Debug)]
 pub enum AppError {
+
+    ///! Used to trigger any validation where the error
+    ///! message doesn't need to be generated (string reference).
+    ///!
+    ///! These errors are processed as HTTP 400 Bad Request.
+    ///!
+    ///! # Example
+    ///! ```
+    ///! return Err(AppError::StaticValidation(
+    ///!     "User already exists."
+    ///! );
+    ///! ```
     #[error("{0}")]
     StaticValidation(&'static str),
 
+    ///! Used to trigger any validation where you need
+    ///! build the string with the error details.
+    ///!
+    ///! These errors are processed as HTTP 400 Bad Request.
+    ///!
+    ///! # Example
+    ///! ```
+    ///! return Err(AppError::Validation(
+    ///!     format!("User linked to account {} already exists.", account.id))
+    ///! );
+    ///! ```
     #[error("{0}")]
     Validation(String),
 
+    /// Encapsulates a `SqlxError` error (database errors), like
+    /// the DB is not accessible, time outs, and so on.
+    ///
+    /// These errors are processed as HTTP 500 Internal Server Error.
     #[error(transparent)]
     DB(#[from] SqlxError),
 
     ///! Any other error that needs to be wrapped inside an AppError.
-    ///! Having an Error `e`, can be used as follow:
     ///!
+    ///! These errors are processed as HTTP 500 Internal Server Error.
+    ///!
+    ///! # Example
+    ///! Having an Error `e`, can be used as follow:
     ///! ```
     ///! return Err(AppError::Unexpected(e.into()));
     ///! ```
-    ///!
     ///! Or something like:
-    ///!
     ///! ```
     ///! some_operation().map_err(|e| AppError::Unexpected(e.into()))?;
     ///! ```
