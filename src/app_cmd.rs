@@ -10,6 +10,7 @@ use actix_web::http::header::Accept;
 use awc::Client;
 use log::{error, info};
 use serde::Deserialize;
+use std::env;
 use std::process::exit;
 
 /// App state class for command line instructions, instead of the HTTP server.
@@ -113,5 +114,6 @@ impl AppCmd {
 
     fn list_envs(&self) {
         info!("{}", self.state.config.to_string());
+        info!("LOG_LEVEL={}", env::var("LOG_LEVEL").unwrap_or("INFO".to_string()));
     }
 }
