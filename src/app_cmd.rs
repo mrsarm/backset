@@ -25,9 +25,9 @@ pub struct HealthPayload {
 }
 
 impl AppCmd {
-    pub async fn build(config: Config) -> Self {
-        let state = AppState::new(config).await;
-        AppCmd { state }
+    pub async fn build(config: Config) -> core::result::Result<Self, String> {
+        let state = AppState::new(config).await?;
+        Ok(AppCmd { state })
     }
 
     pub async fn run(&self, cmd: &Commands) -> Result<()> {

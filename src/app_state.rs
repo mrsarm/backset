@@ -5,7 +5,7 @@ use crate::conf::db::DbConfig;
 use crate::conf::Config;
 use crate::core::{Result, Tx};
 use crate::errors::AppError;
-use log::{debug, error};
+use log::debug;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 
@@ -36,21 +36,19 @@ impl AppState {
     /// the app state, like the pool connection to the DB.
     /// This method normally is used once at startup time
     /// by the web framework (Actix).
-    pub async fn new(config: Config) -> AppState {
-        let pool = match Self::_get_pool(&config.db) {
+    pub async fn new(config: Config) -> core::result::Result<AppState, String> {
+        match Self::_get_pool(&config.db) {
             Ok(pool) => {
                 // The connection is lazy, so not sure whether the connection will work
                 debug!("Connection configuration to the database looks good");
-                pool
+                Ok(AppState { pool, config })
             }
             Err(err) => {
                 // Errors like wrongly parsed URLs arrive here, but not errors
                 // trying to connect to
-                error!("Failed to connect to the database: {:?}", err);
-                std::process::exit(2);
+                Err(format!("Failed to connect to the database: {:?}", err))
             }
-        };
-        AppState { pool, config }
+        }
     }
 
     /// Get a Transaction object to be used to transact with the DB.

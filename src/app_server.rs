@@ -1,5 +1,6 @@
 //! Build and run the HTTP server.
 
+use std::process::exit;
 use actix_contrib_logger::middleware::Logger;
 use actix_web::dev::Server;
 use actix_web::web;
@@ -7,7 +8,7 @@ use actix_web::web::{Data, ServiceConfig};
 use actix_web::{App, HttpServer};
 use actix_web_validator::{JsonConfig, QueryConfig};
 use awc::http::StatusCode;
-use log::{info, Level};
+use log::{error, info, Level};
 
 use crate::app_state::AppState;
 use crate::conf::server::HttpServerConfig;
@@ -33,7 +34,10 @@ impl AppServer {
     pub async fn build(config: Config, app_version: &str) -> Result<Self, anyhow::Error> {
         let HttpServerConfig { addr, port, uri, url } = config.server.clone();
         info!("🚀 Starting Backset server v{} at {} ...", app_version, url);
-        let state = AppState::new(config).await;
+        let state = AppState::new(config).await.unwrap_or_else(|error| {
+            error!("{error}");
+            exit(1);
+        });
 
         let server = HttpServer::new(move || {
             let config_app = Self::config_app(Data::new(state.clone()));

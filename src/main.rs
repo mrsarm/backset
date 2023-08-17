@@ -23,7 +23,10 @@ async fn main() -> anyhow::Result<()> {
         }
         _ => {
             // Command-line tool
-            let app = AppCmd::build(config).await;
+            let app = AppCmd::build(config).await.unwrap_or_else(|error| {
+                error!("{error}");
+                exit(1);
+            });
             app.run(&args.command).await?;
             exit(0);
         }

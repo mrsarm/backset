@@ -30,7 +30,6 @@ impl Args {
                 .target(Target::Stdout)
                 .filter_level(level_filter)
                 .filter(Some("backset::conf"), LevelFilter::Warn)
-                .filter(Some("backset::conf"), LevelFilter::Warn)
                 .filter(Some("backset::app_state"), LevelFilter::Warn)
                 .format(|buf, record| {
                     let level = record.level();

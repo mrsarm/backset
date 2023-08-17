@@ -16,7 +16,7 @@ mod tests {
     use backset::test::assert_status;
     use backset::{BACKSET_PORT, PAGE_SIZE};
     use dotenv::dotenv;
-    use log::error;
+    use log::{error, LevelFilter};
     use rand::Rng;
     use serde::Serialize;
     use serde_json::json;
@@ -29,14 +29,21 @@ mod tests {
     pub async fn initialize() -> Data<AppState> {
         INIT.call_once(|| {
             dotenv().ok(); // read conf from .env file if available
-            env_logger::init();
+            env_logger::builder()
+                .filter(Some("backset::conf"), LevelFilter::Warn)
+                .filter(Some("backset::app_state"), LevelFilter::Warn)
+                .init();
         });
         let config = Config::init_for(BACKSET_PORT, Some(Environment::Test))
             .unwrap_or_else(|error| {
                 error!("{error}");
                 exit(1);
             });
-        let data = AppState::new(config.clone()).await;
+        let data = AppState::new(config.clone()).await
+            .unwrap_or_else(|error| {
+                error!("{error}");
+                exit(1);
+            });
         Data::new(data)
     }
 
