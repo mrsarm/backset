@@ -27,21 +27,21 @@ pub struct Config {
 }
 
 impl Config {
-    /// Initialize config and the environment will be set with the `APP_ENV`
+    /// Initialize config, setting the env attribute with the `APP_ENV`
     /// environment variable.
     ///
     /// The port number is get from the `PORT` env variable, otherwise
     /// defaulted to `default_port`.
-    pub fn init(default_port: u16) -> Config {
+    pub fn init(default_port: u16) -> Result<Config, String> {
         Self::init_for(default_port, None)
     }
 
-    /// Initialize config with the environment passed, if `None`, the environment
+    /// Initialize config with the environment passed, if `None`, env
     /// will be set with the `APP_ENV` environment variable.
     ///
     /// The port number is get from the `PORT` env variable, otherwise
     /// defaulted to `default_port`.
-    pub fn init_for(default_port: u16, environment: Option<Environment>) -> Config {
+    pub fn init_for(default_port: u16, environment: Option<Environment>) -> Result<Config, String> {
         debug!("⚙️  Configuring Backset ...");
         let env = environment.unwrap_or_else(Environment::from_app_env);
         let log_level = match env {
@@ -49,9 +49,9 @@ impl Config {
             _ => Level::Info,
         };
         log!(log_level, "⚙️  Environment set to {env}");
-        let db = DbConfig::init_for(&env);
+        let db = DbConfig::init_for(&env)?;
         let server = HttpServerConfig::init("127.0.0.1", default_port);
-        Config { env, server, db }
+        Ok(Config { env, server, db })
     }
 }
 

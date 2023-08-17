@@ -33,8 +33,8 @@ impl DbConfig {
     /// Init the object with `env` passed, and the rest of the
     /// attributes reading its corresponding environment variable,
     /// otherwise use a default value.
-    pub fn init_for(env: &Environment) -> Self {
-        let url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    pub fn init_for(env: &Environment) -> Result<Self, String> {
+        let url = env::var("DATABASE_URL").map_err(|_| "DATABASE_URL must be set")?;
         let database_url = if *env == Environment::Test && !url.ends_with("_test") {
             format!("{url}_test")
         } else {
@@ -45,13 +45,13 @@ impl DbConfig {
         let acquire_timeout = Duration::from_secs(env_num::<u64>("ACQUIRE_TIMEOUT_SEC", 2));
         let idle_timeout = Duration::from_secs(env_num::<u64>("IDLE_TIMEOUT_SEC", 2));
         let test_before_acquire = env_bool("TEST_BEFORE_ACQUIRE", false);
-        DbConfig {
+        Ok(DbConfig {
             database_url,
             min_connections,
             max_connections,
             acquire_timeout,
             idle_timeout,
             test_before_acquire,
-        }
+        })
     }
 }

@@ -16,10 +16,12 @@ mod tests {
     use backset::test::assert_status;
     use backset::{BACKSET_PORT, PAGE_SIZE};
     use dotenv::dotenv;
+    use log::error;
     use rand::Rng;
     use serde::Serialize;
     use serde_json::json;
     use std::error::Error;
+    use std::process::exit;
     use std::sync::Once;
 
     static INIT: Once = Once::new();
@@ -29,7 +31,11 @@ mod tests {
             dotenv().ok(); // read conf from .env file if available
             env_logger::init();
         });
-        let config = Config::init_for(BACKSET_PORT, Some(Environment::Test));
+        let config = Config::init_for(BACKSET_PORT, Some(Environment::Test))
+            .unwrap_or_else(|error| {
+                error!("{error}");
+                exit(1);
+            });
         let data = AppState::new(config.clone()).await;
         Data::new(data)
     }

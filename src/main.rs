@@ -6,11 +6,15 @@ use backset::app_server::AppServer;
 use backset::conf::Config;
 use backset::{BACKSET_PORT, BACKSET_VERSION};
 use std::process::exit;
+use log::error;
 
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
     let args = Args::init();
-    let config = Config::init(BACKSET_PORT);
+    let config = Config::init(BACKSET_PORT).unwrap_or_else(|error| {
+        error!("{error}");
+        exit(1);
+    });
     match &args.command {
         Commands::Run => {
             // HTTP REST Server

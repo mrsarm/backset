@@ -37,7 +37,8 @@ impl AppState {
                 pool
             }
             Err(err) => {
-                // Errors like wrongly parsed URLs arrive here
+                // Errors like wrongly parsed URLs arrive here, but not errors
+                // trying to connect to
                 error!("Failed to connect to the database: {:?}", err);
                 std::process::exit(2);
             }
