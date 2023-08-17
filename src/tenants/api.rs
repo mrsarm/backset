@@ -1,6 +1,7 @@
 use crate::app_state::AppState;
 use crate::core::HttpResult;
-use crate::page::{Page, QuerySearch};
+use crate::page::Page;
+use crate::query::QuerySearch;
 use crate::tenants::model::{Tenant, TenantPayload};
 use actix_web::web::{Data, Path};
 use actix_web::{delete, get, post, web, HttpResponse};

@@ -10,6 +10,7 @@ pub mod core;
 pub mod errors;
 pub mod health;
 pub mod page;
+pub mod query;
 pub mod stream;
 pub mod tenants;
 pub mod test;

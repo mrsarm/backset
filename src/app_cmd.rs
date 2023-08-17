@@ -3,7 +3,7 @@ use crate::app_state::AppState;
 use crate::conf::Config;
 use crate::core::Result;
 use crate::errors::AppError;
-use crate::page::QuerySearch;
+use crate::query::QuerySearch;
 use crate::stream::read_body;
 use crate::tenants::model::Tenant;
 use actix_web::http::header::Accept;

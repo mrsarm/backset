@@ -1,6 +1,6 @@
 use crate::core::{Result, Tx};
 use crate::errors::AppError;
-use crate::page::QuerySearch;
+use crate::query::QuerySearch;
 use chrono::NaiveDateTime;
 use lazy_static::lazy_static;
 use regex::Regex;
