@@ -102,6 +102,8 @@ pub struct Page<T> {
 }
 
 impl<T> From<Vec<T>> for Page<T> {
+    /// Creates a page with the vector passe. The `page_size` and
+    /// `total` will be equivalent to the size of the `vec`.
     fn from(vec: Vec<T>) -> Self {
         let len: i64 = vec.len() as i64;
         Page {
@@ -116,6 +118,7 @@ impl<T> From<Vec<T>> for Page<T> {
 }
 
 impl<T> Page<T> {
+    /// Create empty page.
     pub fn empty() -> Page<T> {
         Page {
             data: Vec::new(),
@@ -127,6 +130,7 @@ impl<T> Page<T> {
         }
     }
 
+    /// Create page with the data, total and offset passed.
     pub fn with_data(data: Vec<T>, total: Option<i64>, offset: i64) -> Self {
         let page_size: i64 = data.len() as i64;
         Page {

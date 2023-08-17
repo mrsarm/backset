@@ -9,7 +9,7 @@ use futures_core::stream::Stream;
 
 /// Read body as string.
 /// The content has to be encoded in UTF-8, otherwise
-/// AppError::Unexpected is returned.
+/// [`AppError::Unexpected`] is returned.
 pub async fn read_body<S>(body: ResponseBody<S>) -> Result<String>
 where
     S: Stream<Item = core::result::Result<Bytes, PayloadError>>,

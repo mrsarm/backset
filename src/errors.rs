@@ -1,4 +1,4 @@
-//! Errors types to manager errors in Actix apps.
+//! Errors types to manage errors in Actix apps.
 
 use actix_web::error::InternalError;
 use actix_web::http::StatusCode;
@@ -103,37 +103,37 @@ pub fn json_error_handler(err: ActixValidatorError, _req: &HttpRequest) -> actix
     InternalError::from_response(err, json_error).into()
 }
 
-/// Main enum that implements the actix ResponseError
+/// Main enum that implements the actix [ResponseError](https://actix.rs/docs/errors/)
 /// trait to be used as wrapper for different errors
 /// in endpoint handlers.
 #[derive(thiserror::Error, Debug)]
 pub enum AppError {
 
-    ///! Used to trigger any validation where the error
-    ///! message doesn't need to be generated (string reference).
-    ///!
-    ///! These errors are processed as HTTP 400 Bad Request.
-    ///!
-    ///! # Example
-    ///! ```
-    ///! return Err(AppError::StaticValidation(
-    ///!     "User already exists."
-    ///! );
-    ///! ```
+    /// Used to trigger any validation where the error
+    /// message doesn't need to be generated (string reference).
+    ///
+    /// These errors are processed as HTTP 400 Bad Request.
+    ///
+    /// # Example
+    /// ```example
+    /// return Err(AppError::StaticValidation(
+    ///     "User already exists."
+    /// ));
+    /// ```
     #[error("{0}")]
     StaticValidation(&'static str),
 
-    ///! Used to trigger any validation where you need
-    ///! build the string with the error details.
-    ///!
-    ///! These errors are processed as HTTP 400 Bad Request.
-    ///!
-    ///! # Example
-    ///! ```
-    ///! return Err(AppError::Validation(
-    ///!     format!("User linked to account {} already exists.", account.id))
-    ///! );
-    ///! ```
+    /// Used to trigger any validation where you need
+    /// build the string with the error details.
+    ///
+    /// These errors are processed as HTTP 400 Bad Request.
+    ///
+    /// # Example
+    /// ```example
+    /// return Err(AppError::Validation(
+    ///     format!("User linked to account {} already exists.", account.id)
+    /// ));
+    /// ```
     #[error("{0}")]
     Validation(String),
 
@@ -144,19 +144,19 @@ pub enum AppError {
     #[error(transparent)]
     DB(#[from] SqlxError),
 
-    ///! Any other error that needs to be wrapped inside an AppError.
-    ///!
-    ///! These errors are processed as HTTP 500 Internal Server Error.
-    ///!
-    ///! # Example
-    ///! Having an Error `e`, can be used as follow:
-    ///! ```
-    ///! return Err(AppError::Unexpected(e.into()));
-    ///! ```
-    ///! Or something like:
-    ///! ```
-    ///! some_operation().map_err(|e| AppError::Unexpected(e.into()))?;
-    ///! ```
+    /// Any other error that needs to be wrapped inside an AppError.
+    ///
+    /// These errors are processed as HTTP 500 Internal Server Error.
+    ///
+    /// # Example
+    /// Having an Error `e`, can be used as follow:
+    /// ```example
+    /// return Err(AppError::Unexpected(e.into()));
+    /// ```
+    /// Or something like:
+    /// ```example
+    /// some_operation().map_err(|e| AppError::Unexpected(e.into()))?;
+    /// ```
     #[error(transparent)]
     Unexpected(#[from] anyhow::Error),
 }
