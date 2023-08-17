@@ -12,7 +12,7 @@ use log::{error, info};
 use serde::Deserialize;
 use std::process::exit;
 
-/// App class to command line instructions, instead of the HTTP server
+/// App state class for command line instructions, instead of the HTTP server.
 pub struct AppCmd {
     pub state: AppState,
 }

@@ -1,3 +1,5 @@
+//! Utils methods to write tests.
+
 use actix_web::dev::ServiceResponse;
 use actix_web::http::StatusCode;
 use actix_web::test::read_body;

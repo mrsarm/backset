@@ -1,5 +1,7 @@
+//! Settings used to establish a connection with a database.
+
 use crate::conf::Environment;
-use crate::conf::{env_bool, env_num};
+use crate::conf::{env_bool, env_parsable};
 use std::env;
 use std::time::Duration;
 
@@ -40,11 +42,11 @@ impl DbConfig {
         } else {
             url
         };
-        let min_connections = env_num::<u32>("MIN_CONNECTIONS", 1);
-        let max_connections = env_num::<u32>("MAX_CONNECTIONS", 10);
-        let acquire_timeout = Duration::from_secs(env_num::<u64>("ACQUIRE_TIMEOUT_SEC", 2));
-        let idle_timeout = Duration::from_secs(env_num::<u64>("IDLE_TIMEOUT_SEC", 2));
-        let test_before_acquire = env_bool("TEST_BEFORE_ACQUIRE", false);
+        let min_connections = env_parsable::<u32>("MIN_CONNECTIONS", 1)?;
+        let max_connections = env_parsable::<u32>("MAX_CONNECTIONS", 10)?;
+        let acquire_timeout = Duration::from_secs(env_parsable::<u64>("ACQUIRE_TIMEOUT_SEC", 2)?);
+        let idle_timeout = Duration::from_secs(env_parsable::<u64>("IDLE_TIMEOUT_SEC", 2)?);
+        let test_before_acquire = env_bool("TEST_BEFORE_ACQUIRE", false)?;
         Ok(DbConfig {
             database_url,
             min_connections,

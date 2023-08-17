@@ -1,3 +1,5 @@
+//! Errors types to manager errors in Actix apps.
+
 use actix_web::error::InternalError;
 use actix_web::http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError};

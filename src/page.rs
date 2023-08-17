@@ -1,3 +1,5 @@
+//! Types to map page responses and query searches.
+
 use crate::PAGE_SIZE;
 use serde::{Deserialize, Serialize};
 use validator::Validate;

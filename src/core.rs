@@ -1,3 +1,5 @@
+//! Core types.
+
 use crate::errors::AppError;
 use actix_web::HttpResponse;
 use sqlx::{Postgres, Transaction};

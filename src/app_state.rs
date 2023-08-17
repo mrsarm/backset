@@ -1,3 +1,6 @@
+//! App configurations struct and method to handle state
+//! across all the endpoints handlers.
+
 use crate::conf::db::DbConfig;
 use crate::conf::Config;
 use crate::core::{Result, Tx};
@@ -18,6 +21,10 @@ use sqlx::PgPool;
 ///     ...
 /// ) -> Result<HttpResponse, ...> {
 /// ```
+///
+/// It also has facility methods to handle transactions,
+/// and the [`AppState::new()`] method to initialize
+/// the structure, like the connection pool with the DB.
 #[derive(Debug, Clone)]
 pub struct AppState {
     pub pool: PgPool,

@@ -1,3 +1,5 @@
+//! Utils to deal with streams data types.
+
 use crate::core::Result;
 use crate::errors::AppError;
 use actix_http::error::PayloadError;

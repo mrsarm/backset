@@ -6,9 +6,8 @@ use std::env;
 use std::fmt::Debug;
 
 /// `Config` is responsible of the configuration
-/// of the server, reading the settings from environment
-/// variables and .env file if exists, and configuring
-/// the logging system.
+/// of a server, reading the settings from environment
+/// variables or an `.env` file if exists.
 ///
 /// It does not setup anything related with the data layer
 /// other than the DB string connection, see the `app_state`
@@ -43,14 +42,17 @@ impl Config {
     /// defaulted to `default_port`.
     pub fn init_for(default_port: u16, environment: Option<Environment>) -> Result<Config, String> {
         debug!("⚙️  Configuring Backset ...");
-        let env = environment.unwrap_or_else(Environment::from_app_env);
+        let env = match environment {
+            Some(e) => e,
+            None => Environment::from_app_env()?
+        };
         let log_level = match env {
             Environment::Test => Level::Debug,
             _ => Level::Info,
         };
         log!(log_level, "⚙️  Environment set to {env}");
         let db = DbConfig::init_for(&env)?;
-        let server = HttpServerConfig::init("127.0.0.1", default_port);
+        let server = HttpServerConfig::init("127.0.0.1", default_port)?;
         Ok(Config { env, server, db })
     }
 }

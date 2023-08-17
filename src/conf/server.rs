@@ -1,4 +1,6 @@
-use crate::conf::env_num;
+//! Configuration for an HTTP server.
+
+use crate::conf::env_parsable;
 use std::env;
 
 /// Basic configuration for an HTTP server.
@@ -21,14 +23,14 @@ impl HttpServerConfig {
     /// (otherwise default_host) and `PORT` (otherwise use default_port),
     /// and the env variable `APP_URI` is used to se the `uri`, otherwise
     /// defaulted to empty string.
-    pub fn init(default_host: &str, default_port: u16) -> HttpServerConfig {
+    pub fn init(default_host: &str, default_port: u16) -> Result<HttpServerConfig, String> {
         let addr = env::var("HOST").unwrap_or(default_host.to_string());
-        let port = env_num::<u16>("PORT", default_port);
+        let port = env_parsable::<u16>("PORT", default_port)?;
         let uri = env::var("APP_URI").unwrap_or("".to_string());
         let url = format!("http://{}{}{}/",
                           if addr == "0" { "localhost" } else { &addr },
                           if port == 80 { "".to_string() } else { format!(":{}", port) },
                           if uri.is_empty() { "".to_string() } else { format!("/{}", uri) });
-        HttpServerConfig { addr, port, uri, url }
+        Ok(HttpServerConfig { addr, port, uri, url })
     }
 }
