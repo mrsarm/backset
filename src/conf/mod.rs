@@ -13,7 +13,7 @@ pub mod server;
 pub use crate::conf::config::Config;
 pub use crate::conf::env::Environment;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use std::env::var;
 use std::fmt::Debug;
 use std::str::FromStr;
@@ -43,7 +43,7 @@ where
     var(env_name)
         .map(|v| {
             v.parse::<A>()
-                .map_err(|_| anyhow::Error::msg(format!("{env_name} invalid number \"{v}\"")))
+                .map_err(|_| anyhow!("{env_name} invalid number \"{v}\""))
         })
         .unwrap_or(Ok(default_value))
 }
