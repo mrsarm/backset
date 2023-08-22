@@ -25,7 +25,7 @@ pub struct AppServer {
 }
 
 impl AppServer {
-    /// Build the web server, after calling the method, to pause the thread
+    /// Build the web server. After calling the method, to pause the thread
     /// of the app and listen for connections:
     /// ```example
     /// let app = AppServer::build(config, "0.1.0").await?;

@@ -13,13 +13,14 @@ pub mod server;
 pub use crate::conf::config::Config;
 pub use crate::conf::env::Environment;
 
+use anyhow::{Context, Result};
 use std::env::var;
 use std::fmt::Debug;
 use std::str::FromStr;
 
 /// Read boolean environment variable, accepting "0" or "false" as false
 /// values, and "1" or "true" values as true.
-pub fn env_bool(env_name: &'static str, default_value: bool) -> Result<bool, String> {
+pub fn env_bool(env_name: &'static str, default_value: bool) -> Result<bool> {
     var(env_name)
         .map(|v| match v.as_str() {
             "0" => "false".to_owned(),
@@ -28,21 +29,21 @@ pub fn env_bool(env_name: &'static str, default_value: bool) -> Result<bool, Str
         })
         .map(|v| {
             v.parse::<bool>()
-                .map_err(|_| format!("{env_name} invalid boolean \"{v}\""))
+                .with_context(|| format!("{env_name} invalid boolean \"{v}\""))
         })
         .unwrap_or(Ok(default_value))
 }
 
 /// Get a parsable value from an env value like a number,
 /// otherwise return `default_value`.
-pub fn env_parsable<A: FromStr>(env_name: &'static str, default_value: A) -> Result<A, String>
+pub fn env_parsable<A: FromStr>(env_name: &'static str, default_value: A) -> Result<A>
 where
     <A as FromStr>::Err: Debug,
 {
     var(env_name)
         .map(|v| {
             v.parse::<A>()
-                .map_err(|_| format!("{env_name} invalid number \"{v}\""))
+                .map_err(|_| anyhow::Error::msg(format!("{env_name} invalid number \"{v}\"")))
         })
         .unwrap_or(Ok(default_value))
 }

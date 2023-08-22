@@ -2,6 +2,7 @@
 
 use crate::conf::Environment;
 use crate::conf::{env_bool, env_parsable};
+use anyhow::{Context, Result};
 use std::env;
 use std::time::Duration;
 
@@ -35,8 +36,8 @@ impl DbConfig {
     /// Init the object with `env` passed, and the rest of the
     /// attributes reading its corresponding environment variable,
     /// otherwise use a default value.
-    pub fn init_for(env: &Environment) -> Result<Self, String> {
-        let url = env::var("DATABASE_URL").map_err(|_| "DATABASE_URL must be set")?;
+    pub fn init_for(env: &Environment) -> Result<Self> {
+        let url = env::var("DATABASE_URL").context("DATABASE_URL must be set")?;
         let database_url = if *env == Environment::Test && !url.ends_with("_test") {
             format!("{url}_test")
         } else {

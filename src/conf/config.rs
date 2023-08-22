@@ -1,6 +1,7 @@
 use crate::conf::db::DbConfig;
 use crate::conf::env::Environment;
 use crate::conf::server::HttpServerConfig;
+use anyhow::Result;
 use log::{debug, log, Level};
 use std::env;
 use std::fmt::Debug;
@@ -31,7 +32,7 @@ impl Config {
     ///
     /// The port number is get from the `PORT` env variable, otherwise
     /// defaulted to `default_port`.
-    pub fn init(default_port: u16) -> Result<Config, String> {
+    pub fn init(default_port: u16) -> Result<Config> {
         Self::init_for(default_port, None)
     }
 
@@ -40,7 +41,7 @@ impl Config {
     ///
     /// The port number is get from the `PORT` env variable, otherwise
     /// defaulted to `default_port`.
-    pub fn init_for(default_port: u16, environment: Option<Environment>) -> Result<Config, String> {
+    pub fn init_for(default_port: u16, environment: Option<Environment>) -> Result<Config> {
         debug!("⚙️  Configuring Backset ...");
         let env = match environment {
             Some(e) => e,

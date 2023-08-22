@@ -1,6 +1,8 @@
 //! Configuration for an HTTP server.
 
 use crate::conf::env_parsable;
+
+use anyhow::Result;
 use std::env;
 
 /// Basic configuration for an HTTP server.
@@ -23,7 +25,7 @@ impl HttpServerConfig {
     /// (otherwise default_host) and `PORT` (otherwise use default_port),
     /// and the env variable `APP_URI` is used to se the `uri`, otherwise
     /// defaulted to empty string.
-    pub fn init(default_host: &str, default_port: u16) -> Result<HttpServerConfig, String> {
+    pub fn init(default_host: &str, default_port: u16) -> Result<HttpServerConfig> {
         let addr = env::var("HOST").unwrap_or(default_host.to_string());
         let port = env_parsable::<u16>("PORT", default_port)?;
         let uri = env::var("APP_URI").unwrap_or("".to_string());

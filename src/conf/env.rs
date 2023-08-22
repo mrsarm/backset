@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use std::env;
 use std::fmt::Debug;
 use std::str::FromStr;
@@ -18,12 +19,12 @@ impl Environment {
     /// Get the value from the environment variable
     /// `APP_ENV`.
     /// It raise an error if the string doesn't match a possible environment.
-    pub fn from_app_env() -> Result<Self, String> {
+    pub fn from_app_env() -> Result<Self> {
         let app_env = env::var("APP_ENV");
         match app_env {
             Err(_) => Ok(Environment::default()),
             Ok(env) => Environment::from_str(env.as_str())
-                .map_err(|_| format!("APP_ENV invalid value \"{env}\"")),
+                .with_context(|| format!("APP_ENV invalid value \"{env}\"")),
         }
     }
 }
