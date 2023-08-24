@@ -21,8 +21,8 @@ pub struct DbConfig {
     /// Max connections allowed, value set with `MAX_CONNECTIONS` env,
     /// default 10
     pub max_connections: u32,
-    /// Time allowed to acquire a connection, value set with `ACQUIRE_TIMEOUT_SEC` env,
-    /// default 1 sec
+    /// Time allowed to acquire a connection, value set with `ACQUIRE_TIMEOUT_MS` env,
+    /// default 750 milliseconds
     pub acquire_timeout: Duration,
     /// Max time a connection can be idle, value set with `IDLE_TIMEOUT_SEC` env,
     /// default 300 sec (5 min).
@@ -46,7 +46,7 @@ impl DbConfig {
         };
         let min_connections = env_parsable::<u32>("MIN_CONNECTIONS", 1)?;
         let max_connections = env_parsable::<u32>("MAX_CONNECTIONS", 10)?;
-        let acquire_timeout = Duration::from_secs(env_parsable::<u64>("ACQUIRE_TIMEOUT_SEC", 1)?);
+        let acquire_timeout = Duration::from_millis(env_parsable::<u64>("ACQUIRE_TIMEOUT_MS", 750)?);
         let idle_timeout = Duration::from_secs(env_parsable::<u64>("IDLE_TIMEOUT_SEC", 300)?);
         let test_before_acquire = env_bool("TEST_BEFORE_ACQUIRE", false)?;
         Ok(DbConfig {

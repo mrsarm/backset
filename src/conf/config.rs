@@ -77,7 +77,7 @@ PORT={}
 DATABASE_URL="{}"
 MIN_CONNECTIONS={}
 MAX_CONNECTIONS={}
-ACQUIRE_TIMEOUT_SEC={}
+ACQUIRE_TIMEOUT_MS={}
 IDLE_TIMEOUT_SEC={}
 TEST_BEFORE_ACQUIRE={}
 RUST_LOG="{}""#,
@@ -89,7 +89,7 @@ RUST_LOG="{}""#,
             self.db.database_url,
             self.db.min_connections,
             self.db.max_connections,
-            self.db.acquire_timeout.as_secs(),
+            self.db.acquire_timeout.as_millis(),
             self.db.idle_timeout.as_secs(),
             self.db.test_before_acquire,
             env::var("RUST_LOG").unwrap_or("".to_string())
