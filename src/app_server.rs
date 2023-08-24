@@ -6,6 +6,7 @@ use actix_web::dev::Server;
 use actix_web::web;
 use actix_web::web::{Data, ServiceConfig};
 use actix_web::{App, HttpServer};
+use actix_web::middleware::Compress;
 use actix_web_validator::{JsonConfig, QueryConfig};
 use awc::http::StatusCode;
 use log::{error, info, Level};
@@ -60,6 +61,7 @@ impl AppServer {
                 });
             App::new()
                 .service(web::scope(uri.as_str()).configure(config_app))
+                .wrap(Compress::default())
                 .wrap(logger)
         })
         .bind((addr.clone(), port))?
