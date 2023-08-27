@@ -41,6 +41,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-contrib-rest"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94197c8b86e2e8fdb783d405fa41c426acec016b1a986fafab45fa175d6af3c7"
+dependencies = [
+ "actix-http",
+ "actix-web",
+ "actix-web-validator",
+ "anyhow",
+ "awc",
+ "futures-core",
+ "log",
+ "serde",
+ "server-env-config",
+ "sqlx",
+ "thiserror",
+ "validator",
+]
+
+[[package]]
 name = "actix-http"
 version = "3.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -531,6 +551,7 @@ name = "backset"
 version = "0.1.0"
 dependencies = [
  "actix-contrib-logger",
+ "actix-contrib-rest",
  "actix-http",
  "actix-web",
  "actix-web-validator",
@@ -547,6 +568,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "server-env-config",
  "sqlx",
  "strum",
  "strum_macros",
@@ -2218,6 +2240,18 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
+]
+
+[[package]]
+name = "server-env-config"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab2ab0a5deba4bc78eac22052c5ff30d894dc2f88d1814a5fa4661fcf8b523f3"
+dependencies = [
+ "anyhow",
+ "log",
+ "strum",
+ "strum_macros",
 ]
 
 [[package]]

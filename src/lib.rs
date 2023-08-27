@@ -4,16 +4,8 @@ extern crate lazy_static;
 pub mod app_args;
 pub mod app_cmd;
 pub mod app_server;
-pub mod app_state;
-pub mod conf;
-pub mod core;
-pub mod errors;
 pub mod health;
-pub mod page;
-pub mod query;
-pub mod stream;
 pub mod tenants;
-pub mod test;
 
 // Has to match Cargo.toml > version
 // TODO add in CI script to check both versions match

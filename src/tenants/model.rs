@@ -1,6 +1,6 @@
-use crate::core::{Result, Tx};
-use crate::errors::AppError;
-use crate::query::QuerySearch;
+use actix_contrib_rest::db::Tx;
+use actix_contrib_rest::query::QuerySearch;
+use actix_contrib_rest::result::{AppError, Result};
 use chrono::NaiveDateTime;
 use lazy_static::lazy_static;
 use regex::Regex;

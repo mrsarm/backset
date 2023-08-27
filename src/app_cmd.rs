@@ -1,15 +1,15 @@
 use crate::app_args::{Commands, Objects};
-use crate::app_state::AppState;
-use crate::conf::Config;
-use crate::core::Result;
-use crate::errors::AppError;
-use crate::query::QuerySearch;
-use crate::stream::read_body;
 use crate::tenants::model::Tenant;
+use actix_contrib_rest::app_state::AppState;
+use actix_contrib_rest::query::QuerySearch;
+use actix_contrib_rest::result::AppError;
+use actix_contrib_rest::result::Result;
+use actix_contrib_rest::stream::read_body;
 use actix_web::http::header::Accept;
 use awc::Client;
 use log::{error, info};
 use serde::Deserialize;
+use server_env_config::Config;
 use std::env;
 use std::process::exit;
 
@@ -113,7 +113,12 @@ impl AppCmd {
     }
 
     fn list_envs(&self) {
+        info!(
+r"# The following items are the environment variables and its values from
+# the OS, from an .env file, or the default value used by **Backset**.
+#");
         info!("{}", self.state.config.to_string());
         info!("LOG_LEVEL={}", env::var("LOG_LEVEL").unwrap_or("INFO".to_string()));
+        info!("RUST_LOG=\"{}\"", env::var("RUST_LOG").unwrap_or("".to_string()));
     }
 }

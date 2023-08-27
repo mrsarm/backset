@@ -1,20 +1,20 @@
 //! Build and run the HTTP server.
 
-use std::process::exit;
 use actix_contrib_logger::middleware::Logger;
+use actix_contrib_rest::app_state::AppState;
+use actix_contrib_rest::response::json_error_handler;
 use actix_web::dev::Server;
+use actix_web::middleware::Compress;
 use actix_web::web;
 use actix_web::web::{Data, ServiceConfig};
 use actix_web::{App, HttpServer};
-use actix_web::middleware::Compress;
 use actix_web_validator::{JsonConfig, QueryConfig};
 use awc::http::StatusCode;
 use log::{error, info, Level};
+use server_env_config::server::HttpServerConfig;
+use server_env_config::Config;
+use std::process::exit;
 
-use crate::app_state::AppState;
-use crate::conf::server::HttpServerConfig;
-use crate::conf::Config;
-use crate::errors::json_error_handler;
 use crate::health;
 use crate::tenants::api as tenants_api;
 

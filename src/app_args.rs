@@ -29,8 +29,8 @@ impl Args {
             _ => env_logger::builder()
                 .target(Target::Stdout)
                 .filter_level(level_filter)
-                .filter(Some("backset::conf"), LevelFilter::Warn)
-                .filter(Some("backset::app_state"), LevelFilter::Warn)
+                .filter(Some("server_env_config"), LevelFilter::Warn)
+                .filter(Some("actix_contrib_rest::app_state"), LevelFilter::Warn)
                 .format(|buf, record| {
                     let level = record.level();
                     match &level {

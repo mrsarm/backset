@@ -19,6 +19,7 @@ actix-web = "4.3"
 actix-web-validator = "5.0"
 actix-http = "3.3"
 actix-contrib-logger = "0.1"
+actix-contrib-rest = { version = "0.1", features = ["sqlx-postgres"] }
 awc = { version = "3.1", features = ["rustls"] }
 anyhow = "1.0"
 clap = { version = "4.3", features = ["derive"] }
@@ -36,4 +37,5 @@ strum = "0.25"
 strum_macros = "0.25"
 rand = "0.8"
 regex = "1.9"
+server-env-config = "0.1"
 chrono = { version = "0.4", features = ["serde"] }

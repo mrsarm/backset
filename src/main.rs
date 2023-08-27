@@ -3,10 +3,10 @@
 use backset::app_args::{Args, Commands};
 use backset::app_cmd::AppCmd;
 use backset::app_server::AppServer;
-use backset::conf::Config;
 use backset::{BACKSET_PORT, BACKSET_VERSION};
-use std::process::exit;
 use log::error;
+use server_env_config::Config;
+use std::process::exit;
 
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {

@@ -1,5 +1,9 @@
 #[cfg(test)]
 mod tests {
+    use actix_contrib_rest::app_state::AppState;
+    use actix_contrib_rest::page::Page;
+    use actix_contrib_rest::result::ValidationErrorPayload;
+    use actix_contrib_rest::test::assert_status;
     use actix_http::Request;
     use actix_web::http::header::{Accept, ContentType};
     use actix_web::http::StatusCode;
@@ -7,19 +11,15 @@ mod tests {
     use actix_web::web::Data;
     use actix_web::App;
     use backset::app_server::AppServer;
-    use backset::app_state::AppState;
-    use backset::conf::Config;
-    use backset::conf::Environment;
-    use backset::errors::ValidationErrorPayload;
-    use backset::page::Page;
     use backset::tenants::model::Tenant;
-    use backset::test::assert_status;
     use backset::{BACKSET_PORT, PAGE_SIZE};
     use dotenv::dotenv;
     use log::{error, LevelFilter};
     use rand::Rng;
     use serde::Serialize;
     use serde_json::json;
+    use server_env_config::env::Environment;
+    use server_env_config::Config;
     use std::error::Error;
     use std::process::exit;
     use std::sync::Once;

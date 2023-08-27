@@ -1,8 +1,9 @@
-use crate::app_state::AppState;
-use crate::core::HttpResult;
-use crate::page::Page;
-use crate::query::QuerySearch;
 use crate::tenants::model::{Tenant, TenantPayload};
+
+use actix_contrib_rest::app_state::AppState;
+use actix_contrib_rest::page::Page;
+use actix_contrib_rest::query::QuerySearch;
+use actix_contrib_rest::result::HttpResult;
 use actix_web::web::{Data, Path};
 use actix_web::{delete, get, post, web, HttpResponse};
 use actix_web_validator::{Json, Query};
