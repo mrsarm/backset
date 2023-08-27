@@ -81,16 +81,8 @@ Missing:
 - [ ] "/sets" model and endpoints
 
 More stuff to add:
-- [ ] Improve validations: when a required field is not passed
-      the error is ```{"error": "Json deserialize error: missing field `name` at line ..."}```
-      instead of providing field details. Check-out the default string handler that return
-      a string instead of JSON (sucks) but can be a good sample of how to iterate the errors
-      at least for these cases: https://github.com/rambler-digital-solutions/actix-web-validator/blob/master/src/error.rs#L51-L55
-      - Looks like it's not possible, and alternative is to apply a regex to the error, e.g.
-        when the error is a "ActixValidatorError::JsonPayloadError(Deserialize)", and the message
-        is ```Json deserialize error: missing field `FIELDNAME` at line \d+ column \d+```,
-        the error type and field name can be inferred.
 - [ ] Random PKs (when more models are added).
+- [ ] Add command to create tenants: `backset create tenant NAME `.
 
 
 ### About
