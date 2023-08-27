@@ -116,10 +116,10 @@ impl AppCmd {
         Ok(())
     }
 
-    async fn create_tenants(&self, id: &String, name: &String) -> Result<()> {
+    async fn create_tenants(&self, id: &str, name: &str) -> Result<()> {
         let tenant = TenantPayload {
-            id: id.clone(),
-            name: name.clone(),
+            id: id.to_string(),
+            name: name.to_string(),
         };
         tenant.validate().map_err(|e| AppError::Validation(e.to_string()))?;
         let mut tx = self.state.get_tx().await?;
