@@ -1,5 +1,5 @@
-use crate::app_args::{Commands, Objects};
-use crate::tenants::model::Tenant;
+use crate::app_args::{Commands, CreateObjects, ListObjects};
+use crate::tenants::model::{Tenant, TenantPayload};
 use actix_contrib_rest::app_state::AppState;
 use actix_contrib_rest::query::QuerySearch;
 use actix_contrib_rest::result::AppError;
@@ -12,6 +12,7 @@ use serde::Deserialize;
 use server_env_config::Config;
 use std::env;
 use std::process::exit;
+use validator::Validate;
 
 /// App state class for command line instructions, instead of the HTTP server.
 pub struct AppCmd {
@@ -36,11 +37,14 @@ impl AppCmd {
             Commands::Health => {
                 self.healthcheck().await?;
             }
-            Commands::List { object: Objects::Envs } => {
+            Commands::List { object: ListObjects::Envs } => {
                 self.list_envs();
             }
-            Commands::List { object: Objects::Tenants { query, lines } } => {
+            Commands::List { object: ListObjects::Tenants { query, lines } } => {
                 self.list_tenants(query, *lines).await?;
+            }
+            Commands::Create { object: CreateObjects::Tenant { id, name } } => {
+                self.create_tenants(id, name).await?;
             }
             Commands::Run => {
                 // It should not get to this point
@@ -109,6 +113,19 @@ impl AppCmd {
         for tenant in tenants.iter() {
             info!("{}: {}", tenant.id, tenant.name);
         }
+        Ok(())
+    }
+
+    async fn create_tenants(&self, id: &String, name: &String) -> Result<()> {
+        let tenant = TenantPayload {
+            id: id.clone(),
+            name: name.clone(),
+        };
+        tenant.validate().map_err(|e| AppError::Validation(e.to_string()))?;
+        let mut tx = self.state.get_tx().await?;
+        Tenant::insert(&mut tx, tenant).await?;
+        self.state.commit_tx(tx).await?;
+        info!("Tenant \"{}\" created.", id);
         Ok(())
     }
 

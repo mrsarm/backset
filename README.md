@@ -18,9 +18,10 @@ object belongs to.
 - Logging configured with settings examples in the source.
 - Tests and CI pipeline with GitHub Actions.
 - Model driven design.
-- Good error management.
-  - JSON validations with [validator](https://github.com/Keats/validator) and
-    [actix-web-validator](https://github.com/rambler-digital-solutions/actix-web-validator) crates.
+- Good serialization and error management:
+  - It uses the crates: [Serde](https://serde.rs/), [validator](https://github.com/Keats/validator),
+    [actix-web-validator](https://github.com/rambler-digital-solutions/actix-web-validator), [serde_valid](https://github.com/yassun7010/serde_valid) and
+    [actix-contrib-rest](https://github.com/mrsarm/rust-actix-contrib-rest).
 - Dockerized, ready to use for development or production envs.
 
 
@@ -82,7 +83,6 @@ Missing:
 
 More stuff to add:
 - [ ] Random PKs (when more models are added).
-- [ ] Add command to create tenants: `backset create tenant NAME `.
 
 
 ### About

@@ -53,13 +53,16 @@ pub enum Commands {
     /// List objects
     List {
         #[command(subcommand)]
-        object: Objects,
+        object: ListObjects,
     },
-    //TODO more coming soon...
+    Create {
+        #[command(subcommand)]
+        object: CreateObjects,
+    },
 }
 
 #[derive(Subcommand, strum_macros::Display)]
-pub enum Objects {
+pub enum ListObjects {
     /// List tenants
     Tenants {
         /// Text to filter tenants
@@ -72,4 +75,18 @@ pub enum Objects {
     },
     /// List all ENVIRONMENT_VARIABLE=current_value used by the server
     Envs,
+}
+
+#[derive(Subcommand, strum_macros::Display)]
+pub enum CreateObjects {
+    /// Create tenant
+    Tenant {
+        /// The id of the new tenant
+        #[clap(value_name = "ID")]
+        id: String,
+
+        /// The name of the new tenant
+        #[arg(short = 'n', long)]
+        name: String,
+    },
 }
