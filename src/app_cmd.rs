@@ -44,7 +44,7 @@ impl AppCmd {
                 self.list_tenants(query, *lines).await?;
             }
             Commands::Create { object: CreateObjects::Tenant { id, name } } => {
-                self.create_tenants(id, name).await?;
+                self.create_tenant(id, name).await?;
             }
             Commands::Run => {
                 // It should not get to this point
@@ -116,7 +116,7 @@ impl AppCmd {
         Ok(())
     }
 
-    async fn create_tenants(&self, id: &str, name: &str) -> Result<()> {
+    async fn create_tenant(&self, id: &str, name: &str) -> Result<()> {
         let tenant = TenantPayload {
             id: id.to_string(),
             name: name.to_string(),
