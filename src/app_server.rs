@@ -51,13 +51,6 @@ impl AppServer {
                     } else {
                         Level::Info
                     }
-                })
-                .custom_error_resp_level(|status| {
-                    if status.is_server_error() {
-                        Level::Error
-                    } else {
-                        Level::Info
-                    }
                 });
             App::new()
                 .service(web::scope(uri.as_str()).configure(config_app))
