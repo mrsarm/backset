@@ -70,11 +70,11 @@ impl Tenant {
                 format!("Tenant with name \"{}\" already exists.", tenant_form.name))
             );
         }
-        let tenant = sqlx::query_as!(
-                Tenant,
+        let tenant = sqlx::query_as::<_, Tenant>(
                 "INSERT INTO tenants (id, name, created_at) VALUES ($1, $2, NOW()) RETURNING *",
-                tenant_form.id,
-                tenant_form.name)
+            )
+            .bind(tenant_form.id.as_str())
+            .bind(tenant_form.name.as_str())
             .fetch_one(&mut **tx)
             .await
             .map_err(AppError::DB)?;
