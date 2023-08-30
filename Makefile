@@ -1,5 +1,5 @@
 .PHONY: clean build build-test release install uninstall run list-tenants test lint fmt-check \
-        migrate migrate-revert migrate-info create-db drop-db recreate-db recreate-db-test \
+        migrate migrate-revert migrate-info create-db drop-db recreate-db recreate-db-test wait-pg \
         check-sqlx-data psql
 .DEFAULT_GOAL := build-all
 
@@ -40,6 +40,10 @@ recreate-db:
 
 recreate-db-test:
 	./scripts/recreate-db-test.sh
+
+wait-pg:
+	$(eval POSTGRES_PORT ?= 5432)
+	./scripts/wait-port.sh "${POSTGRES_PORT}"
 
 test: recreate-db-test
 	RUST_LOG=warn cargo test
