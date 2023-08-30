@@ -39,7 +39,7 @@ mod tests {
                 error!("{error}");
                 exit(1);
             });
-        let data = AppState::new(config.clone()).await
+        let data = AppState::init(config.clone()).await
             .unwrap_or_else(|error| {
                 error!("{error}");
                 exit(1);

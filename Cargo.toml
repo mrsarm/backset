@@ -19,7 +19,7 @@ actix-web = "4.4"
 actix-web-validator = "5.0"
 actix-http = "3.4"
 actix-contrib-logger = "0.1"
-actix-contrib-rest = { version = "0.1", features = ["sqlx-postgres"] }
+actix-contrib-rest = { version = "0.2", features = ["sqlx-postgres"] }
 awc = { version = "3.2", features = ["rustls"] }
 anyhow = "1.0"
 clap = { version = "4.3", features = ["derive"] }

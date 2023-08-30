@@ -20,6 +20,13 @@ services:
       - TEST_BEFORE_ACQUIRE
     depends_on:
       - postgres
+    healthcheck:
+      test: ["CMD", "/usr/app/bin/backset", "health"]
+      interval: 10s
+      timeout: 8s
+#      retries: 3
+#      start_period: 40s
+#      start_interval: 5s
 
   postgres:
     image: postgres
@@ -27,10 +34,10 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - data:/var/lib/postgresql/data
-    #command: ["postgres", "-c", "log_statement=all"]  # Comment to disable SQL logs. all: all queries, ddl: DDL only, mod: DDL and modifying statements
+    command: ["postgres", "-c", "log_statement=all"]  # Comment to disable SQL logs. all: all queries, ddl: DDL only, mod: DDL and modifying statements
 
   psql:
     image: postgres

@@ -12,6 +12,7 @@ use serde::Deserialize;
 use server_env_config::Config;
 use std::env;
 use std::process::exit;
+use sqlx::Connection;
 use validator::Validate;
 
 /// App state class for command line instructions, instead of the HTTP server.
@@ -28,7 +29,7 @@ pub struct HealthPayload {
 
 impl AppCmd {
     pub async fn build(config: Config) -> core::result::Result<Self, String> {
-        let state = AppState::new(config).await?;
+        let state = AppState::new(config);
         Ok(AppCmd { state })
     }
 
@@ -97,7 +98,8 @@ impl AppCmd {
     }
 
     async fn list_tenants(&self, query: &Option<String>, lines: i64) -> Result<()> {
-        let mut tx = self.state.get_tx().await?;
+        let mut conn = self.state.get_conn().await?;
+        let mut tx = Connection::begin(&mut conn).await.map_err(AppError::DB)?;
         let tenants = Tenant::find(
             &mut tx,
             &QuerySearch {
@@ -122,7 +124,8 @@ impl AppCmd {
             name: name.to_string(),
         };
         tenant.validate().map_err(|e| AppError::Validation(e.to_string()))?;
-        let mut tx = self.state.get_tx().await?;
+        let mut conn = self.state.get_conn().await?;
+        let mut tx = Connection::begin(&mut conn).await.map_err(AppError::DB)?;
         Tenant::insert(&mut tx, tenant).await?;
         self.state.commit_tx(tx).await?;
         info!("Tenant \"{}\" created.", id);

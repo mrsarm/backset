@@ -35,7 +35,7 @@ impl AppServer {
     pub async fn build(config: Config, app_version: &str) -> Result<Self, anyhow::Error> {
         let HttpServerConfig { addr, port, uri, url } = config.server.clone();
         info!("🚀 Starting Backset server v{} at {} ...", app_version, url);
-        let state = AppState::new(config).await.unwrap_or_else(|error| {
+        let state = AppState::init(config).await.unwrap_or_else(|error| {
             error!("{error}");
             exit(1);
         });
