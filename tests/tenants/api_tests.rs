@@ -15,7 +15,7 @@ mod tests {
     use backset::{BACKSET_PORT, PAGE_SIZE};
     use dotenv::dotenv;
     use log::{error, LevelFilter};
-    use rand::Rng;
+    use rand::random;
     use serde::Serialize;
     use serde_json::json;
     use server_env_config::env::Environment;
@@ -69,7 +69,7 @@ mod tests {
     async fn test_tenants_post() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let _id = rand::thread_rng().gen::<u32>();
+        let _id = random::<u32>();
         let id = format!("ten-{_id}");
         let name = format!("The Tenant Name {_id}");
         let req = _post(json!({ "id": id, "name": name }));
@@ -85,7 +85,7 @@ mod tests {
     async fn test_tenants_post_and_get() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let _id = rand::thread_rng().gen::<u32>();
+        let _id = random::<u32>();
         let id = format!("another-{_id}");
         let name = format!("Another Name {_id}");
         let req = _post(json!({ "id": id, "name": name }));
@@ -105,7 +105,7 @@ mod tests {
     async fn test_tenants_get_paginated() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let _id = rand::thread_rng().gen::<u32>();
+        let _id = random::<u32>();
         let _id_prefix = format!("paginated-{_id}");
         for i in 0..80 {
             let id = format!("{_id_prefix}-{i}");
@@ -146,7 +146,7 @@ mod tests {
     async fn test_tenants_do_not_include_total() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let _id = rand::thread_rng().gen::<u32>();
+        let _id = random::<u32>();
         let _id_prefix = format!("paginated-without-total-{_id}");
         for i in 0..5 {
             let id = format!("{_id_prefix}-{i}");
@@ -176,9 +176,9 @@ mod tests {
     async fn test_tenants_search() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let rand_for_test = rand::thread_rng().gen::<u32>();
+        let rand_for_test = random::<u32>();
         let rand_classic = format!("Classic data {rand_for_test}");
-        let _id = rand::thread_rng().gen::<u32>();
+        let _id = random::<u32>();
         for i in 0..3 {
             let id = format!("classic-{rand_for_test}-{_id}-{i}");
             let name = format!("{rand_classic} {rand_for_test} {i} {_id}");
@@ -186,10 +186,10 @@ mod tests {
             call_service(&app, req).await;
         }
         let rand_new = format!("NEW data {rand_for_test}");
-        let _id = rand::thread_rng().gen::<u32>();
+        let _id = random::<u32>();
         for i in 0..3 {
             let id = format!("new-{rand_for_test}-{_id}-{i}");
-            let name = format!("{rand_new} {i} {}", rand::thread_rng().gen::<u32>());
+            let name = format!("{rand_new} {i} {}", random::<u32>());
             let req = _post(json!({ "id": id, "name": name }));
             call_service(&app, req).await;
         }
@@ -224,14 +224,14 @@ mod tests {
     async fn test_tenants_post_already_exists() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let _id = rand::thread_rng().gen::<u32>();
+        let _id = random::<u32>();
         let id = format!("first-{_id}");
         let same_name = format!("First Time Name {_id}");
         let req = _post(json!({ "id": id, "name": same_name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let req = _post(json!({
-            "id": format!("id-{}", rand::thread_rng().gen::<u32>()),
+            "id": format!("id-{}", random::<u32>()),
             "name": same_name // same name again
         }));
         let resp = call_service(&app, req).await;
@@ -243,7 +243,7 @@ mod tests {
         );
         let req = _post(json!({
             "id": id,   // same id
-            "name": format!("Some Name {}", rand::thread_rng().gen::<u32>())
+            "name": format!("Some Name {}", random::<u32>())
         }));
         let resp = call_service(&app, req).await;
         let body = assert_status(resp, StatusCode::BAD_REQUEST).await;
@@ -260,7 +260,7 @@ mod tests {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let req = _post(json!({
-            "id": format!("validate-{}", rand::thread_rng().gen::<u32>()),
+            "id": format!("validate-{}", random::<u32>()),
             "name": "Sr"
         }));
         let resp = call_service(&app, req).await;
@@ -301,8 +301,8 @@ mod tests {
     async fn test_tenants_delete() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let id = format!("to-delete-{}", rand::thread_rng().gen::<u32>());
-        let name = format!("To Be Deleted {}", rand::thread_rng().gen::<u32>());
+        let id = format!("to-delete-{}", random::<u32>());
+        let name = format!("To Be Deleted {}", random::<u32>());
         let req = _post(json!({ "id": id, "name": name }));
         let resp = call_service(&app, req).await;
         let body = assert_status(resp, StatusCode::CREATED).await;
