@@ -7,7 +7,7 @@ RUN apk add --no-cache --purge openssl-dev musl-dev \
 WORKDIR /usr/src/backset
 COPY . .
 
-RUN SQLX_OFFLINE=true cargo install --path .
+RUN cargo install --path .
 
 ARG BUILD
 LABEL build=${BUILD}

@@ -67,15 +67,9 @@ DB for `cargo test`, or execute the re-creation and the tests with:
 make test
 ```
 
-#### Update "offline mode" queries
-
-```shell
-cargo sqlx prepare
-```
-
 ### Build
 
-Debug build, you have to have a Postgres DB instance running and migrated:
+Debug build:
 
 ```shell
 cargo build
@@ -90,18 +84,6 @@ cargo build --release
 ```
 
 Or `make release`.
-
-#### Build in "offline mode"
-
-In "offline mode" you don't need to have a DB instance running,
-but SQLx will still check the queries written in the code against
-the `sqlx-data.json` file that has the latest queries cached.
-
-```shell
-SQLX_OFFLINE=true cargo build
-# or
-SQLX_OFFLINE=true make
-```
 
 ### Linting
 
@@ -144,11 +126,10 @@ sudo make install
 ```
 
 To change the prefix folder use the `INSTALL_PREFIX` env variable. E.g. to
-install the binary under the user folder at `~/.local/bin/backset`, and compiling
-the sources without the Postgres database:
+install the binary under the user folder at `~/.local/bin/backset`:
 
 ```shell
-SQLX_OFFLINE=true make release
+make release
 INSTALL_PREFIX="$HOME/.local" make install
 ```
 

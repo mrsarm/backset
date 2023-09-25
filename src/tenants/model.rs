@@ -5,6 +5,7 @@ use chrono::NaiveDateTime;
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use sqlx::postgres::PgQueryResult;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use validator::{Validate, ValidationError};
@@ -103,10 +104,9 @@ impl Tenant {
     }
 
     pub async fn get(tx: &mut Tx<'_>, id: &str) -> Result<Option<Tenant>> {
-        let tenant = sqlx::query_as!(
-                Tenant,
-                "SELECT id, name, created_at FROM tenants WHERE id = $1", id
-            )
+        let tenant: Option<Tenant> = sqlx::query_as(
+                "SELECT id, name, created_at FROM tenants WHERE id = $1")
+            .bind(id)
             .fetch_optional(&mut **tx)
             .await
             .map_err(AppError::DB)?;
@@ -163,11 +163,12 @@ impl Tenant {
     }
 
     pub async fn delete(tx: &mut Tx<'_>, id: &str) -> Result<u64> {
-        let result = sqlx::query!("DELETE FROM tenants WHERE id = $1", id)
+        let res: PgQueryResult = sqlx::query("DELETE FROM tenants WHERE id = $1")
+            .bind(id)
             .execute(&mut **tx)
             .await
             .map_err(AppError::DB)?;
 
-        Ok(result.rows_affected())
+        Ok(res.rows_affected())
     }
 }

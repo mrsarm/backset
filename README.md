@@ -90,7 +90,6 @@ More stuff to add:
 - [ ] `/health?db=true&timeout=MILLIS`
       and `backset health --db --timeout MILLIS` to check DB connection as well.
       - [ ] The DB check could be in a new method `AppState::check_conn(Option<Duration>)`.
-- [-] Remove sqlx macros?
 
 
 ### About
