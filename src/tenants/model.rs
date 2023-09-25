@@ -81,6 +81,18 @@ impl Tenant {
         Ok(res.0)
     }
 
+    pub async fn exists_or_fail(tx: &mut Tx<'_>, tid: &str) -> Result<()> {
+        let tenant_exists = Tenant::exists(tx, tid).await?;
+        if !tenant_exists {
+            return Err(AppError::ResourceNotFound {
+                resource: "tenant",
+                attribute: "id",
+                value: tid.to_string(),
+            });
+        }
+        Ok(())
+    }
+
     pub async fn get_id_by_name(tx: &mut Tx<'_>, name: &str) -> Result<Option<String>> {
         let res: Option<(String,)> = sqlx::query_as("SELECT id FROM tenants WHERE name = $1")
             .bind(name)
