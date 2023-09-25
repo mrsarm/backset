@@ -45,6 +45,10 @@ wait-pg:
 	$(eval POSTGRES_PORT ?= 5432)
 	./scripts/wait-port.sh "${POSTGRES_PORT}"
 
+wait-server:
+	$(eval PORT ?= 8558)
+	./scripts/wait-port.sh "${PORT}"
+
 test: recreate-db-test
 	RUST_LOG=warn cargo test
 

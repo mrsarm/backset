@@ -36,6 +36,6 @@ jobs:
     - name: Run server
       run: make run &
     - name: Wait Server
-      run: sleep 2
+      run: make wait-server
     - name: Check server
       run: make health
