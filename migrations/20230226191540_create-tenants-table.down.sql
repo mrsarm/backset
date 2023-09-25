@@ -1,1 +1,1 @@
-DROP TABLE tenants;
+DROP TABLE IF EXISTS tenants;
