@@ -48,24 +48,14 @@ pub struct TenantPayload {
 
 impl Tenant {
     pub async fn insert(tx: &mut Tx<'_>, tenant_form: TenantPayload) -> Result<Tenant> {
-        let res = sqlx::query!(
-                "SELECT EXISTS(SELECT id FROM tenants WHERE id = $1)",
-                tenant_form.id)
-            .fetch_one(&mut **tx)
-            .await
-            .map_err(AppError::DB)?;
-        if res.exists.unwrap_or(false) {
+        let exists = Self::exists(&mut *tx, tenant_form.id.as_str()).await?;
+        if exists {
             return Err(AppError::Validation(
                 format!("Tenant with id \"{}\" already exists.", tenant_form.id))
             );
         }
-        let res = sqlx::query!(
-                "SELECT EXISTS(SELECT id FROM tenants WHERE name = $1)",
-                tenant_form.name)
-            .fetch_one(&mut **tx)
-            .await
-            .map_err(AppError::DB)?;
-        if res.exists.unwrap_or(false) {
+        let id = Self::get_id_by_name(&mut *tx, tenant_form.name.as_str()).await?;
+        if id.is_some() {
             return Err(AppError::Validation(
                 format!("Tenant with name \"{}\" already exists.", tenant_form.name))
             );
@@ -79,6 +69,25 @@ impl Tenant {
             .await
             .map_err(AppError::DB)?;
         Ok(tenant)
+    }
+
+    pub async fn exists(tx: &mut Tx<'_>, id: &str) -> Result<bool> {
+        let res: (bool,) = sqlx::query_as(
+                "SELECT EXISTS(SELECT id FROM tenants WHERE id = $1)")
+            .bind(id)
+            .fetch_one(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        Ok(res.0)
+    }
+
+    pub async fn get_id_by_name(tx: &mut Tx<'_>, name: &str) -> Result<Option<String>> {
+        let res: Option<(String,)> = sqlx::query_as("SELECT id FROM tenants WHERE name = $1")
+            .bind(name)
+            .fetch_optional(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        Ok(res.map(|r| r.0))
     }
 
     pub async fn get(tx: &mut Tx<'_>, id: &str) -> Result<Option<Tenant>> {
