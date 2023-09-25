@@ -5,7 +5,7 @@ use actix_contrib_rest::page::Page;
 use actix_contrib_rest::query::QuerySearch;
 use actix_contrib_rest::result::HttpResult;
 use actix_web::web::{Data, Path};
-use actix_web::{delete, get, post, web, HttpResponse};
+use actix_web::{delete, get, HttpResponse, post};
 use actix_web_validator::{Json, Query};
 
 #[post("")]
@@ -62,15 +62,4 @@ async fn delete(app: Data<AppState>, id: Path<String>) -> HttpResult {
         0 => Ok(HttpResponse::NotFound().finish()),
         _ => Ok(HttpResponse::NoContent().finish()),
     }
-}
-
-pub fn config(conf: &mut web::ServiceConfig) {
-    let scope = web::scope("/tenants")
-        .service(create)
-        .service(delete)
-        .service(list);
-    conf.service(scope);
-    let scope = web::scope("")
-        .service(read);
-    conf.service(scope);
 }

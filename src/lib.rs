@@ -5,7 +5,10 @@ pub mod app_args;
 pub mod app_cmd;
 pub mod app_server;
 pub mod health;
+
+pub mod elements;
 pub mod tenants;
+pub mod routes;
 
 // Has to match Cargo.toml > version
 // TODO add in CI script to check both versions match

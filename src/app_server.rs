@@ -15,8 +15,7 @@ use server_env_config::server::HttpServerConfig;
 use server_env_config::Config;
 use std::process::exit;
 
-use crate::health;
-use crate::tenants::api as tenants_api;
+use crate::routes;
 
 /// Build and run the HTTP server.
 pub struct AppServer {
@@ -72,8 +71,7 @@ impl AppServer {
             conf.app_data(data.clone())
                 .app_data(JsonConfig::default().error_handler(json_error_handler))
                 .app_data(QueryConfig::default().error_handler(json_error_handler))
-                .configure(health::config)
-                .configure(tenants_api::config);
+                .configure(routes::config);
         })
     }
 }

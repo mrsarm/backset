@@ -79,10 +79,18 @@ Missing:
 
 - [x] "/tenants" model and endpoints
 - [ ] "/elements" model and endpoints
+  - [x] `POST`
+  - [ ] `GET`
+  - [ ] `GET` all
+  - [ ] `PUT`
 - [ ] "/sets" model and endpoints
 
 More stuff to add:
 - [ ] Random PKs (when more models are added).
+- [ ] `/health?db=true&timeout=MILLIS`
+      and `backset health --db --timeout MILLIS` to check DB connection as well.
+      - [ ] The DB check could be in a new method `AppState::check_conn(Option<Duration>)`.
+- [-] Remove sqlx macros?
 
 
 ### About
