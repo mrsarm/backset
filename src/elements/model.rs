@@ -43,10 +43,11 @@ impl Element {
     pub async fn insert(tx: &mut Tx<'_>, tid: &str, el_form: ElementPayload) -> Result<Element> {
         let tenant_exists = Tenant::exists(tx, tid).await?;
         if !tenant_exists {
-            // TODO Add new error for resource not found
-            return Err(AppError::Validation(
-                format!("Tenant with id \"{}\" doesn't exists.", tid))
-            );
+            return Err(AppError::ResourceNotFound {
+                resource: "tenant",
+                attribute: "id",
+                value: tid.to_string(),
+            });
         }
         let id = match el_form.id {
             None => random::<u64>().to_string(),
