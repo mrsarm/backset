@@ -79,9 +79,11 @@ Missing:
 
 - [x] "/tenants" model and endpoints
 - [ ] "/elements" model and endpoints
-  - [x] `POST`
-  - [ ] `GET`
+  - [x] `GET`
   - [ ] `GET` all
+  - [x] `POST`
+  - [x] `GET`
+  - [x] `DELETE`
   - [ ] `PUT`
 - [ ] "/sets" model and endpoints
 

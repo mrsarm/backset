@@ -6,6 +6,7 @@ use rand::random;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
+use sqlx::postgres::PgQueryResult;
 use sqlx::types::Json;
 use validator::Validate;
 
@@ -42,6 +43,10 @@ pub struct ElementPayload {
 impl Element {
     pub async fn insert(tx: &mut Tx<'_>, tid: &str, el_form: ElementPayload) -> Result<Element> {
         Tenant::exists_or_fail(tx, tid).await?;
+        if el_form.data.as_ref().contains_key("created_at") {
+            return Err(AppError::StaticValidation(
+                "cannot provide reserved attribute \"created_at\""));
+        }
         let id = match el_form.id {
             None => random::<u64>().to_string(),
             Some(_id) => {
@@ -70,5 +75,30 @@ impl Element {
             .await
             .map_err(AppError::DB)?;
         Ok(element)
+    }
+
+    pub async fn get(tx: &mut Tx<'_>, tid: &str, id: &str) -> Result<Option<Element>> {
+        Tenant::exists_or_fail(tx, tid).await?;
+        let element: Option<Element> = sqlx::query_as(
+            "SELECT * FROM elements WHERE tid = $1 AND id = $2")
+            .bind(tid)
+            .bind(id)
+            .fetch_optional(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        Ok(element)
+    }
+
+    pub async fn delete(tx: &mut Tx<'_>, tid: &str, id: &str) -> Result<u64> {
+        Tenant::exists_or_fail(tx, tid).await?;
+        let res: PgQueryResult = sqlx::query(
+                "DELETE FROM elements WHERE tid = $1 AND id = $2")
+            .bind(tid)
+            .bind(id)
+            .execute(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+
+        Ok(res.rows_affected())
     }
 }
