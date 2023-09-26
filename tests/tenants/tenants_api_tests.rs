@@ -3,8 +3,6 @@ mod tests {
     use actix_contrib_rest::page::Page;
     use actix_contrib_rest::result::ValidationErrorPayload;
     use actix_contrib_rest::test::assert_status;
-    use actix_http::Request;
-    use actix_web::http::header::{Accept, ContentType};
     use actix_web::http::StatusCode;
     use actix_web::test::{call_service, init_service, try_read_body_json, TestRequest};
     use actix_web::App;
@@ -12,28 +10,9 @@ mod tests {
     use backset::tenants::model::Tenant;
     use backset::PAGE_SIZE;
     use rand::random;
-    use serde::Serialize;
     use serde_json::json;
     use std::error::Error;
-    use crate::initialize;
-
-    #[actix_web::test]
-    async fn test_health_get() {
-        let state = initialize().await;
-        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let req = _get("/health");
-        let resp = call_service(&app, req).await;
-        assert!(resp.status().is_success());
-    }
-
-    #[actix_web::test]
-    async fn test_unregistered_route_get_404() {
-        let state = initialize().await;
-        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let req = _get("/not-a-registered-route");
-        let resp = call_service(&app, req).await;
-        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
-    }
+    use crate::{get, post, initialize};
 
     #[actix_web::test]
     async fn test_tenants_post() -> Result<(), Box<dyn Error>> {
@@ -42,7 +21,7 @@ mod tests {
         let _id = random::<u32>();
         let id = format!("ten-{_id}");
         let name = format!("The Tenant Name {_id}");
-        let req = _post(json!({ "id": id, "name": name }));
+        let req = post("/tenants", json!({ "id": id, "name": name }));
         let resp = call_service(&app, req).await;
         let body = assert_status(resp, StatusCode::CREATED).await;
         let tenant: Tenant = serde_json::from_slice(&body).unwrap();
@@ -58,11 +37,11 @@ mod tests {
         let _id = random::<u32>();
         let id = format!("another-{_id}");
         let name = format!("Another Name {_id}");
-        let req = _post(json!({ "id": id, "name": name }));
+        let req = post("/tenants", json!({ "id": id, "name": name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let tenant: Tenant = try_read_body_json(resp).await?;
-        let req = _get(format!("/tenants/{}", tenant.id).as_str());
+        let req = get(format!("/tenants/{}", tenant.id).as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let tenant: Tenant = try_read_body_json(resp).await?;
@@ -80,11 +59,11 @@ mod tests {
         for i in 0..80 {
             let id = format!("{_id_prefix}-{i}");
             let name = format!("Paginated {_id} {i}");
-            let req = _post(json!({ "id": id, "name": name }));
+            let req = post("/tenants", json!({ "id": id, "name": name }));
             let resp = call_service(&app, req).await;
             assert_status(resp, StatusCode::CREATED).await;
         }
-        let req = _get(format!("/tenants?q={_id_prefix}").as_str());
+        let req = get(format!("/tenants?q={_id_prefix}").as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
@@ -97,7 +76,7 @@ mod tests {
         assert_eq!(page.page_size, PAGE_SIZE);
         assert_eq!(page.data.len() as i64, PAGE_SIZE);
 
-        let req = _get("/tenants?page_size=5&offset=10");
+        let req = get("/tenants?page_size=5&offset=10");
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
@@ -121,11 +100,11 @@ mod tests {
         for i in 0..5 {
             let id = format!("{_id_prefix}-{i}");
             let name = format!("Paginated Without Total {_id} {i}");
-            let req = _post(json!({ "id": id, "name": name }));
+            let req = post("/tenants", json!({ "id": id, "name": name }));
             let resp = call_service(&app, req).await;
             assert_status(resp, StatusCode::CREATED).await;
         }
-        let req = _get(
+        let req = get(
             format!("/tenants?q={_id_prefix}&include_total=false").as_str()
         );
         let resp = call_service(&app, req).await;
@@ -152,7 +131,7 @@ mod tests {
         for i in 0..3 {
             let id = format!("classic-{rand_for_test}-{_id}-{i}");
             let name = format!("{rand_classic} {rand_for_test} {i} {_id}");
-            let req = _post(json!({ "id": id, "name": name }));
+            let req = post("/tenants", json!({ "id": id, "name": name }));
             call_service(&app, req).await;
         }
         let rand_new = format!("NEW data {rand_for_test}");
@@ -160,21 +139,21 @@ mod tests {
         for i in 0..3 {
             let id = format!("new-{rand_for_test}-{_id}-{i}");
             let name = format!("{rand_new} {i} {}", random::<u32>());
-            let req = _post(json!({ "id": id, "name": name }));
+            let req = post("/tenants", json!({ "id": id, "name": name }));
             call_service(&app, req).await;
         }
-        let req = _get(format!("/tenants?q={rand_for_test}").as_str());
+        let req = get(format!("/tenants?q={rand_for_test}").as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
         assert_eq!(page.total, Some(6));
         let q = rand_new.replace(" ", "%20"); //TODO improve query string parsing
-        let req = _get(format!("/tenants?q={q}").as_str());
+        let req = get(format!("/tenants?q={q}").as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
         assert_eq!(page.total, Some(3));
-        let req = _get(format!("/tenants?q={rand_for_test}&page_size=5&sort=-name").as_str());
+        let req = get(format!("/tenants?q={rand_for_test}&page_size=5&sort=-name").as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let page: Page<Tenant> = try_read_body_json(resp).await?;
@@ -197,10 +176,10 @@ mod tests {
         let _id = random::<u32>();
         let id = format!("first-{_id}");
         let same_name = format!("First Time Name {_id}");
-        let req = _post(json!({ "id": id, "name": same_name }));
+        let req = post("/tenants", json!({ "id": id, "name": same_name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
-        let req = _post(json!({
+        let req = post("/tenants", json!({
             "id": format!("id-{}", random::<u32>()),
             "name": same_name // same name again
         }));
@@ -211,7 +190,7 @@ mod tests {
             error.error,
             format!("Tenant with name \"{same_name}\" already exists.")
         );
-        let req = _post(json!({
+        let req = post("/tenants", json!({
             "id": id,   // same id
             "name": format!("Some Name {}", random::<u32>())
         }));
@@ -229,7 +208,7 @@ mod tests {
     async fn test_tenants_field_validations() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let req = _post(json!({
+        let req = post("/tenants", json!({
             "id": format!("validate-{}", random::<u32>()),
             "name": "Sr"
         }));
@@ -262,7 +241,7 @@ mod tests {
     async fn test_tenants_get_404() {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let req = _get("/tenants/123456789"); // tenant record doesn't exist
+        let req = get("/tenants/123456789"); // tenant record doesn't exist
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
     }
@@ -273,7 +252,7 @@ mod tests {
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let id = format!("to-delete-{}", random::<u32>());
         let name = format!("To Be Deleted {}", random::<u32>());
-        let req = _post(json!({ "id": id, "name": name }));
+        let req = post("/tenants", json!({ "id": id, "name": name }));
         let resp = call_service(&app, req).await;
         let body = assert_status(resp, StatusCode::CREATED).await;
         let tenant: Tenant = serde_json::from_slice(&body).unwrap();
@@ -283,7 +262,7 @@ mod tests {
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::NO_CONTENT);
         // trying to get the deleted element returns 404
-        let req = _get(format!("/tenants/{}", tenant.id).as_str());
+        let req = get(format!("/tenants/{}", tenant.id).as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
         Ok(())
@@ -298,21 +277,5 @@ mod tests {
             .to_request();
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
-    }
-
-    fn _post(data: impl Serialize) -> Request {
-        TestRequest::post()
-            .uri("/tenants")
-            .insert_header(Accept::json())
-            .insert_header(ContentType::json())
-            .set_json(data)
-            .to_request()
-    }
-
-    fn _get(path: &str) -> Request {
-        TestRequest::get()
-            .uri(path)
-            .insert_header(Accept::json())
-            .to_request()
     }
 }

@@ -6,8 +6,13 @@ use server_env_config::Config;
 use server_env_config::env::Environment;
 use std::process::exit;
 use std::sync::Once;
+use actix_http::Request;
+use actix_web::test::TestRequest;
+use actix_web::http::header::{Accept, ContentType};
+use serde::Serialize;
 
-mod api_tests;
+mod tenants_api_tests;
+mod health_api_tests;
 
 static INIT: Once = Once::new();
 
@@ -30,4 +35,20 @@ pub async fn initialize() -> Data<AppState> {
             exit(1);
         });
     Data::new(data)
+}
+
+pub fn get(path: &str) -> Request {
+    TestRequest::get()
+        .uri(path)
+        .insert_header(Accept::json())
+        .to_request()
+}
+
+pub fn post(path: &str, data: impl Serialize) -> Request {
+    TestRequest::post()
+        .uri(path)
+        .insert_header(Accept::json())
+        .insert_header(ContentType::json())
+        .set_json(data)
+        .to_request()
 }
