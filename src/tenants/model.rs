@@ -72,10 +72,10 @@ impl Tenant {
         Ok(tenant)
     }
 
-    pub async fn exists(tx: &mut Tx<'_>, id: &str) -> Result<bool> {
+    pub async fn exists(tx: &mut Tx<'_>, tid: &str) -> Result<bool> {
         let res: (bool,) = sqlx::query_as(
                 "SELECT EXISTS(SELECT id FROM tenants WHERE id = $1)")
-            .bind(id)
+            .bind(tid)
             .fetch_one(&mut **tx)
             .await
             .map_err(AppError::DB)?;
@@ -103,10 +103,10 @@ impl Tenant {
         Ok(res.map(|r| r.0))
     }
 
-    pub async fn get(tx: &mut Tx<'_>, id: &str) -> Result<Option<Tenant>> {
+    pub async fn get(tx: &mut Tx<'_>, tid: &str) -> Result<Option<Tenant>> {
         let tenant: Option<Tenant> = sqlx::query_as(
                 "SELECT id, name, created_at FROM tenants WHERE id = $1")
-            .bind(id)
+            .bind(tid)
             .fetch_optional(&mut **tx)
             .await
             .map_err(AppError::DB)?;
@@ -125,6 +125,17 @@ impl Tenant {
                 .bind(format!("%{q}%")),
         };
         let count: (i64,) = query.fetch_one(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        Ok(count.0)
+    }
+
+    pub async fn count_elements(tx: &mut Tx<'_>, tid: &str) -> Result<i64> {
+        let count: (i64,) = sqlx::query_as(
+            "SELECT COUNT(*) FROM elements WHERE tid = $1"
+            )
+            .bind(tid)
+            .fetch_one(&mut **tx)
             .await
             .map_err(AppError::DB)?;
         Ok(count.0)
@@ -162,13 +173,19 @@ impl Tenant {
         Ok(tenants)
     }
 
-    pub async fn delete(tx: &mut Tx<'_>, id: &str) -> Result<u64> {
+    pub async fn delete(tx: &mut Tx<'_>, tid: &str) -> Result<u64> {
+        let count_el = Self::count_elements(&mut *tx, tid).await?;
+        if count_el > 0 {
+            return Err(AppError::StaticValidation(
+                "cannot delete tenant with elements"
+            ));
+        }
         let res: PgQueryResult = sqlx::query("DELETE FROM tenants WHERE id = $1")
-            .bind(id)
+            .bind(tid)
             .execute(&mut **tx)
             .await
             .map_err(AppError::DB)?;
 
-        Ok(res.rows_affected())
+        return Ok(res.rows_affected());
     }
 }
