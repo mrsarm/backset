@@ -1,4 +1,5 @@
 use actix_contrib_rest::db::Tx;
+use actix_contrib_rest::query::QuerySearch;
 use actix_contrib_rest::result::{AppError, Result};
 use chrono::NaiveDateTime;
 use lazy_static::lazy_static;
@@ -111,5 +112,24 @@ impl Element {
             .await
             .map_err(AppError::DB)?;
         Ok(count.0)
+    }
+
+    pub async fn find(tx: &mut Tx<'_>, tid: &str, query: &QuerySearch) -> Result<Vec<Element>> {
+        let query = sqlx::query_as(
+                r#"
+            SELECT *
+            FROM elements
+            WHERE tid = $1
+            ORDER BY created_at DESC
+            LIMIT $2 OFFSET $3
+                "#
+            )
+            .bind(tid)
+            .bind(query.page_size)
+            .bind(query.offset);
+        let elements: Vec<Element> = query.fetch_all(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        Ok(elements)
     }
 }

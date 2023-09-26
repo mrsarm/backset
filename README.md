@@ -80,7 +80,8 @@ Missing:
 - [x] "/tenants" model and endpoints
 - [ ] "/elements" model and endpoints
   - [x] `GET`
-  - [ ] `GET` all that replaces `GET /{tid}`
+  - [x] `GET` all that replaces `GET /{tid}`
+    - [ ] Filters
   - [x] `POST`
   - [x] `GET`
   - [x] `DELETE`

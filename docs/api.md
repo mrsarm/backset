@@ -92,8 +92,8 @@ content-type: application/json
         ...
     ],
     "offset": 10,
-    "page_size": 2,
-    "total": 12
+    "page_size": 5,
+    "total": 32
 }
 ```
 
@@ -146,4 +146,50 @@ content-type: application/json
     "id": "1234",
     "name": "Obj name"
 }
+```
+
+#### GET /{tenant}
+
+List all elements from a tenant.
+
+Query arguments:
+
+- `page_size`: optional integer, default 50.
+- `offset`: optional integer, default 0.
+- `include_total`: optional boolean, default true. If true include a count of the
+  total records in the database in the field `total`.
+
+```shell
+$ http ":8558/collections?page_size=5&offset=10"
+HTTP/1.1 200 OK
+content-type: application/json
+...
+
+{
+    "data": [
+        {
+            "created_at": "2023-09-26T02:04:38.980746",
+            "id": "1235",
+            "name": "Obj name"
+        },
+        {
+            "created_at": "2023-09-26T02:02:27.173042",
+            "id": "fixed-id",
+            "name": "Example created with an id set",
+            "some-field": ["val", 1]
+        },
+        ...
+    ],
+    "offset": 10,
+    "page_size": 3,
+    "total": 14
+}
+```
+
+#### DELETE /{tenant}/{id}
+
+```shell
+$ http DELETE :8558/collections/1235
+HTTP/1.1 204 No Content
+...
 ```
