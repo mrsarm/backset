@@ -1,6 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use actix_contrib_rest::app_state::AppState;
     use actix_contrib_rest::page::Page;
     use actix_contrib_rest::result::ValidationErrorPayload;
     use actix_contrib_rest::test::assert_status;
@@ -8,44 +7,15 @@ mod tests {
     use actix_web::http::header::{Accept, ContentType};
     use actix_web::http::StatusCode;
     use actix_web::test::{call_service, init_service, try_read_body_json, TestRequest};
-    use actix_web::web::Data;
     use actix_web::App;
     use backset::app_server::AppServer;
     use backset::tenants::model::Tenant;
-    use backset::{BACKSET_PORT, PAGE_SIZE};
-    use dotenv::dotenv;
-    use log::{error, LevelFilter};
+    use backset::PAGE_SIZE;
     use rand::random;
     use serde::Serialize;
     use serde_json::json;
-    use server_env_config::env::Environment;
-    use server_env_config::Config;
     use std::error::Error;
-    use std::process::exit;
-    use std::sync::Once;
-
-    static INIT: Once = Once::new();
-
-    pub async fn initialize() -> Data<AppState> {
-        INIT.call_once(|| {
-            dotenv().ok(); // read conf from .env file if available
-            env_logger::builder()
-                .filter(Some("backset::conf"), LevelFilter::Warn)
-                .filter(Some("backset::app_state"), LevelFilter::Warn)
-                .init();
-        });
-        let config = Config::init_for(BACKSET_PORT, Some(Environment::Test))
-            .unwrap_or_else(|error| {
-                error!("{error}");
-                exit(1);
-            });
-        let data = AppState::init(config.clone()).await
-            .unwrap_or_else(|error| {
-                error!("{error}");
-                exit(1);
-            });
-        Data::new(data)
-    }
+    use crate::initialize;
 
     #[actix_web::test]
     async fn test_health_get() {
