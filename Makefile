@@ -49,7 +49,7 @@ wait-server:
 	$(eval PORT ?= 8558)
 	./scripts/wait-port.sh "${PORT}"
 
-test: recreate-db-test
+test: build-test recreate-db-test
 	RUST_LOG=warn cargo test
 
 lint:
