@@ -92,7 +92,7 @@ mod tests {
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
         let tenant: Tenant = try_read_body_json(resp).await?;
-        let req = _get(format!("/{}", tenant.id).as_str());
+        let req = _get(format!("/tenants/{}", tenant.id).as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::OK);
         let tenant: Tenant = try_read_body_json(resp).await?;

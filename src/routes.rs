@@ -13,12 +13,12 @@ pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/tenants")
         .service(create)
         .service(delete)
+        .service(read)
         .service(list);
     conf.service(scope);
     let scope = web::scope("")
         .service(elements_create)
         .service(elements_delete)
-        .service(elements_read)
-        .service(read);
+        .service(elements_read);
     conf.service(scope);
 }
