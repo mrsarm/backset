@@ -101,4 +101,15 @@ impl Element {
 
         Ok(res.rows_affected())
     }
+
+    pub async fn count(tx: &mut Tx<'_>, tid: &str) -> Result<i64> {
+        let count: (i64,) = sqlx::query_as(
+            "SELECT COUNT(*) FROM elements WHERE tid = $1"
+        )
+            .bind(tid)
+            .fetch_one(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        Ok(count.0)
+    }
 }
