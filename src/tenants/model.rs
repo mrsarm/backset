@@ -186,6 +186,6 @@ impl Tenant {
             .await
             .map_err(AppError::DB)?;
 
-        return Ok(res.rows_affected());
+        Ok(res.rows_affected())
     }
 }
