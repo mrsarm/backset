@@ -39,12 +39,12 @@ content-type: application/json
 }
 ```
 
-#### GET /{id}
+#### GET /tenants/{id}
 
 Having a tenant with id `my-tenant`:
 
 ```shell
-http :8558/my-tenant
+http :8558/tenants/my-tenant
 HTTP/1.1 200 OK
 content-type: application/json
 ...
@@ -99,6 +99,8 @@ content-type: application/json
 ```
 
 #### DELETE /tenants/{id}
+
+The tenant cannot have elements before deletion.
 
 ```shell
 $ http DELETE :8558/tenants/my-tentant
