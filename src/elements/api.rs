@@ -13,7 +13,7 @@ use crate::tenants::model::Tenant;
 async fn create(
     app: Data<AppState>,
     tid: Path<String>,
-    el_form: Json<ElementPayload>
+    el_form: Json<ElementPayload>,
 ) -> HttpResult {
     let mut tx = app.get_tx().await?;
 

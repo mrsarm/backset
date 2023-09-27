@@ -5,7 +5,7 @@ use actix_contrib_rest::page::Page;
 use actix_contrib_rest::query::QuerySearch;
 use actix_contrib_rest::result::HttpResult;
 use actix_web::web::{Data, Path};
-use actix_web::{delete, get, HttpResponse, post};
+use actix_web::{delete, get, post, HttpResponse};
 use actix_web_validator::{Json, Query};
 
 #[post("")]

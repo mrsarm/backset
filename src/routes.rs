@@ -1,12 +1,12 @@
-use actix_web::web;
-use crate::health::health_check_handler;
-use crate::tenants::api::{create, delete, list, read};
 use crate::elements::api::{
     create as elements_create,
     delete as elements_delete,
     list as elements_list,
     read as elements_read,
 };
+use crate::health::health_check_handler;
+use crate::tenants::api::{create, delete, list, read};
+use actix_web::web;
 
 pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/health").service(health_check_handler);

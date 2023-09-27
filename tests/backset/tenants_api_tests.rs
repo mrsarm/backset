@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+    use crate::{get, post, initialize};
     use actix_contrib_rest::page::Page;
     use actix_contrib_rest::result::ValidationErrorPayload;
     use actix_contrib_rest::test::assert_status;
@@ -12,7 +13,6 @@ mod tests {
     use rand::random;
     use serde_json::json;
     use std::error::Error;
-    use crate::{get, post, initialize};
 
     #[actix_web::test]
     async fn test_tenants_post() -> Result<(), Box<dyn Error>> {

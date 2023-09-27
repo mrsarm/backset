@@ -168,7 +168,7 @@ impl Tenant {
         let count_el = Element::count(&mut *tx, tid).await?;
         if count_el > 0 {
             return Err(AppError::StaticValidation(
-                "cannot delete tenant with elements"
+                "cannot delete tenant with elements",
             ));
         }
         let res: PgQueryResult = sqlx::query("DELETE FROM tenants WHERE id = $1")

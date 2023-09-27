@@ -10,9 +10,9 @@ use awc::Client;
 use log::{error, info};
 use serde::Deserialize;
 use server_env_config::Config;
+use sqlx::Connection;
 use std::env;
 use std::process::exit;
-use sqlx::Connection;
 use validator::Validate;
 
 /// App state class for command line instructions, instead of the HTTP server.

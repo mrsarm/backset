@@ -1,18 +1,19 @@
-use actix_web::web::Data;
 use actix_contrib_rest::app_state::AppState;
+use actix_http::Request;
+use actix_web::http::header::{Accept, ContentType};
+use actix_web::test::TestRequest;
+use actix_web::web::Data;
 use backset::BACKSET_PORT;
 use log::{error, LevelFilter};
-use server_env_config::Config;
+use serde::Serialize;
 use server_env_config::env::Environment;
+use server_env_config::Config;
 use std::process::exit;
 use std::sync::Once;
-use actix_http::Request;
-use actix_web::test::TestRequest;
-use actix_web::http::header::{Accept, ContentType};
-use serde::Serialize;
 
-mod tenants_api_tests;
+mod elements_api_tests;
 mod health_api_tests;
+mod tenants_api_tests;
 
 static INIT: Once = Once::new();
 

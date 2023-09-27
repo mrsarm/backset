@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod tests {
+    use crate::{get, initialize};
+    use actix_web::http::StatusCode;
     use actix_web::test::{call_service, init_service};
     use actix_web::App;
-    use actix_web::http::StatusCode;
     use backset::app_server::AppServer;
-    use crate::{get, initialize};
 
     #[actix_web::test]
     async fn test_health_get() {

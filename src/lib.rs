@@ -8,6 +8,7 @@ pub mod health;
 
 pub mod elements;
 pub mod tenants;
+
 pub mod routes;
 
 // Has to match Cargo.toml > version
