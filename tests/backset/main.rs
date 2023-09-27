@@ -11,7 +11,6 @@ use server_env_config::Config;
 use std::process::exit;
 use std::sync::Once;
 
-mod elements_api_tests;
 mod health_api_tests;
 mod tenants_api_tests;
 
