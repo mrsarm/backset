@@ -88,7 +88,6 @@ Missing:
   - [x] `GET`
   - [x] `DELETE`
   - [ ] `PUT`
-  - [ ] Tests
 - [ ] "/sets" model and endpoints
 
 More stuff to add:

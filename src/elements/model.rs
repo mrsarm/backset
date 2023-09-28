@@ -14,7 +14,8 @@ use validator::Validate;
 use crate::tenants::model::Tenant;
 
 lazy_static! {
-    static ref ID_VALID: Regex = Regex::new(r"^(?i)[a-z0-9_~@\\/][a-z0-9_~@\\/\-\.\:+]*$").unwrap();
+    // Base64 URL characters (except =) and some others like \~@-.:+
+    static ref ID_VALID: Regex = Regex::new(r"^(?i)[a-z0-9_~@\\/][a-z0-9_\\~@\-\.\:+]*$").unwrap();
 }
 
 #[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
@@ -33,8 +34,8 @@ pub struct ElementPayload {
     #[validate(regex(
         path = "ID_VALID",
         code = "invalid_id",
-        message = "id can only contains letters, numbers or the symbols _~@\\/-.:+, \
-        and must starts with a letter or number, or the symbols _~@\\/"
+        message = "id can only contains letters, numbers or the symbols \\_~@-.:+, \
+        and must starts with a letter or number, or the symbols \\_~@"
     ))]
     pub id: Option<String>,
     #[serde(flatten)]
