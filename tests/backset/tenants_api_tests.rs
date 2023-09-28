@@ -51,6 +51,17 @@ mod tests {
     }
 
     #[actix_web::test]
+    async fn test_tenant_not_found() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let _id = random::<u32>();
+        let req = get(format!("/tenants/does-not-exist-{_id}").as_str());
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+        Ok(())
+    }
+
+    #[actix_web::test]
     async fn test_tenants_get_paginated() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
