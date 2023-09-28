@@ -52,13 +52,8 @@ impl Element {
         let id = match el_form.id {
             None => random::<u64>().to_string(),
             Some(_id) => {
-                let res: (bool,) = sqlx::query_as(
-                "SELECT EXISTS(SELECT id FROM elements WHERE id = $1)")
-                    .bind(_id.as_str())
-                    .fetch_one(&mut **tx)
-                    .await
-                    .map_err(AppError::DB)?;
-                if res.0 {
+                let exists = Self::exists(tx, tid, _id.as_str()).await?;
+                if exists {
                     return Err(AppError::Validation(
                         format!("Element with id \"{}\" already exists.", _id))
                     );
@@ -77,6 +72,17 @@ impl Element {
             .await
             .map_err(AppError::DB)?;
         Ok(element)
+    }
+
+    pub async fn exists(tx: &mut Tx<'_>, tid: &str, id: &str) -> Result<bool> {
+        let res: (bool,) = sqlx::query_as(
+            "SELECT EXISTS(SELECT id FROM elements WHERE tid = $1 AND id = $2)")
+            .bind(tid)
+            .bind(id)
+            .fetch_one(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        Ok(res.0)
     }
 
     pub async fn get(tx: &mut Tx<'_>, tid: &str, id: &str) -> Result<Option<Element>> {

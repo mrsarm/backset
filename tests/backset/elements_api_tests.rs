@@ -134,6 +134,15 @@ mod tests {
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
         let _id = random::<u32>();
         let _id_prefix = format!("paginated-{_id}");
+        let req = get(&format!("/{tid}"));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let page: Page<ElementPayload> = try_read_body_json(resp).await?;
+        assert!(
+            page.total == Some(0),
+            "page.total = {:?}, expected 0",
+            page.total
+        );
         for i in 0..60 {
             let id = format!("{_id_prefix}-{i}");
             let name = format!("Paginated {_id} {i}");
@@ -170,6 +179,17 @@ mod tests {
     }
 
     #[actix_web::test]
+    async fn test_elements_get_paginated_not_found() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let _id = random::<u32>();
+        let req = get(&format!("/tenant-does-not-exist-{_id}"));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+        Ok(())
+    }
+
+    #[actix_web::test]
     async fn test_elements_post_already_exists() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let tids: &(u16, u16, u16) = initialize_tenant(&state).await;
@@ -181,7 +201,8 @@ mod tests {
         let req = post(&format!("/{tid}"), json!({ "id": id, "val": same_name }));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::CREATED);
-        let req = post(&format!("/{tid}"), json!({ "id": id, "val": same_name }));
+        // use the same id for a new element under the same tenant is not allowed
+        let req = post(&format!("/{tid}"), json!({ "id": id, "val": "Same id" }));
         let resp = call_service(&app, req).await;
         let body = assert_status(resp, StatusCode::BAD_REQUEST).await;
         let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
@@ -189,6 +210,10 @@ mod tests {
             error.error,
             format!("Element with id \"{id}\" already exists.")
         );
+        // If we use the same id under another tenants it works
+        let req = post(&format!("/{}", tids.0), json!({ "id": id, "val": "Same id" }));
+        let resp = call_service(&app, req).await;
+        assert_status(resp, StatusCode::CREATED).await;
         Ok(())
     }
 
