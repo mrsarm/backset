@@ -10,8 +10,6 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use validator::{Validate, ValidationError};
 
-use crate::elements::model::Element;
-
 lazy_static! {
     static ref ID_VALID: Regex = Regex::new(r"^[a-z][a-z0-9\-]+$").unwrap();
 }
@@ -164,9 +162,20 @@ impl Tenant {
         Ok(tenants)
     }
 
+    pub async fn has_elements(tx: &mut Tx<'_>, tid: &str) -> Result<bool> {
+        let res: (bool,) = sqlx::query_as(
+                "SELECT EXISTS(SELECT id FROM elements WHERE tid = $1)"
+            )
+            .bind(tid)
+            .fetch_one(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        Ok(res.0)
+    }
+
     pub async fn delete(tx: &mut Tx<'_>, tid: &str) -> Result<u64> {
-        let count_el = Element::count(&mut *tx, tid).await?;
-        if count_el > 0 {
+        let has_el = Self::has_elements(&mut *tx, tid).await?;
+        if has_el {
             return Err(AppError::StaticValidation(
                 "cannot delete tenant with elements",
             ));
