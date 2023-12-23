@@ -78,8 +78,7 @@ Dockerfile and compose files are provided, check-out the [Docker](docs/docker.md
 Missing:
 
 - [x] "/tenants" model and endpoints
-    - [ ] Add `?force=true` flag in `DELETE` to remove all
-          elements with the tenant deletion
+    - [ ] Configurable validations and behaviour, e.g. ids validation 
 - [ ] "/elements" model and endpoints
   - [x] `GET`
   - [x] `GET` all that replaces `GET /{tid}`

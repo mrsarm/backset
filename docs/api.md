@@ -99,13 +99,16 @@ content-type: application/json
 
 #### DELETE /tenants/{id}
 
-The tenant cannot have elements before deletion.
-
 ```shell
 $ http DELETE :8558/tenants/my-tentant
 HTTP/1.1 204 No Content
 ...
 ```
+
+The tenant cannot have elements before deletion. In case it
+has, an HTTP 400 is returned, unless the endpoint is
+called with `?force=true`, in which case all elements
+will be deleted as well.
 
 ### Elements in tenants endpoints
 

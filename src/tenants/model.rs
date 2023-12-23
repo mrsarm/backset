@@ -177,19 +177,34 @@ impl Tenant {
         Ok(res.0)
     }
 
-    pub async fn delete(tx: &mut Tx<'_>, tid: &str) -> Result<u64> {
-        let has_el = Self::has_elements(&mut *tx, tid).await?;
-        if has_el {
-            return Err(AppError::StaticValidation(
-                "cannot delete tenant with elements",
-            ));
+    pub async fn delete(tx: &mut Tx<'_>, tid: &str, force: bool) -> Result<u64> {
+        let has_to_delete_elements = if force {
+            true
+        } else {
+            let has_el = Self::has_elements(&mut *tx, tid).await?;
+            if has_el {
+                return Err(AppError::StaticValidation(
+                    "cannot delete tenant with elements",
+                ));
+            }
+            false
+        };
+        let mut rows_affected: u64 = 0;
+        if has_to_delete_elements {
+            let res: PgQueryResult = sqlx::query("DELETE FROM elements WHERE tid = $1")
+                .bind(tid)
+                .execute(&mut **tx)
+                .await
+                .map_err(AppError::DB)?;
+            rows_affected += res.rows_affected();
         }
         let res: PgQueryResult = sqlx::query("DELETE FROM tenants WHERE id = $1")
             .bind(tid)
             .execute(&mut **tx)
             .await
             .map_err(AppError::DB)?;
+        rows_affected += res.rows_affected();
 
-        Ok(res.rows_affected())
+        Ok(rows_affected)
     }
 }

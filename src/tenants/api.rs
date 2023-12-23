@@ -2,7 +2,7 @@ use crate::tenants::model::{Tenant, TenantPayload};
 
 use actix_contrib_rest::app_state::AppState;
 use actix_contrib_rest::page::Page;
-use actix_contrib_rest::query::QuerySearch;
+use actix_contrib_rest::query::{Force, QuerySearch};
 use actix_contrib_rest::result::HttpResult;
 use actix_web::web::{Data, Path};
 use actix_web::{delete, get, post, HttpResponse};
@@ -52,10 +52,15 @@ async fn list(app: Data<AppState>, query: Query<QuerySearch>) -> HttpResult {
 }
 
 #[delete("{id}")]
-async fn delete(app: Data<AppState>, id: Path<String>) -> HttpResult {
+async fn delete(app: Data<AppState>, id: Path<String>, query: Query<Force>) -> HttpResult {
+    let query = query.into_inner();
     let mut tx = app.get_tx().await?;
 
-    let rows_deleted = Tenant::delete(&mut tx, id.into_inner().as_str()).await?;
+    let rows_deleted = Tenant::delete(
+        &mut tx,
+        id.into_inner().as_str(),
+        query.force.unwrap_or(false),
+    ).await?;
 
     app.commit_tx(tx).await?;
     match rows_deleted {

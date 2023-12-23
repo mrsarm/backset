@@ -261,9 +261,9 @@ mod tests {
     async fn test_tenants_delete() -> Result<(), Box<dyn Error>> {
         let state = initialize().await;
         let app = init_service(App::new().configure(AppServer::config_app(state))).await;
-        let id = format!("to-delete-{}", random::<u32>());
+        let tid = format!("to-delete-{}", random::<u32>());
         let name = format!("To Be Deleted {}", random::<u32>());
-        let req = post("/tenants", json!({ "id": id, "name": name }));
+        let req = post("/tenants", json!({ "id": tid, "name": name }));
         let resp = call_service(&app, req).await;
         let body = assert_status(resp, StatusCode::CREATED).await;
         let tenant: Tenant = serde_json::from_slice(&body).unwrap();
@@ -276,6 +276,58 @@ mod tests {
         let req = get(format!("/tenants/{}", tenant.id).as_str());
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+        Ok(())
+    }
+
+    #[actix_web::test]
+    async fn test_tenants_delete_with_elements_error() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let tid = format!("not-delete-with-elements-{}", random::<u32>());
+        let name = format!("Not Delete with Elements {}", random::<u32>());
+        let req = post("/tenants", json!({ "id": tid, "name": name }));
+        let resp = call_service(&app, req).await;
+        let body = assert_status(resp, StatusCode::CREATED).await;
+
+        // Add at least one element
+        let el_name = format!("Element to Not Delete {}", random::<u32>());
+        let req = post(format!("/{}", tid).as_str(), json!({ "name": el_name }));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::CREATED);
+
+        let tenant: Tenant = serde_json::from_slice(&body).unwrap();
+        let req = TestRequest::delete()
+            .uri(format!("/tenants/{}", tenant.id).as_str())
+            .to_request();
+        let resp = call_service(&app, req).await;
+        let body = assert_status(resp, StatusCode::BAD_REQUEST).await;
+        let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
+        assert_eq!(error.error, "cannot delete tenant with elements");
+        Ok(())
+    }
+
+    #[actix_web::test]
+    async fn test_tenants_delete_with_elements_force() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let tid = format!("force-delete-with-elements-{}", random::<u32>());
+        let name = format!("Force Delete with Elements {}", random::<u32>());
+        let req = post("/tenants", json!({ "id": tid, "name": name }));
+        let resp = call_service(&app, req).await;
+        let body = assert_status(resp, StatusCode::CREATED).await;
+
+        // Add at least one element
+        let el_name = format!("Element to Delete {}", random::<u32>());
+        let req = post(format!("/{}", tid).as_str(), json!({ "name": el_name }));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::CREATED);
+
+        let tenant: Tenant = serde_json::from_slice(&body).unwrap();
+        let req = TestRequest::delete()
+            .uri(format!("/tenants/{}?force=true", tenant.id).as_str())
+            .to_request();
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::NO_CONTENT);
         Ok(())
     }
 
