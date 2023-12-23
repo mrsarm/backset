@@ -3,7 +3,7 @@ use crate::tenants::model::{Tenant, TenantPayload};
 use actix_contrib_rest::app_state::AppState;
 use actix_contrib_rest::page::Page;
 use actix_contrib_rest::query::{Force, QuerySearch};
-use actix_contrib_rest::result::HttpResult;
+use actix_contrib_rest::result::{DeletedCount, HttpResult};
 use actix_web::web::{Data, Path};
 use actix_web::{delete, get, post, HttpResponse};
 use actix_web_validator::{Json, Query};
@@ -64,7 +64,7 @@ async fn delete(app: Data<AppState>, id: Path<String>, query: Query<Force>) -> H
 
     app.commit_tx(tx).await?;
     match rows_deleted {
-        0 => Ok(HttpResponse::NotFound().finish()),
-        _ => Ok(HttpResponse::NoContent().finish()),
+        0 => Ok(HttpResponse::NotFound().json(DeletedCount { deleted: rows_deleted })),
+        _ => Ok(HttpResponse::Ok().json(DeletedCount { deleted: rows_deleted })),
     }
 }
