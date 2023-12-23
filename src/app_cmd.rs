@@ -123,7 +123,7 @@ impl AppCmd {
             id: id.to_string(),
             name: name.to_string(),
         };
-        tenant.validate().map_err(|e| AppError::Validation(e.to_string()))?;
+        tenant.validate().map_err(|e| AppError::Validation(None, e.to_string()))?;
         let mut conn = self.state.get_conn().await?;
         let mut tx = Connection::begin(&mut conn).await.map_err(AppError::DB)?;
         Tenant::insert(&mut tx, tenant).await?;

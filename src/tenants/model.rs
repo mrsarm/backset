@@ -40,7 +40,7 @@ pub struct TenantPayload {
     #[validate(regex(
         path = "ID_VALID",
         code = "invalid_id",
-        message = "Tenant id can only contains letters in lower case, numbers or the \"-\" symbol"
+        message = "tenant id can only contains letters in lower case, numbers or the \"-\" symbol"
     ))]
     pub id: String,
     #[validate(length(min = 3, max = 80))]
@@ -51,15 +51,19 @@ impl Tenant {
     pub async fn insert(tx: &mut Tx<'_>, tenant_form: TenantPayload) -> Result<Tenant> {
         let exists = Self::exists(&mut *tx, tenant_form.id.as_str()).await?;
         if exists {
-            return Err(AppError::Validation(
-                format!("Tenant with id \"{}\" already exists.", tenant_form.id))
-            );
+            return Err(AppError::ResourceAlreadyExists {
+                resource: "tenant",
+                attribute: "id",
+                value: tenant_form.id
+            });
         }
         let id = Self::get_id_by_name(&mut *tx, tenant_form.name.as_str()).await?;
         if id.is_some() {
-            return Err(AppError::Validation(
-                format!("Tenant with name \"{}\" already exists.", tenant_form.name))
-            );
+            return Err(AppError::ResourceAlreadyExists {
+                resource: "tenant",
+                attribute: "name",
+                value: tenant_form.name
+            });
         }
         let tenant = sqlx::query_as::<_, Tenant>(
                 "INSERT INTO tenants (id, name, created_at) VALUES ($1, $2, NOW()) RETURNING *",

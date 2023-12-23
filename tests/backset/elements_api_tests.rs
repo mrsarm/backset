@@ -208,7 +208,7 @@ mod tests {
         let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
         assert_eq!(
             error.error,
-            format!("Element with id \"{id}\" already exists.")
+            format!("element with id \"{id}\" already exists")
         );
         // If we use the same id under another tenants it works
         let req = post(&format!("/{}", tids.0), json!({ "id": id, "val": "Same id" }));

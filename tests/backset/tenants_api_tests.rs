@@ -199,7 +199,7 @@ mod tests {
         let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
         assert_eq!(
             error.error,
-            format!("Tenant with name \"{same_name}\" already exists.")
+            format!("tenant with name \"{same_name}\" already exists")
         );
         let req = post("/tenants", json!({
             "id": id,   // same id
@@ -210,7 +210,7 @@ mod tests {
         let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
         assert_eq!(
             error.error,
-            format!("Tenant with id \"{id}\" already exists.")
+            format!("tenant with id \"{id}\" already exists")
         );
         Ok(())
     }

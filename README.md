@@ -91,7 +91,9 @@ Missing:
 - [ ] "/sets" model and endpoints
 
 More stuff to add:
-- [ ] Random PKs (when more models are added).
+- [ ] Check tenant existence in elements endpoints from a middleware.
+- [ ] Random PKs configurable.
+- [ ] Use Postgres from GH Action matrix to speed up CI.
 - [ ] `/health?db=true&timeout=MILLIS`
       and `backset health --db --timeout MILLIS` to check DB connection as well.
       - [ ] The DB check could be in a new method `AppState::check_conn(Option<Duration>)`.

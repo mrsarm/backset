@@ -54,9 +54,11 @@ impl Element {
             Some(_id) => {
                 let exists = Self::exists(tx, tid, _id.as_str()).await?;
                 if exists {
-                    return Err(AppError::Validation(
-                        format!("Element with id \"{}\" already exists.", _id))
-                    );
+                    return Err(AppError::ResourceAlreadyExists {
+                        resource: "element",
+                        attribute: "id",
+                        value: _id
+                    });
                 }
                 _id
             }
