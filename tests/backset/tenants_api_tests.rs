@@ -2,7 +2,7 @@
 mod tests {
     use crate::{get, post, initialize};
     use actix_contrib_rest::page::Page;
-    use actix_contrib_rest::result::ValidationErrorPayload;
+    use actix_contrib_rest::result::{DeletedCount, ValidationErrorPayload};
     use actix_contrib_rest::test::assert_status;
     use actix_web::http::StatusCode;
     use actix_web::test::{call_service, init_service, try_read_body_json, TestRequest};
@@ -271,7 +271,9 @@ mod tests {
             .uri(format!("/tenants/{}", tenant.id).as_str())
             .to_request();
         let resp = call_service(&app, req).await;
-        assert_eq!(resp.status(), StatusCode::NO_CONTENT);
+        let body = assert_status(resp, StatusCode::OK).await;
+        let deleted_count: DeletedCount = serde_json::from_slice(&body).unwrap();
+        assert_eq!(deleted_count.deleted, 1);
         // trying to get the deleted element returns 404
         let req = get(format!("/tenants/{}", tenant.id).as_str());
         let resp = call_service(&app, req).await;
@@ -327,7 +329,9 @@ mod tests {
             .uri(format!("/tenants/{}?force=true", tenant.id).as_str())
             .to_request();
         let resp = call_service(&app, req).await;
-        assert_eq!(resp.status(), StatusCode::NO_CONTENT);
+        let body = assert_status(resp, StatusCode::OK).await;
+        let deleted_count: DeletedCount = serde_json::from_slice(&body).unwrap();
+        assert_eq!(deleted_count.deleted, 2);
         Ok(())
     }
 

@@ -43,6 +43,7 @@ mod tests {
         assert_eq!(el.data.get("numb"), Some(&json!(1234)));
         assert_eq!(el.data.get("nil"),  Some(&json!(None::<u32>)));
         assert_eq!(el.data.get("arr"),  Some(&json!(["str",0,{"a": 1,},])));
+        assert!(el.data.get("created_at").is_some());
         Ok(())
     }
 
@@ -63,6 +64,7 @@ mod tests {
         let el: ElementPayload = try_read_body_json(resp).await?;
         assert_eq!(el.id, Some(id));
         assert_eq!(el.data.get("name"),  Some(&json!(name)));
+        assert!(el.data.get("created_at").is_some());
         Ok(())
     }
 
