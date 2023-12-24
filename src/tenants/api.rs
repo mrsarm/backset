@@ -5,7 +5,7 @@ use actix_contrib_rest::page::Page;
 use actix_contrib_rest::query::{Force, QuerySearch};
 use actix_contrib_rest::result::{DeletedCount, HttpResult};
 use actix_web::web::{Data, Path};
-use actix_web::{delete, get, post, HttpResponse, put};
+use actix_web::{delete, get, post, put, HttpResponse};
 use actix_web_validator::{Json, Query};
 
 #[post("")]
@@ -55,7 +55,7 @@ async fn list(app: Data<AppState>, query: Query<QuerySearch>) -> HttpResult {
 async fn put(
     app: Data<AppState>,
     id: Path<String>,
-    tenant_form: Json<TenantPayloadEdition>
+    tenant_form: Json<TenantPayloadEdition>,
 ) -> HttpResult {
     let mut tx = app.get_tx().await?;
 
@@ -82,7 +82,11 @@ async fn delete(app: Data<AppState>, id: Path<String>, query: Query<Force>) -> H
 
     app.commit_tx(tx).await?;
     match rows_deleted {
-        0 => Ok(HttpResponse::NotFound().json(DeletedCount { deleted: rows_deleted })),
-        _ => Ok(HttpResponse::Ok().json(DeletedCount { deleted: rows_deleted })),
+        0 => Ok(HttpResponse::NotFound().json(DeletedCount {
+            deleted: rows_deleted,
+        })),
+        _ => Ok(HttpResponse::Ok().json(DeletedCount {
+            deleted: rows_deleted,
+        })),
     }
 }

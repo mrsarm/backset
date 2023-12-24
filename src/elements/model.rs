@@ -45,7 +45,7 @@ pub struct ElementPayload {
 
 impl ElementPayload {
     pub fn validate(&self) -> Result<()> {
-        Ok(reject_created_at(&self.data)?)
+        reject_created_at(&self.data)
     }
 }
 
@@ -61,7 +61,7 @@ impl Element {
                     return Err(AppError::ResourceAlreadyExists {
                         resource: "element",
                         attribute: "id",
-                        value: _id
+                        value: _id,
                     });
                 }
                 _id

@@ -69,7 +69,7 @@ async fn list(
 async fn put(
     app: Data<AppState>,
     path: Path<(String, String)>,
-    el_form: Json<ElementPayload>
+    el_form: Json<ElementPayload>,
 ) -> HttpResult {
     let mut tx = app.get_tx().await?;
 

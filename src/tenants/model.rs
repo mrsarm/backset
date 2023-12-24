@@ -68,7 +68,7 @@ impl Tenant {
             return Err(AppError::ResourceAlreadyExists {
                 resource: "tenant",
                 attribute: "name",
-                value: tenant_form.name
+                value: tenant_form.name,
             });
         }
         let tenant = sqlx::query_as::<_, Tenant>(
