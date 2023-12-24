@@ -78,19 +78,12 @@ Dockerfile and compose files are provided, check-out the [Docker](docs/docker.md
 Missing:
 
 - [x] "/tenants" model and endpoints
-    - [ ] Configurable validations and behaviour, e.g. ids validation 
 - [ ] "/elements" model and endpoints
-  - [x] `GET`
-  - [x] `GET` all that replaces `GET /{tid}`
-    - [ ] Filters
-  - [x] `POST`
-  - [x] `GET`
-  - [x] `DELETE`
-  - [ ] `PUT`
+  - [ ] Configurable validations and behaviour, e.g. ids validation
 - [ ] "/sets" model and endpoints
 
 More stuff to add:
-- [ ] Check tenant existence in elements endpoints from a middleware.
+- [ ] Some sort of authorization.
 - [ ] Random PKs configurable.
 - [ ] Use Postgres from GH Action matrix to speed up CI.
 - [ ] `/health?db=true&timeout=MILLIS`

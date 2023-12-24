@@ -6,7 +6,7 @@ use crate::elements::api::{
     put as elements_put,
 };
 use crate::health::health_check_handler;
-use crate::tenants::api::{create, delete, list, read};
+use crate::tenants::api::{create, delete, list, read, put};
 use actix_web::web;
 
 pub fn config(conf: &mut web::ServiceConfig) {
@@ -17,7 +17,8 @@ pub fn config(conf: &mut web::ServiceConfig) {
         .service(create)
         .service(delete)
         .service(list)
-        .service(read);
+        .service(read)
+        .service(put);
     conf.service(scope);
 
     // "/{tenant}" and "/{tenant}/{id}"

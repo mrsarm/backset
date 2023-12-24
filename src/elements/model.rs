@@ -12,6 +12,7 @@ use sqlx::types::Json;
 use validator::Validate;
 
 use crate::tenants::model::Tenant;
+use crate::utils::reject_created_at;
 
 lazy_static! {
     // Base64 URL characters (except =) and some others like \~@-.:+
@@ -43,18 +44,14 @@ pub struct ElementPayload {
 }
 
 impl ElementPayload {
-    pub fn reject_created_at(&self) -> Result<()> {
-        if self.data.contains_key("created_at") {
-            return Err(AppError::StaticValidation(
-                "cannot provide reserved attribute \"created_at\""));
-        }
-        Ok(())
+    pub fn validate(&self) -> Result<()> {
+        Ok(reject_created_at(&self.data)?)
     }
 }
 
 impl Element {
     pub async fn insert(tx: &mut Tx<'_>, tid: &str, el_form: ElementPayload) -> Result<Element> {
-        el_form.reject_created_at()?;
+        el_form.validate()?;
         Tenant::exists_or_fail(tx, tid).await?;
         let id = match el_form.id {
             None => random::<u64>().to_string(),
@@ -148,13 +145,14 @@ impl Element {
             .map_err(AppError::DB)?;
         Ok(elements)
     }
-    pub async fn update(
+
+    pub async fn save(
         tx: &mut Tx<'_>,
         tid: &str,
         id: &str,
         el_form: ElementPayload
     ) -> Result<Element> {
-        el_form.reject_created_at()?;
+        el_form.validate()?;
         if el_form.id.map(|form_id| form_id.as_str() != id).unwrap_or(false) {
             return Err(AppError::StaticValidation("id mismatch"));
         }

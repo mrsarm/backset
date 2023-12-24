@@ -100,15 +100,36 @@ content-type: application/json
 #### DELETE /tenants/{id}
 
 ```shell
-$ http DELETE :8558/tenants/my-tentant
-HTTP/1.1 204 No Content
+$ http DELETE :8558/tenants/my-tenant
+HTTP/1.1 200 OK
+content-type: application/json
 ...
+
+{ "deleted": 1 }
 ```
 
 The tenant cannot have elements before deletion. In case it
-has, an HTTP 400 is returned, unless the endpoint is
-called with `?force=true`, in which case all elements
-will be deleted as well.
+has, an HTTP 400 is returned, unless the endpoint is called
+with `?force=true`, in which case all elements will be deleted
+as well, and the `deleted` field in the JSON response will
+inform the number of elements deleted + 1 (the tenant).
+
+#### PUT /tenants/{id}
+
+To create a new tenant with `PUT` or override tenant name from existent one:
+
+```shell
+$ http PUT :8558/tenants/my-tenant --raw '{"name": "New Tenant Name"}'
+HTTP/1.1 200 OK
+content-type: application/json
+...
+
+{
+    "id": "my-tenant",
+    "name": "New Tenant Name",
+    "created_at": "2023-05-19T20:04:26.331117"
+}
+```
 
 ### Elements in tenants endpoints
 
@@ -191,8 +212,28 @@ content-type: application/json
 
 #### DELETE /{tenant}/{id}
 
+
+
 ```shell
 $ http DELETE :8558/collections/1235
 HTTP/1.1 204 No Content
+date: Sun, ...
+```
+
+#### PUT /{tenant}/{id}
+
+Create new element or override element values (except `created_at` that is preserved):
+
+```shell
+$ http PUT :8558/collections/1235 --raw '{"name": "New obj name", "another": "prop"}'
+HTTP/1.1 200 OK
+content-type: application/json
 ...
+
+{
+    "id": "1235",
+    "name": "New obj name",
+    "another": "prop",
+    "created_at": "2023-05-19T20:04:26.331117"
+}
 ```

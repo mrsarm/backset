@@ -11,6 +11,8 @@ pub mod tenants;
 
 pub mod routes;
 
+pub mod utils;
+
 // Has to match Cargo.toml > version
 // TODO add in CI script to check both versions match
 pub static BACKSET_VERSION: &str = "0.1.0";

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::{get, post, initialize};
+    use crate::{get, post, put, initialize};
     use actix_contrib_rest::page::Page;
     use actix_contrib_rest::result::{DeletedCount, ValidationErrorPayload};
     use actix_contrib_rest::test::assert_status;
@@ -197,6 +197,7 @@ mod tests {
         let resp = call_service(&app, req).await;
         let body = assert_status(resp, StatusCode::BAD_REQUEST).await;
         let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
+        assert_eq!(error.code, Some("already_exists".to_string()));
         assert_eq!(
             error.error,
             format!("tenant with name \"{same_name}\" already exists")
@@ -208,6 +209,7 @@ mod tests {
         let resp = call_service(&app, req).await;
         let body = assert_status(resp, StatusCode::BAD_REQUEST).await;
         let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
+        assert_eq!(error.code, Some("already_exists".to_string()));
         assert_eq!(
             error.error,
             format!("tenant with id \"{id}\" already exists")
@@ -226,6 +228,7 @@ mod tests {
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
         let error: ValidationErrorPayload = try_read_body_json(resp).await?;
+        assert_eq!(error.code, Some("validation_error".to_string()));
         assert_eq!(error.error, "Validation error");
         match error.field_errors {
             None => assert!(false, "field_errors shouldn't not be None"),
@@ -304,6 +307,7 @@ mod tests {
         let resp = call_service(&app, req).await;
         let body = assert_status(resp, StatusCode::BAD_REQUEST).await;
         let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
+        assert_eq!(error.code, None);
         assert_eq!(error.error, "cannot delete tenant with elements");
         Ok(())
     }
@@ -344,5 +348,76 @@ mod tests {
             .to_request();
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[actix_web::test]
+    async fn test_tenants_put_and_get() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let _id = random::<u32>();
+        let id = format!("put-tenant-{_id}");
+        let name = format!("Name {_id}");
+        let req = put(format!("/tenants/{id}").as_str(), json!({ "name": name }));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let tenant: Tenant = try_read_body_json(resp).await?;
+        assert_eq!(tenant.id, id);
+        let req = get(format!("/tenants/{}", tenant.id).as_str());
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let tenant: Tenant = try_read_body_json(resp).await?;
+        assert_eq!(tenant.id, id);
+        assert_eq!(tenant.name, name);
+        Ok(())
+    }
+
+    #[actix_web::test]
+    async fn test_tenants_post_and_put() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let _id = random::<u32>();
+        let id = format!("post-put-tenant-{_id}");
+        let name = format!("Name {_id}");
+        let name_edited = format!("Name {_id} edited");
+        let req = post("/tenants", json!({ "id": id, "name": name }));
+        let resp = call_service(&app, req).await;
+        let body = assert_status(resp, StatusCode::CREATED).await;
+        let tenant: Tenant = serde_json::from_slice(&body).unwrap();
+        let created_at = tenant.created_at;
+        let req = put(format!("/tenants/{id}").as_str(), json!({ "name": name_edited }));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let req = get(format!("/tenants/{id}").as_str());
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let tenant: Tenant = try_read_body_json(resp).await?;
+        assert_eq!(tenant.id, id);
+        // created_at still has the same value
+        assert_eq!(tenant.created_at, created_at);
+        // some field changed
+        assert_eq!(tenant.name, name_edited);
+        Ok(())
+    }
+
+    #[actix_web::test]
+    async fn test_tenants_put_name_already_taken() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let _id = random::<u32>();
+        let id = format!("post-put-tenant-{_id}");
+        let name = format!("Name {_id}");
+        let req = post("/tenants", json!({ "id": id, "name": name }));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::CREATED);
+        let req = put(format!("/tenants/{id}-another").as_str(), json!({ "name": name }));
+        let resp = call_service(&app, req).await;
+        let body = assert_status(resp, StatusCode::BAD_REQUEST).await;
+        let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
+        assert_eq!(error.code, Some("tenant_name_exists".to_string()));
+        assert_eq!(
+            error.error,
+            format!("name \"{name}\" already taken by tenant with id \"{id}\"")
+        );
+        Ok(())
     }
 }

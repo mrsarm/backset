@@ -208,6 +208,7 @@ mod tests {
         let resp = call_service(&app, req).await;
         let body = assert_status(resp, StatusCode::BAD_REQUEST).await;
         let error: ValidationErrorPayload = serde_json::from_slice(&body).unwrap();
+        assert_eq!(error.code, Some("already_exists".to_string()));
         assert_eq!(
             error.error,
             format!("element with id \"{id}\" already exists")

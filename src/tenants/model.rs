@@ -47,6 +47,12 @@ pub struct TenantPayload {
     pub name: String,
 }
 
+#[derive(Deserialize, Validate)]
+pub struct TenantPayloadEdition {
+    #[validate(length(min = 3, max = 80))]
+    pub name: String,
+}
+
 impl Tenant {
     pub async fn insert(tx: &mut Tx<'_>, tenant_form: TenantPayload) -> Result<Tenant> {
         let exists = Self::exists(&mut *tx, tenant_form.id.as_str()).await?;
@@ -74,6 +80,39 @@ impl Tenant {
             .await
             .map_err(AppError::DB)?;
         Ok(tenant)
+    }
+
+    pub async fn save(
+        tx: &mut Tx<'_>,
+        tid: &str,
+        tenant_form: TenantPayloadEdition
+    ) -> Result<Tenant> {
+        let name = tenant_form.name.as_str();
+        let res: Option<(String,)> = sqlx::query_as(
+            "SELECT id FROM tenants WHERE id <> $1 AND name = $2")
+            .bind(tid)
+            .bind(name)
+            .fetch_optional(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        if let Some((duplicated_id,)) = res {
+            return Err(AppError::Validation(
+                Some("tenant_name_exists"),
+                format!("name \"{name}\" already taken by tenant with id \"{duplicated_id}\"")
+            ));
+        }
+        let element = sqlx::query_as::<_, Tenant>(
+            "INSERT INTO tenants (id, name, created_at) \
+            VALUES ($1, $2, NOW()) \
+            ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name
+            RETURNING *",
+        )
+            .bind(tid)
+            .bind(name)
+            .fetch_one(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        Ok(element)
     }
 
     pub async fn exists(tx: &mut Tx<'_>, tid: &str) -> Result<bool> {

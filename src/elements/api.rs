@@ -73,7 +73,7 @@ async fn put(
 ) -> HttpResult {
     let mut tx = app.get_tx().await?;
 
-    let el = Element::update(
+    let el = Element::save(
         &mut tx,
         path.as_ref().0.as_str(),
         path.as_ref().1.as_str(),
