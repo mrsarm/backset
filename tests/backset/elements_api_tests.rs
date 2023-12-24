@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::{get, post, create_tenant, initialize, initialize_tenant};
+    use crate::{get, post, put, create_tenant, initialize, initialize_tenant};
     use actix_contrib_rest::page::Page;
     use actix_contrib_rest::result::ValidationErrorPayload;
     use actix_contrib_rest::test::assert_status;
@@ -237,6 +237,62 @@ mod tests {
         let req = get(&format!("/{tid}/{id}"));
         let resp = call_service(&app, req).await;
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+        Ok(())
+    }
+
+    #[actix_web::test]
+    async fn test_elements_put_and_get() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let tids: &(u16, u16, u16) = initialize_tenant(&state).await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let _id = random::<u32>();
+        let id = format!("put-{_id}");
+        let some_data = format!("El {_id}");
+        let req = put(format!("/{}/{}", tids.1, id).as_str(), json!({ "some": some_data }));
+        let resp = call_service(&app, req).await;
+        let body = assert_status(resp, StatusCode::OK).await;
+        let el: ElementPayload = serde_json::from_slice(&body).unwrap();
+        assert_eq!(el.id, Some(id.clone()));
+        assert_eq!(el.data.get("some"), Some(&json!(some_data)));
+        assert!(el.data.get("created_at").is_some());
+        let req = get(&format!("/{}/{}", tids.1, id));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let el: ElementPayload = try_read_body_json(resp).await?;
+        assert_eq!(el.id, Some(id.clone()));
+        assert_eq!(el.data.get("some"), Some(&json!(some_data)));
+        Ok(())
+    }
+
+    #[actix_web::test]
+    async fn test_elements_put_over_existing_element() -> Result<(), Box<dyn Error>> {
+        let state = initialize().await;
+        let tids: &(u16, u16, u16) = initialize_tenant(&state).await;
+        let app = init_service(App::new().configure(AppServer::config_app(state))).await;
+        let _id = random::<u32>();
+        let id = format!("post-put-{_id}");
+        let some_data = format!("El {_id}");
+        let req = post(format!("/{}", tids.1).as_str(), json!({ "some": some_data, "id": id }));
+        let resp = call_service(&app, req).await;
+        let body = assert_status(resp, StatusCode::CREATED).await;
+        let el: ElementPayload = serde_json::from_slice(&body).unwrap();
+        let created_at = el.data.get("created_at");
+        assert!(created_at.is_some());
+        let some_data_edited = format!("El {_id} edited");
+        let req = put(format!("/{}/{}", tids.1, id).as_str(), json!({ "some": some_data_edited }));
+        let resp = call_service(&app, req).await;
+        let body = assert_status(resp, StatusCode::OK).await;
+        let el: ElementPayload = serde_json::from_slice(&body).unwrap();
+        // created_at still has the same value
+        assert_eq!(el.data.get("created_at"), created_at);
+        // some field changed
+        assert_eq!(el.data.get("some"), Some(&json!(some_data_edited)));
+        let req = get(&format!("/{}/{}", tids.1, id));
+        let resp = call_service(&app, req).await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let el: ElementPayload = try_read_body_json(resp).await?;
+        assert_eq!(el.id, Some(id.clone()));
+        assert_eq!(el.data.get("some"), Some(&json!(some_data_edited)));
         Ok(())
     }
 }

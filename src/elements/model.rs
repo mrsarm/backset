@@ -42,13 +42,20 @@ pub struct ElementPayload {
     pub data: Json<Map<String, Value>>,
 }
 
-impl Element {
-    pub async fn insert(tx: &mut Tx<'_>, tid: &str, el_form: ElementPayload) -> Result<Element> {
-        Tenant::exists_or_fail(tx, tid).await?;
-        if el_form.data.as_ref().contains_key("created_at") {
+impl ElementPayload {
+    pub fn reject_created_at(&self) -> Result<()> {
+        if self.data.contains_key("created_at") {
             return Err(AppError::StaticValidation(
                 "cannot provide reserved attribute \"created_at\""));
         }
+        Ok(())
+    }
+}
+
+impl Element {
+    pub async fn insert(tx: &mut Tx<'_>, tid: &str, el_form: ElementPayload) -> Result<Element> {
+        el_form.reject_created_at()?;
+        Tenant::exists_or_fail(tx, tid).await?;
         let id = match el_form.id {
             None => random::<u64>().to_string(),
             Some(_id) => {
@@ -140,5 +147,30 @@ impl Element {
             .await
             .map_err(AppError::DB)?;
         Ok(elements)
+    }
+    pub async fn update(
+        tx: &mut Tx<'_>,
+        tid: &str,
+        id: &str,
+        el_form: ElementPayload
+    ) -> Result<Element> {
+        el_form.reject_created_at()?;
+        if el_form.id.map(|form_id| form_id.as_str() != id).unwrap_or(false) {
+            return Err(AppError::StaticValidation("id mismatch"));
+        }
+        Tenant::exists_or_fail(tx, tid).await?;
+        let element = sqlx::query_as::<_, Element>(
+            "INSERT INTO elements (tid, id, data, created_at) \
+            VALUES ($1, $2, $3, NOW()) \
+            ON CONFLICT (tid,id) DO UPDATE SET data = EXCLUDED.data
+            RETURNING *",
+        )
+            .bind(tid)
+            .bind(id)
+            .bind(el_form.data)
+            .fetch_one(&mut **tx)
+            .await
+            .map_err(AppError::DB)?;
+        Ok(element)
     }
 }

@@ -3,7 +3,7 @@ use actix_contrib_rest::page::Page;
 use actix_contrib_rest::query::QuerySearch;
 use actix_contrib_rest::result::HttpResult;
 use actix_web::web::{Data, Path};
-use actix_web::{delete, get, post, HttpResponse};
+use actix_web::{delete, get, post, put, HttpResponse};
 use actix_web_validator::{Json, Query};
 
 use crate::elements::model::{Element, ElementPayload};
@@ -63,6 +63,25 @@ async fn list(
     };
     app.commit_tx(tx).await?;
     Ok(HttpResponse::Ok().json(elements))
+}
+
+#[put("{tid}/{id}")]
+async fn put(
+    app: Data<AppState>,
+    path: Path<(String, String)>,
+    el_form: Json<ElementPayload>
+) -> HttpResult {
+    let mut tx = app.get_tx().await?;
+
+    let el = Element::update(
+        &mut tx,
+        path.as_ref().0.as_str(),
+        path.as_ref().1.as_str(),
+        el_form.0
+    ).await?;
+
+    app.commit_tx(tx).await?;
+    Ok(HttpResponse::Ok().json(el))
 }
 
 #[delete("{tid}/{id}")]

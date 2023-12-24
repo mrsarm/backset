@@ -98,3 +98,12 @@ pub fn post(path: &str, data: impl Serialize) -> Request {
         .set_json(data)
         .to_request()
 }
+
+pub fn put(path: &str, data: impl Serialize) -> Request {
+    TestRequest::put()
+        .uri(path)
+        .insert_header(Accept::json())
+        .insert_header(ContentType::json())
+        .set_json(data)
+        .to_request()
+}
