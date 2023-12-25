@@ -17,10 +17,10 @@ name = "backset"
 [dependencies]
 actix-web = "4.4"
 actix-web-validator = "5.0"
-actix-http = "3.4"
+actix-http = "3.5"
 actix-contrib-logger = "0.1"
 actix-contrib-rest = { version = "0.4", features = ["sqlx-postgres"] }
-awc = { version = "3.2", features = ["rustls"] }
+awc = { version = "3.3", features = ["rustls"] }
 anyhow = "1.0"
 async-once-cell = "0.5"
 clap = { version = "4.3", features = ["derive"] }
