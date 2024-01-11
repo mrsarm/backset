@@ -10,6 +10,7 @@ mod tests {
     use backset::app_server::AppServer;
     use backset::tenants::model::Tenant;
     use backset::PAGE_SIZE;
+    use pretty_assertions::assert_eq;
     use rand::random;
     use serde_json::json;
     use std::error::Error;

@@ -41,3 +41,6 @@ rand = "0.8"
 regex = "1.9"
 server-env-config = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]
+pretty_assertions = "1.4.0"

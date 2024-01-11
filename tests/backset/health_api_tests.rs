@@ -4,6 +4,7 @@ mod tests {
     use actix_web::http::StatusCode;
     use actix_web::test::{call_service, init_service};
     use actix_web::App;
+    use pretty_assertions::assert_eq;
     use backset::app_server::AppServer;
 
     #[actix_web::test]
