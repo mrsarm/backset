@@ -19,7 +19,8 @@ services:
       - IDLE_TIMEOUT_SEC
       - TEST_BEFORE_ACQUIRE
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "/usr/app/bin/backset", "health"]
       interval: 10s
@@ -33,17 +34,24 @@ services:
     container_name: pg-bss
     environment:
       - POSTGRES_PASSWORD=postgres
+      - PGUSER=postgres
     ports:
       - "5432:5432"
     volumes:
       - data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
     command: ["postgres", "-c", "log_statement=all"]  # Comment to disable SQL logs. all: all queries, ddl: DDL only, mod: DDL and modifying statements
 
   psql:
     image: postgres
     command: psql postgres -h postgres -U postgres -W
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     profiles:       # To avoid the container start with `docker compose up'
       - tools
 
@@ -53,7 +61,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres/bss_dev
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     profiles:
       - tools
 
