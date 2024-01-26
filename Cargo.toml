@@ -44,3 +44,7 @@ chrono = { version = "0.4", features = ["serde"] }
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
+
+[profile.release]
+# This is going to be the default soon if not provided
+strip = "debuginfo"
