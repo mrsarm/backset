@@ -16,7 +16,7 @@ jobs:
     - name: Create .env file
       run: cp .env.example .env
     - name: Install SQLx
-      run: cargo install sqlx-cli --no-default-features --features native-tls,postgres
+      run: RUSTFLAGS='-C strip=symbols' cargo install sqlx-cli --no-default-features --features native-tls,postgres
     - name: Run PostgreSQL
       run: docker compose up postgres -d
     - name: Wait DB
