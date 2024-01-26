@@ -14,7 +14,7 @@ for more info, but here are some shortcuts:
 #### Install SQLx CLI
 
 ```shell
-cargo install sqlx-cli --no-default-features --features native-tls,postgres
+RUSTFLAGS='-C strip=symbols' cargo install sqlx-cli --no-default-features --features native-tls,postgres
 ```
 
 #### Create DB

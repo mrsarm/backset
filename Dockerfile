@@ -2,7 +2,7 @@ FROM rust:1.71-alpine3.18 as build
 LABEL maintainer="Mariano Ruiz"
 
 RUN apk add --no-cache --purge openssl-dev musl-dev \
-    && cargo install sqlx-cli --target x86_64-unknown-linux-musl --no-default-features --features native-tls,postgres
+    && RUSTFLAGS='-C strip=symbols' cargo install sqlx-cli --target x86_64-unknown-linux-musl --no-default-features --features native-tls,postgres
 
 WORKDIR /usr/src/backset
 COPY . .
