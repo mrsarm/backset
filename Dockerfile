@@ -1,7 +1,7 @@
-FROM rust:1.71-alpine3.18 as build
+FROM rust:1.76-alpine3.19 as build
 LABEL maintainer="Mariano Ruiz"
 
-RUN apk add --no-cache --purge openssl-dev musl-dev \
+RUN apk add --no-cache --purge openssl-dev openssl-libs-static musl-dev libc-dev \
     && RUSTFLAGS='-C strip=symbols' cargo install sqlx-cli --target x86_64-unknown-linux-musl --no-default-features --features native-tls,postgres
 
 WORKDIR /usr/src/backset
