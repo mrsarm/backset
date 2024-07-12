@@ -33,7 +33,7 @@ pub struct Element {
 pub struct ElementPayload {
     #[validate(length(min = 1, max = 256))]
     #[validate(regex(
-        path = "ID_VALID",
+        path = *ID_VALID,
         code = "invalid_id",
         message = "id can only contains letters, numbers or the symbols \\_~@-.:+, \
         and must starts with a letter or number, or the symbols \\_~@"

@@ -36,9 +36,9 @@ fn validate_forbidden_list(tenant_id: &str) -> core::result::Result<(), Validati
 #[derive(Deserialize, Validate)]
 pub struct TenantPayload {
     #[validate(length(min = 3, max = 40))]
-    #[validate(custom = "validate_forbidden_list")]
+    #[validate(custom(function = "validate_forbidden_list"))]
     #[validate(regex(
-        path = "ID_VALID",
+        path = *ID_VALID,
         code = "invalid_id",
         message = "tenant id can only contains letters in lower case, numbers or the \"-\" symbol"
     ))]
