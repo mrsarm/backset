@@ -2,17 +2,15 @@ use actix_contrib_rest::db::Tx;
 use actix_contrib_rest::query::QuerySearch;
 use actix_contrib_rest::result::{AppError, Result};
 use chrono::NaiveDateTime;
-use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgQueryResult;
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::sync::LazyLock;
 use validator::{Validate, ValidationError};
 
-lazy_static! {
-    static ref ID_VALID: Regex = Regex::new(r"^[a-z][a-z0-9\-]+$").unwrap();
-}
+static ID_VALID: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^[a-z][a-z0-9\-]+$").unwrap());
 
 #[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
 pub struct Tenant {
