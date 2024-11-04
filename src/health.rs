@@ -1,16 +1,16 @@
 use actix_web::{get, HttpResponse, Responder};
 use serde_json::json;
+use std::sync::LazyLock;
 
 use crate::BACKSET_VERSION;
 
-lazy_static! {
-    static ref HEALTH_CHECK: String = json!({
+static HEALTH_CHECK: LazyLock<String> = LazyLock::new(|| {
+    json!({
         "status": "UP",
         "service": "backset",
         "version": BACKSET_VERSION,
-    })
-    .to_string();
-}
+    }).to_string()
+});
 
 #[get("")]
 pub async fn health_check_handler() -> impl Responder {

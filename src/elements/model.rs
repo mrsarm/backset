@@ -2,22 +2,22 @@ use actix_contrib_rest::db::Tx;
 use actix_contrib_rest::query::QuerySearch;
 use actix_contrib_rest::result::{AppError, Result};
 use chrono::NaiveDateTime;
-use lazy_static::lazy_static;
 use rand::random;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use sqlx::postgres::PgQueryResult;
 use sqlx::types::Json;
+use std::sync::LazyLock;
 use validator::Validate;
 
 use crate::tenants::model::Tenant;
 use crate::utils::reject_created_at;
 
-lazy_static! {
-    // Base64 URL characters (except =) and some others like \~@-.:+
-    static ref ID_VALID: Regex = Regex::new(r"^(?i)[a-z0-9_~@\\/][a-z0-9_\\~@\-\.\:+]*$").unwrap();
-}
+// Base64 URL characters (except =) and some others like \~@-.:+
+static ID_VALID: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^(?i)[a-z0-9_~@\\/][a-z0-9_\\~@\-\.\:+]*$").unwrap()
+});
 
 #[derive(Debug, Deserialize, sqlx::FromRow, Serialize, Clone)]
 pub struct Element {

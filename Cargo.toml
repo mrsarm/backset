@@ -15,11 +15,11 @@ path = "src/main.rs"
 name = "backset"
 
 [dependencies]
-actix-web = "4.7"
+actix-web = "4.9"
 actix-web-validator = "6.0"
-actix-http = "3.7"
+actix-http = "3.9"
 actix-contrib-logger = "0.1"
-actix-contrib-rest = { version = "0.5", features = ["sqlx-postgres"] }
+actix-contrib-rest = { version = "0.6", features = ["sqlx-postgres"] }
 awc = { version = "3.5", features = ["rustls"] }
 anyhow = "1.0"
 async-once-cell = "0.5"
@@ -27,18 +27,17 @@ clap = { version = "4.5", features = ["derive"] }
 dotenv = "0.15"
 env_logger = "0.11"
 futures-core = "0.3"
-lazy_static = "1.4"
 log = "0.4"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_valid = "0.21"
-sqlx = { version = "0.7", features = ["runtime-async-std", "tls-native-tls", "postgres", "macros", "chrono"] }
+sqlx = { version = "0.8", features = ["runtime-async-std", "tls-native-tls", "postgres", "macros", "chrono"] }
 thiserror = "1.0"
 validator = { version = "0.18", features = ["derive"] }
 strum = "0.26"
 strum_macros = "0.26"
 rand = "0.8"
-regex = "1.10"
+regex = "1.11"
 server-env-config = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 

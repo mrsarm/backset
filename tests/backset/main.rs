@@ -6,7 +6,6 @@ use actix_web::web::Data;
 use async_once_cell::OnceCell;
 use backset::tenants::model::{Tenant, TenantPayload};
 use backset::BACKSET_PORT;
-use lazy_static::lazy_static;
 use log::{error, LevelFilter};
 use rand::random;
 use serde::Serialize;
@@ -14,8 +13,7 @@ use server_env_config::env::Environment;
 use server_env_config::Config;
 use sqlx::Connection;
 use std::process::exit;
-use std::sync::Arc;
-use std::sync::Once;
+use std::sync::{Arc, LazyLock, Once};
 
 mod health_api_tests;
 mod elements_api_tests;
@@ -44,9 +42,9 @@ pub async fn initialize() -> Data<AppState> {
     Data::new(data)
 }
 
-lazy_static! {
-    static ref TENANT_ID_ARC: Arc<OnceCell<(u16, u16, u16)>> = Arc::new(OnceCell::new());
-}
+static TENANT_ID_ARC: LazyLock<Arc<OnceCell<(u16, u16, u16)>>> = LazyLock::new(|| {
+    Arc::new(OnceCell::new())
+});
 
 /// Create a few tenants
 pub async fn initialize_tenant<'a>(state: &Data<AppState>) -> &'a (u16, u16, u16) {
