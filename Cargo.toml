@@ -15,9 +15,9 @@ path = "src/main.rs"
 name = "backset"
 
 [dependencies]
-actix-web = "4.7"
+actix-web = "4.9"
 actix-web-validator = "6.0"
-actix-http = "3.7"
+actix-http = "3.9"
 actix-contrib-logger = "0.1"
 actix-contrib-rest = { version = "0.5", features = ["sqlx-postgres"] }
 awc = { version = "3.5", features = ["rustls"] }
