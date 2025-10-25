@@ -34,10 +34,10 @@ serde_valid = "0.21"
 sqlx = { version = "0.8", features = ["runtime-async-std", "tls-native-tls", "postgres", "macros", "chrono"] }
 thiserror = "1.0"
 validator = { version = "0.18", features = ["derive"] }
-strum = "0.26"
-strum_macros = "0.26"
-rand = "0.8"
-regex = "1.11"
+strum = "0.27"
+strum_macros = "0.27"
+rand = "0.9"
+regex = "1.12"
 server-env-config = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 
