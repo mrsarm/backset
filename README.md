@@ -52,7 +52,7 @@ cargo run -- run
 # `cargo test' to run the tests
 
 # Check is alive with
-curl localhost:8558/
+curl -i localhost:8558/health
 
 # This command run backset in "command" mode, listing all tenants within the terminal
 cargo run -- list tenants
@@ -71,7 +71,7 @@ List of endpoints with usage samples: [API](docs/api.md).
 
 ### 🐳 Docker
 
-Dockerfile and compose files are provided, check-out the [Docker](docs/docker.md) page.
+Dockerfile and compose files are provided, check out the [Docker](docs/docker.md) page.
 
 ### TO-DOs
 
