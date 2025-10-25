@@ -15,12 +15,12 @@ path = "src/main.rs"
 name = "backset"
 
 [dependencies]
-actix-web = "4.9"
+actix-web = "4.11"
 actix-web-validator = "6.0"
-actix-http = "3.9"
+actix-http = "3.11"
 actix-contrib-logger = "0.1"
 actix-contrib-rest = { version = "0.6", features = ["sqlx-postgres"] }
-awc = { version = "3.5", features = ["rustls"] }
+awc = { version = "3.8", features = ["rustls"] }
 anyhow = "1.0"
 async-once-cell = "0.5"
 clap = { version = "4.5", features = ["derive"] }
