@@ -1,7 +1,7 @@
 [package]
 name = "backset"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 description = " Backset REST Service stores elements, sets, and relationships between them."
 readme = "README.md"
 homepage = "https://github.com/mrsarm/backset"
