@@ -1,7 +1,7 @@
 [package]
 name = "backset"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 description = " Backset REST Service stores elements, sets, and relationships between them."
 readme = "README.md"
 homepage = "https://github.com/mrsarm/backset"
@@ -15,12 +15,12 @@ path = "src/main.rs"
 name = "backset"
 
 [dependencies]
-actix-web = "4.9"
-actix-web-validator = "6.0"
-actix-http = "3.9"
+actix-web = "4.11"
+actix-web-validator = "7.0"
+actix-http = "3.11"
 actix-contrib-logger = "0.1"
-actix-contrib-rest = { version = "0.6", features = ["sqlx-postgres"] }
-awc = { version = "3.5", features = ["rustls"] }
+actix-contrib-rest = { version = "0.7", features = ["sqlx-postgres"] }
+awc = { version = "3.8", features = ["rustls"] }
 anyhow = "1.0"
 async-once-cell = "0.5"
 clap = { version = "4.5", features = ["derive"] }
@@ -30,14 +30,14 @@ futures-core = "0.3"
 log = "0.4"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-serde_valid = "0.21"
+serde_valid = "2.0"
 sqlx = { version = "0.8", features = ["runtime-async-std", "tls-native-tls", "postgres", "macros", "chrono"] }
-thiserror = "1.0"
-validator = { version = "0.18", features = ["derive"] }
-strum = "0.26"
-strum_macros = "0.26"
-rand = "0.8"
-regex = "1.11"
+thiserror = "2.0"
+validator = { version = "0.20", features = ["derive"] }
+strum = "0.27"
+strum_macros = "0.27"
+rand = "0.9"
+regex = "1.12"
 server-env-config = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 
